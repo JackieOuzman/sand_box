@@ -21,6 +21,10 @@ shinyServer(function(input, output) {
   rainfall_summary <-reactive({
     cal_water_avail(test1())
   })  
+  
+  deciles_test <-reactive({
+    decile(rainfall_summary())
+  }) 
     
   
 
@@ -38,6 +42,9 @@ shinyServer(function(input, output) {
     })
     output$test <- renderTable({
       rainfall_summary()
+    }) 
+    output$deciles_table <- renderTable({
+      deciles_test()
     }) 
     output$site <- renderText(input$stationID)
     

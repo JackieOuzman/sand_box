@@ -91,7 +91,8 @@ ui <- fluidPage(
       tableOutput("table1"), #site
       tableOutput("table2"), #list of treatmnets
       tableOutput("table3"),  #ripping depth
-      tableOutput("test")
+      tableOutput("test"),
+      tableOutput("deciles_table")
       
       
       )
