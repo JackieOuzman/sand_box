@@ -25,6 +25,9 @@ shinyServer(function(input, output) {
   deciles_test <-reactive({
     decile(rainfall_summary())
   }) 
+  dec_5_yld_pot <-reactive({
+    decile5_yld_pot(rainfall_summary())
+  }) 
     
   
 
@@ -45,6 +48,9 @@ shinyServer(function(input, output) {
     }) 
     output$deciles_table <- renderTable({
       deciles_test()
+    }) 
+    output$xxx <- renderTable({
+      dec_5_yld_pot()
     }) 
     output$site <- renderText(input$stationID)
     

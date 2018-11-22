@@ -134,3 +134,33 @@ decile <- function(water_aval) {
   return(Analogue_yrs)
 }
 #test_decile <- decile(water_aval)
+
+###REPORT JUST DECILE 5 av with sd
+#takes the water avial and cals what the average and SD yield pot is 
+
+decile5_yld_pot <- function(water_aval) {
+  yield_pot1 <- water_aval %>%  
+    mutate(test_name = percent_rank(Rain_GS_summer))
+  yield_pot1$test_name <- round(yield_pot1$test_name,2)
+  
+  #Assign label to df for decile
+  yield_pot1 <- yield_pot1 %>% 
+    mutate(Decile = ifelse(test_name < 0.1, "Decile1",
+                     ifelse(test_name >= 0.1 & test_name <= 0.2, "Decile2",
+                     ifelse(test_name >= 0.2 & test_name <= 0.3, "Decile3",
+                     ifelse(test_name >= 0.3 & test_name <= 0.4, "Decile4",                         
+                      ifelse(test_name >= 0.4 & test_name <= 0.5, "Decile5",                         
+                      ifelse(test_name >= 0.5 & test_name <= 0.6, "Decile6",                         
+                      ifelse(test_name >= 0.6 & test_name <= 0.7, "Decile7",                        
+                      ifelse(test_name >= 0.7 & test_name <= 0.8, "Decile8",      
+                      ifelse(test_name >= 0.8 & test_name <= 0.9, "Decile9","Decile10"))))))))))      
+  
+  
+  decile_av <- yield_pot1 %>% 
+    group_by(Decile) %>%
+    summarise(av_yld_pot= round(mean(FS_yld_pot_wheat),2),
+              stdev_yld_pot = round(sd(FS_yld_pot_wheat),2))
+  decile_5 <- subset(decile_av, Decile == "Decile5")
+  
+  return(decile_5)
+}
