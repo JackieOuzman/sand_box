@@ -15,12 +15,13 @@ shinyServer(function(input, output) {
     })
   
   test1 <- reactive({
-    getSiloMet_jax(input$stationID) #note the lack of ""
+    getSiloMet_jax(input$stationID) #this is the first function
   })
   
   rainfall_summary <-reactive({
-    cal_water_avail(input$test1)
-  })   
+    cal_water_avail(test1())
+  })  
+    
   
 
 
@@ -40,6 +41,8 @@ shinyServer(function(input, output) {
     }) 
     output$site <- renderText(input$stationID)
     
+    #ooh this need to be much better - Regex solution?
+    #or create data frame and then split?
     output$table_crop <- renderText({
       list_of_crops_z1 <- ifelse(input$crop_seq_zone1 == 'Yr1_wh',"wheat",
                                  ifelse(input$crop_seq_zone1 == 'Yr2_wh', "wheat",

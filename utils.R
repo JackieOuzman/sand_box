@@ -43,8 +43,8 @@ library(lubridate)
 #input is a met df with daily rainfall data and output is ....
 
 cal_water_avail <- function(met_file) {
-  
   rainfall_1 <- select(met_file, date, daily_rain, station)
+  #rainfall_1 <- select(test_met, date, daily_rain, station)
   #Create new clm month and year
   rainfall_1$month <- as.Date(rainfall_1$date, "%d/%m/%Y")
   rainfall_1$year <- as.Date(rainfall_1$date, "%d/%m/%Y")
@@ -79,11 +79,10 @@ cal_water_avail <- function(met_file) {
   
   #use aggreate function to sum the summer_rain0.25 clm by year making a new df
   water_aval <- aggregate(Rain_GS_summer~ year, sum_yr_rain_season, FUN= sum)
+  
+  water_aval <- mutate(water_aval,FS_yld_pot_wheat = (((Rain_GS_summer - 60)*22)*1.12)/1000) 
+  
   glimpse(water_aval)
   
   return(water_aval)
 }
-
-#check <- cal_water_avail(test_met)
-
-
