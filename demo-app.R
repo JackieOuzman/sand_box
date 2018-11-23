@@ -59,8 +59,11 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
-  test <- reactive({
+  test1 <- reactive({
     function_df_1(input$treatment, input$crop_seq_zone1)
+  })  
+  test <- reactive({
+    fix_crop_name(test1())
   })  
   
   output$crop_types <- renderText(input$treatment_2)
