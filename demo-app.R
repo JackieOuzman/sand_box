@@ -16,7 +16,7 @@ source('utils_demo.R')
 ui <- fluidPage(
    
    # Application title
-   titlePanel("Old Faithful Geyser Data"),
+   titlePanel("Happy Happy Demo App"),
    
    # Sidebar with a slider input for number of bins 
    sidebarLayout(
@@ -35,6 +35,7 @@ ui <- fluidPage(
                          "Year9"= c("Yr9_wh","Yr9_ba","Yr9_can","Yr9_leg","Yr9_pas"),
                          "Year101"= c("Yr10_wh","Yr10_ba","Yr10_can","Yr10_leg","Yr10_pas")
                        ),
+                       selected = c("Yr1_wh", "Yr2_wh", "Yr3_wh" ,"Yr4_wh" ,"Yr5_wh", "Yr6_wh", "Yr7_wh", "Yr8_wh" ,"Yr9_wh", "Yr10_wh"),
                        options = list(maxItems = 10),
                        multiple = TRUE
         ),
@@ -42,9 +43,31 @@ ui <- fluidPage(
          selectInput("treatment",
                      label = "Treatment",
                      choices = list("wetting agent", "ripping")),
-        selectInput("treatment_2",
-                    label = "Treatment2",
-                    choices = list("wetting agent2", "ripping2"))
+        
+        numericInput("price_wh",
+                    label = "Farm gate price wheat ($/t)",
+                    value = 290,
+                    min = 0,
+                    max= 400,
+                    step = 10),
+        numericInput("price_ba",
+                     label = "Farm gate price barley ($/t)",
+                     value = 290,
+                     min = 0,
+                     max= 400,
+                     step = 10),
+        numericInput("price_can",
+                     label = "Farm gate price canola ($/t)",
+                     value = 290,
+                     min = 0,
+                     max= 400,
+                     step = 10),
+        numericInput("price_leg",
+                     label = "Farm gate price legume ($/t)",
+                     value = 290,
+                     min = 0,
+                     max= 400,
+                     step = 10)
         ),
         
                 
@@ -58,18 +81,23 @@ ui <- fluidPage(
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-  
+  #group all the reactive variable here
   test1 <- reactive({
     function_df_1(input$treatment, input$crop_seq_zone1)
   })  
   test <- reactive({
     fix_crop_name(test1())
   })  
+  prices <-reactive({
+    function_add_prices(df, price_wh,price_bar,price_can, price_leg)
+  })
+  
+  #output renders here don't forget if calling a reactive variable it need()after the name
   
   output$crop_types <- renderText(input$treatment_2)
   
   output$df <- renderTable({
-    test()
+    prices()
   })
   
 }

@@ -1,34 +1,49 @@
 ##this just defines my function...
-function_df_2 <- function(treatment,treatment_2){
-  data.frame(treatment = treatment,
-             year = 1:length(treatment_2),
-             crop_Type = treatment_2,
-             value = rnorm(length(treatment_2), 50))
-}
+
 
 function_df_1 <- function(treatment,crop_seq_zone1){
   data.frame(treatment = treatment,
              year = 1:length(crop_seq_zone1),
-             crop_Type = crop_seq_zone1,
-             value = rnorm(length(crop_seq_zone1), 50))
+             crop = crop_seq_zone1,
+             value = rnorm(length(crop_seq_zone1), 50,
+             price = price)) ##not sure if this is correct
 }
 #this function changes the df crop names to something more useful
 fix_crop_name <- function(df){
-  df$crop_Type <- sapply(df$crop_Type, 
+  df$crop <- sapply(df$crop, 
                          sub, 
                          pattern = "Yr[[:digit:]]_", 
                          replacement = "")
   #sapply didnt get year 10
-  df$crop_Type <- sapply(df$crop_Type, 
+  df$crop <- sapply(df$crop, 
                          sub, 
                          pattern = "Yr10_", 
                          replacement = "")
   #change name to long one
-  df$crop_Type <- ifelse(df$crop_Type == 'wh',"wheat",
-                  ifelse(df$crop_Type == 'ba', "barley",
-                  ifelse(df$crop_Type == 'can', "canola",
-                  ifelse(df$crop_Type == 'leg', "legume",
-                  ifelse(df$crop_Type == 'pas', "pasture","oops")))))
+  df$crop <- ifelse(df$crop == 'wh',"wheat",
+                  ifelse(df$crop == 'ba', "barley",
+                  ifelse(df$crop == 'can', "canola",
+                  ifelse(df$crop == 'leg', "legume",
+                  ifelse(df$crop == 'pas', "pasture","oops")))))
   
   return(df) 
 }
+
+
+#this function makes a df of the prices from the user defined prices
+#input requiers input$price_wh,input$price_bar,input$price_can,input$priceleg)
+#Assign the prices df to a reactive function
+#as it will be used to join to base df
+
+crop_prices_function <- function(price_wh,price_bar,price_can,price_leg){
+  data.frame(crop = c("wheat", "barley", "canola", "legume"),
+             price = c(price_wh, price_bar, price_can, price_leg))
+}
+
+#Assign the prices df 
+#as it will be used to join to base df
+function_add_prices <- function(df, price_wh, price_bar, price_can, price_leg){
+  price <- crop_prices_df(price_wh, price_bar, price_can, price_leg)
+  df2 <- left_join(df, price, by = 'crop')
+  return(df)
+  }

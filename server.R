@@ -28,9 +28,19 @@ shinyServer(function(input, output) {
   dec_5_yld_pot <-reactive({
     decile5_yld_pot(rainfall_summary())
   }) 
-    
   
-
+  list_of_crops_z1df <-reactive({  
+  grep_pass1 <- sub('Yr[[:digit:]]_', '', input$crop_seq_zone1)
+  print(grep_pass1)
+  grep_pass2 <- sub('Yr10_', '', grep_pass1)
+  print(grep_pass2)
+  list_of_crops_z1 <- ifelse(grep_pass2 == 'wh',"wheat",
+                      ifelse(grep_pass2 == 'ba', "barley",
+                      ifelse(grep_pass2 == 'can', "canola",
+                      ifelse(grep_pass2 == 'leg', "legume",
+                      ifelse(grep_pass2 == 'pas', "pasture","oops")))))
+  list_crops_z1df<- list_of_crops_z1
+  })
 
 ####Display outputs####  
 ###Some reactive df  
@@ -54,45 +64,11 @@ shinyServer(function(input, output) {
     }) 
     output$site <- renderText(input$stationID)
     
-    #ooh this need to be much better - Regex solution?
-    #or create data frame and then split?
-    output$table_crop <- renderText({
-      list_of_crops_z1 <- ifelse(input$crop_seq_zone1 == 'Yr1_wh',"wheat",
-                                 ifelse(input$crop_seq_zone1 == 'Yr2_wh', "wheat",
-                                 ifelse(input$crop_seq_zone1 == 'Yr3_wh', "wheat",
-                                 ifelse(input$crop_seq_zone1 == 'Yr4_wh', "wheat",
-                                 ifelse(input$crop_seq_zone1 == 'Yr5_wh', "wheat",
-                                 ifelse(input$crop_seq_zone1 == 'Yr6_wh', "wheat",
-                                 ifelse(input$crop_seq_zone1 == 'Yr7_wh', "wheat",
-                                 ifelse(input$crop_seq_zone1 == 'Yr8_wh', "wheat",
-                                 ifelse(input$crop_seq_zone1 == 'Yr9_wh', "wheat",
-                                 ifelse(input$crop_seq_zone1 == 'Yr10_wh', "wheat",
-                                  ifelse(input$crop_seq_zone1 == 'Yr1_ba', "barley",
-                                  ifelse(input$crop_seq_zone1 == 'Yr2_ba', "barley",
-                                  ifelse(input$crop_seq_zone1 == 'Yr3_ba', "barley",
-                                  ifelse(input$crop_seq_zone1 == 'Yr4_ba', "barley",
-                                  ifelse(input$crop_seq_zone1 == 'Yr5_ba', "barley",
-                                  ifelse(input$crop_seq_zone1 == 'Yr6_ba', "barley",
-                                  ifelse(input$crop_seq_zone1 == 'Yr7_ba', "barley",
-                                  ifelse(input$crop_seq_zone1 == 'Yr8_ba', "barley",
-                                  ifelse(input$crop_seq_zone1 == 'Yr9_ba', "barley",
-                                  ifelse(input$crop_seq_zone1 == 'Yr10_ba', "barley",
-                                  ifelse(input$crop_seq_zone1 == 'Yr1_can', "canola",
-                                  ifelse(input$crop_seq_zone1 == 'Yr2_can', "canola",
-                                   ifelse(input$crop_seq_zone1 == 'Yr3_can', "canola",
-                                   ifelse(input$crop_seq_zone1 == 'Yr4_can', "canola",
-                                   ifelse(input$crop_seq_zone1 == 'Yr5_can', "canola",
-                                   ifelse(input$crop_seq_zone1 == 'Yr6_can', "canola",
-                                   ifelse(input$crop_seq_zone1 == 'Yr7_can', "canola",
-                                   ifelse(input$crop_seq_zone1 == 'Yr8_can', "canola",
-                                   ifelse(input$crop_seq_zone1 == 'Yr9_can', "canola",     
-                                   ifelse(input$crop_seq_zone1 == 'Yr10_can', "canola",
-                                  ifelse(input$crop_seq_zone1 == 'Yr1_leg', "legume",
-                                  ifelse(input$crop_seq_zone1 == 'Yr2_leg', "legume",
-                                  ifelse(input$crop_seq_zone1 == 'Yr1_pas', "pasture",
-                                  ifelse(input$crop_seq_zone1 == 'Yr2_pas', "pasture","oops"))))))))))
-                                   ))))))))))))))))))))))))
-        paste(list_of_crops_z1)
+    output$what_is <- renderText(data.frame(input$crop_seq_zone1))
+      
+      
+      output$table_crop <- renderText({
+        paste(list_of_crops_z1df())
       
     })
 
