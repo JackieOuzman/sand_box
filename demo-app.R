@@ -92,11 +92,35 @@ ui <- fluidPage(
                      value = 3,
                      min = 0,
                      max= 8,
+                     step = 0.5),
+        numericInput("aaa",
+                     label = "Potential wheat (t/ha)",
+                     value = 4,
+                     min = 0,
+                     max= 8,
+                     step = 0.5),
+        numericInput("bbb",
+                     label = "Potential barley (t/ha)",
+                     value = 4,
+                     min = 0,
+                     max= 8,
+                     step = 0.5),
+        numericInput("ccc",
+                     label = "Potential canola (t/ha)",
+                     value = 4,
+                     min = 0,
+                     max= 8,
+                     step = 0.5),
+        numericInput("ddd",
+                     label = "Potential legume (t/ha)",
+                     value = 4,
+                     min = 0,
+                     max= 8,
                      step = 0.5)
         ),
         
                 
-      # Show a plot of the generated distribution
+      # Show a df tables I am making...
       mainPanel(
         tableOutput("df"), 
         tableOutput("df_with_price")
@@ -134,9 +158,20 @@ server <- function(input, output) {
     function_flip_df_current(making_df_current())
   })
   join_current_df <- reactive({
-    function_join_current_df(df(),flip_df_current())
+    function_join_current_df(join_price_df(),flip_df_current())
   })
   
+  #making a data frame of the potential yld two step process
+  #make a data frame and then flip it using gather
+  making_df_potential <- reactive({
+    function_making_df_current(input$aaa, input$bbb, input$ccc, input$ddd)
+  })
+  flip_df_potential <- reactive({
+    function_flip_df_potential(making_df_potential())
+  })
+  join_potential_df <- reactive({
+    function_join_potential_df(join_current_df(),flip_df_potential())
+  })
   
   #output renders here don't forget if calling a reactive variable it need()after the name
   
@@ -145,7 +180,7 @@ server <- function(input, output) {
     df()
   })
   output$df_with_price <- renderTable({
-    join_current_df()
+    join_potential_df()
   })
   
 }
