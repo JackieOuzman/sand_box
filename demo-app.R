@@ -68,7 +68,31 @@ ui <- fluidPage(
                      value = 290,
                      min = 0,
                      max= 400,
-                     step = 10)
+                     step = 10),
+        numericInput("aa",
+                     label = "Current wheat (t/ha)",
+                     value = 3,
+                     min = 0,
+                     max= 8,
+                     step = 0.5),
+        numericInput("bb",
+                     label = "Current barley (t/ha)",
+                     value = 3,
+                     min = 0,
+                     max= 8,
+                     step = 0.5),
+        numericInput("cc",
+                     label = "Current canola (t/ha)",
+                     value = 3,
+                     min = 0,
+                     max= 8,
+                     step = 0.5),
+        numericInput("dd",
+                     label = "Current legume (t/ha)",
+                     value = 3,
+                     min = 0,
+                     max= 8,
+                     step = 0.5)
         ),
         
                 
@@ -101,6 +125,18 @@ server <- function(input, output) {
     function_join_price_df(df(),flip_df_price())
   })
   
+  #making a data frame of the current yld two step process
+  #make a data frame and then flip it using gather
+  making_df_current <- reactive({
+    function_making_df_current(input$aa, input$bb, input$cc, input$dd)
+  })
+  flip_df_current <- reactive({
+    function_flip_df_current(making_df_current())
+  })
+  join_current_df <- reactive({
+    function_join_current_df(df(),flip_df_current())
+  })
+  
   
   #output renders here don't forget if calling a reactive variable it need()after the name
   
@@ -109,7 +145,7 @@ server <- function(input, output) {
     df()
   })
   output$df_with_price <- renderTable({
-    join_price_df()
+    join_current_df()
   })
   
 }
