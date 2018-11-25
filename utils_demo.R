@@ -34,29 +34,22 @@ fix_crop_name <- function(df){
 #Assign the prices df to a reactive function
 #as it will be used to join to base df
 
+#making a data frame of the prices two step process
+#make a data frame and then flip it using gather
 
-
-#Assign the prices df 
-#as it will be used to join to base df
-#need to do this is 2 step - prob can be better
-#function_crop_prices_df <- function(price_wh, price_bar, price_can, price_leg){
-#  data.frame(crop = c("wheat", "barley", "canola", "legume"),
-#             price = c(price_wh, price_bar, price_can, price_leg))
-#}
-
-function_crop_prices_df <- function(price_wh, price_bar){
-  data.frame(wheat = price_wh, 
-             barley = price_bar,
-             value = 1:2)
+#step 1
+function_making_df_price <- function(a,b,c,d){
+  data.frame( wheat = a,
+              barley = b,
+              canola = c,
+              legume = d) 
+}
+#step 2
+function_flip_df_price <- function(df){
+  gather(df, crop, price)
 }
 
-#crop_price_table <- crop_prices_df(price_wh,price_bar,price_can,price_leg)
-
-#Assign the prices df to a reactive function
-#as it will be used to join to base df
-
-function_add_prices <- function(crop_price_table, test){
-  df1 <- left_join(test, crop_price_table, by = 'crop')
-  return(df1)
+#now join it to the df
+function_join_price_df <- function(df, flip_df_price){
+  left_join(df, flip_df_price, by = 'crop')
 }
-

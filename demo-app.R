@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(tidyr)
 
 source('utils_demo.R')
 
@@ -44,25 +45,25 @@ ui <- fluidPage(
                      label = "Treatment",
                      choices = list("wetting agent", "ripping")),
         
-        numericInput("price_wh",
+        numericInput("a",
                     label = "Farm gate price wheat ($/t)",
                     value = 290,
                     min = 0,
                     max= 400,
                     step = 10),
-        numericInput("price_ba",
+        numericInput("b",
                      label = "Farm gate price barley ($/t)",
                      value = 290,
                      min = 0,
                      max= 400,
                      step = 10),
-        numericInput("price_can",
+        numericInput("c",
                      label = "Farm gate price canola ($/t)",
                      value = 290,
                      min = 0,
                      max= 400,
                      step = 10),
-        numericInput("price_leg",
+        numericInput("d",
                      label = "Farm gate price legume ($/t)",
                      value = 290,
                      min = 0,
@@ -73,10 +74,8 @@ ui <- fluidPage(
                 
       # Show a plot of the generated distribution
       mainPanel(
-         textOutput("crop_types"),
-         tableOutput("crop_price"),
-         tableOutput("df"),
-         tableOutput("df1")
+        tableOutput("df"), 
+        tableOutput("df_with_price")
       )
    )
 )
@@ -90,35 +89,28 @@ server <- function(input, output) {
   df <- reactive({
     fix_crop_name(start_df())
   })  
-  #make the input prices reactive so I can use them in formular
-  price_wheat <- reactive({
-    input$price_wh
+  #making a data frame of the prices two step process
+  #make a data frame and then flip it using gather
+  making_df_price <- reactive({
+    function_making_df_price(input$a, input$b, input$c, input$d)
   })
-  price_barley <- reactive({
-    input$price_bar
+  flip_df_price <- reactive({
+    function_flip_df_price(making_df_price())
+  })
+  join_price_df <- reactive({
+    function_join_price_df(df(),flip_df_price())
   })
   
-  crop_price_table <-reactive({
-    function_crop_prices_df(input$price_wh, input$price_bar)
-  })
-  
-  #df1 <- reactive({
-  #  function_add_prices(crop_price_table(), test())
-  #})
   
   #output renders here don't forget if calling a reactive variable it need()after the name
   
-  output$crop_types <- renderText(input$price_wh)
   
-  output$crop_price <- renderTable({
-    crop_price_table()
-  })
   output$df <- renderTable({
     df()
   })
-  #output$df1 <- renderTable({
-  #  df1()
-  #})
+  output$df_with_price <- renderTable({
+    join_price_df()
+  })
   
 }
 
