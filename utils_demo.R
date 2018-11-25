@@ -1,11 +1,11 @@
 ##this just defines my function...
 
 
-function_df_1 <- function(treatment,crop_seq_zone1){
+function_df_1 <- function(treatment,crop_seq_zone1, discount){
   data.frame(treatment = treatment,
              year = 1:length(crop_seq_zone1),
              crop = crop_seq_zone1,
-             value = rnorm(length(crop_seq_zone1), 50)) 
+             discount = discount) 
 }
 #this function changes the df crop names to something more useful
 fix_crop_name <- function(df){

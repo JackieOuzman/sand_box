@@ -116,7 +116,13 @@ ui <- fluidPage(
                      value = 4,
                      min = 0,
                      max= 8,
-                     step = 0.5)
+                     step = 0.5),
+        numericInput("discount",
+                     label = "Discount factor",
+                     value = 0.6,
+                     min = 0,
+                     max= 1,
+                     step = 0.02)
         ),
         
                 
@@ -132,7 +138,7 @@ ui <- fluidPage(
 server <- function(input, output) {
   #group all the reactive variable here
   start_df <- reactive({
-    function_df_1(input$treatment, input$crop_seq_zone1)
+    function_df_1(input$treatment, input$crop_seq_zone1, input$discount)
   })  
   df <- reactive({
     fix_crop_name(start_df())
