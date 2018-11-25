@@ -5,8 +5,7 @@ function_df_1 <- function(treatment,crop_seq_zone1){
   data.frame(treatment = treatment,
              year = 1:length(crop_seq_zone1),
              crop = crop_seq_zone1,
-             value = rnorm(length(crop_seq_zone1), 50,
-             price = price)) ##not sure if this is correct
+             value = rnorm(length(crop_seq_zone1), 50)) 
 }
 #this function changes the df crop names to something more useful
 fix_crop_name <- function(df){
@@ -35,15 +34,29 @@ fix_crop_name <- function(df){
 #Assign the prices df to a reactive function
 #as it will be used to join to base df
 
-crop_prices_function <- function(price_wh,price_bar,price_can,price_leg){
-  data.frame(crop = c("wheat", "barley", "canola", "legume"),
-             price = c(price_wh, price_bar, price_can, price_leg))
-}
+
 
 #Assign the prices df 
 #as it will be used to join to base df
-function_add_prices <- function(df, price_wh, price_bar, price_can, price_leg){
-  price <- crop_prices_df(price_wh, price_bar, price_can, price_leg)
-  df2 <- left_join(df, price, by = 'crop')
-  return(df)
-  }
+#need to do this is 2 step - prob can be better
+#function_crop_prices_df <- function(price_wh, price_bar, price_can, price_leg){
+#  data.frame(crop = c("wheat", "barley", "canola", "legume"),
+#             price = c(price_wh, price_bar, price_can, price_leg))
+#}
+
+function_crop_prices_df <- function(price_wh, price_bar){
+  data.frame(wheat = price_wh, 
+             barley = price_bar,
+             value = 1:2)
+}
+
+#crop_price_table <- crop_prices_df(price_wh,price_bar,price_can,price_leg)
+
+#Assign the prices df to a reactive function
+#as it will be used to join to base df
+
+function_add_prices <- function(crop_price_table, test){
+  df1 <- left_join(test, crop_price_table, by = 'crop')
+  return(df1)
+}
+

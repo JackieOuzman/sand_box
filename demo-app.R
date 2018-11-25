@@ -74,7 +74,9 @@ ui <- fluidPage(
       # Show a plot of the generated distribution
       mainPanel(
          textOutput("crop_types"),
-         tableOutput("df")
+         tableOutput("crop_price"),
+         tableOutput("df"),
+         tableOutput("df1")
       )
    )
 )
@@ -82,23 +84,41 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   #group all the reactive variable here
-  test1 <- reactive({
+  start_df <- reactive({
     function_df_1(input$treatment, input$crop_seq_zone1)
   })  
-  test <- reactive({
-    fix_crop_name(test1())
+  df <- reactive({
+    fix_crop_name(start_df())
   })  
-  prices <-reactive({
-    function_add_prices(df, price_wh,price_bar,price_can, price_leg)
+  #make the input prices reactive so I can use them in formular
+  price_wheat <- reactive({
+    input$price_wh
   })
+  price_barley <- reactive({
+    input$price_bar
+  })
+  
+  crop_price_table <-reactive({
+    function_crop_prices_df(input$price_wh, input$price_bar)
+  })
+  
+  #df1 <- reactive({
+  #  function_add_prices(crop_price_table(), test())
+  #})
   
   #output renders here don't forget if calling a reactive variable it need()after the name
   
-  output$crop_types <- renderText(input$treatment_2)
+  output$crop_types <- renderText(input$price_wh)
   
-  output$df <- renderTable({
-    prices()
+  output$crop_price <- renderTable({
+    crop_price_table()
   })
+  output$df <- renderTable({
+    df()
+  })
+  #output$df1 <- renderTable({
+  #  df1()
+  #})
   
 }
 
