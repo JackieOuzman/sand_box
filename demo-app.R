@@ -43,7 +43,8 @@ ui <- fluidPage(
          
         checkboxGroupInput("treatment",
                      label = "Treatment",
-                     choices = list("wetting agent", "ripping")),
+                     choices = list("wetting agent", "ripping"),
+                     selected = "ripping" ),
         
         numericInput("a",
                     label = "Farm gate price wheat ($/t)",
@@ -182,9 +183,9 @@ server <- function(input, output) {
   #output renders here don't forget if calling a reactive variable it need()after the name
   
   
-  output$df <- renderTable({
-    df()
-  })
+  #output$df <- renderTable({
+  #  df()
+  #})
   output$df_with_price <- renderTable({
     join_potential_df()
   })
