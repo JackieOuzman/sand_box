@@ -304,7 +304,8 @@ tabItem(
                                 selected = "cashflow_disc_ann") #checkboxInput bracket
           ), #box1 bracket
         box(
-        tableOutput("df_progress")
+        tableOutput("df_progress"),
+        tableOutput("df_progress_cost")
         )#box2 bracket
         ) #fluid bracket
         ), #tabItem bracket
@@ -412,6 +413,11 @@ server <- function(input, output) {
   join_price_df <- reactive({
     function_join_price_df(join_potential_df(),flip_df_price())
   })
+  #create a new df for treatments crop, yr, costs etc
+  treatments_df <- reactive({
+    function_treatments_df(join_price_df())
+  })
+  
   
   
   
@@ -425,6 +431,9 @@ server <- function(input, output) {
    join_price_df()
  })
 
+ output$df_progress_cost = renderTable({
+   treatments_df()
+ })
 }
 shinyApp(ui, server)
 

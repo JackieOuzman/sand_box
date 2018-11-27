@@ -88,3 +88,8 @@ function_flip_df_price <- function(making_df_price){
 function_join_price_df <- function(join_potential_df, flip_df_price){
   left_join(join_potential_df, flip_df_price, by = 'crop')
 }
+
+#Now make a sep df for treatments with crops, year costs and yield response
+function_treatments_df <- function(join_price_df){
+  a <- select(join_price_df, year, crop)
+}
