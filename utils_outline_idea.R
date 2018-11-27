@@ -98,4 +98,27 @@ function_treatments_df <- function(join_price_df, year_for_ripping, costs_rippin
   cost_df <- left_join(a, b, "year")
   cost_df <- select(cost_df, year, crop, cost)
   
+  #bring in a file with the yield response over the 10 years
+  yld_resp_crop_treat <- read.csv("cost_rip.csv")
+  cost_df <- left_join(cost_df,yld_resp_crop_treat, "year")
+  #step3 cal to modify the yield response reflecting when the treatment was applied
+  cost_df <- cost_df %>% 
+    mutate(code = case_when(cost > 0 ~ 1,
+                            cost == 0 ~ 0)) 
+  cost_df$year <- as.integer(cost_df$year)
+  cost_df <- cost_df %>%
+    mutate(
+      code = as.logical(code),
+      last_event = if_else(code, true = year, false = NA_integer_)) %>%
+    fill(last_event) %>%
+    mutate(yr_since_app = (year - last_event)+1) %>% 
+    select(year, cost, yld_reponse_ripping, crop, yr_since_app)
+  #making temp file for a join which has a dummy yr_since_app clm
+  treat <- select(cost_df, year, cost, yld_reponse_ripping)
+  treat <- mutate(treat,yr_since_app = year )
+  cost_df <- left_join(cost_df, treat, by = 'yr_since_app') %>% 
+    select(year = year.x, crop, cost = cost.x, yld_resp_since_applied
+           = yld_reponse_ripping.y, yr_since_app)
+  
+  
 }
