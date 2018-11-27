@@ -402,9 +402,16 @@ server <- function(input, output) {
     function_join_potential_df(join_current_df(),flip_df_potential())
   })
   
-  
-  
-  
+  #price 
+  making_df_price <- reactive({
+    function_making_df_price(input$a, input$b, input$c, input$d)
+  })
+  flip_df_price <- reactive({
+    function_flip_df_price(making_df_price())
+  })
+  join_price_df <- reactive({
+    function_join_price_df(join_potential_df(),flip_df_price())
+  })
   
   
   
@@ -415,7 +422,7 @@ server <- function(input, output) {
 })
 
  output$df_progress = renderTable({
-   join_potential_df()
+   join_price_df()
  })
 
 }

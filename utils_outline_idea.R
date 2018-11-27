@@ -69,3 +69,22 @@ function_join_potential_df <- function(join_current_df, flip_df_potential){
   left_join(join_current_df, flip_df_potential, by = 'crop')
 }
 
+#making a data frame of the prices two step process
+#make a data frame and then flip it using gather
+
+#step 1
+function_making_df_price <- function(a,b,c,d){
+  data.frame( wheat = a,
+              barley = b,
+              canola = c,
+              legume = d) 
+}
+#step 2
+function_flip_df_price <- function(making_df_price){
+  gather(making_df_price, crop, price)
+}
+
+#now join it to the df
+function_join_price_df <- function(join_potential_df, flip_df_price){
+  left_join(join_potential_df, flip_df_price, by = 'crop')
+}
