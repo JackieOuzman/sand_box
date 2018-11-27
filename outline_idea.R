@@ -11,6 +11,9 @@ library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 library(readxl)
+library(dplyr)
+library(tidyverse)
+
 source('utils_outline_idea.R')
 
 #empty dashboard
@@ -375,6 +378,18 @@ server <- function(input, output) {
     function_base_df1 (input$crop_seq_zone1, input$discount)
   })
   
+  fix_crop_name <- reactive({
+    function_fix_crop_name (base_df1())
+  })
+  making_df_current <- reactive({
+    function_making_df_current(input$aa, input$bb, input$cc, input$dd)
+  })
+  flip_df_current <- reactive({
+    function_flip_df_current(making_df_current())
+  })
+  join_current_df <- reactive({
+    function_join_current_df(fix_crop_name(),flip_df_current())
+  })
   #group of render outputs
 
  output$text_size_farm = renderText({
@@ -382,7 +397,7 @@ server <- function(input, output) {
 })
 
  output$df_progress = renderTable({
-   base_df1()
+   join_current_df()
  })
 
 }
