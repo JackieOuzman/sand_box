@@ -119,6 +119,8 @@ function_treatments_df <- function(join_price_df, year_for_ripping, costs_rippin
   cost_df <- left_join(cost_df, treat, by = 'yr_since_app') %>% 
     select(year = year.x, crop, cost = cost.x, yld_resp_since_applied
            = yld_reponse_ripping.y, yr_since_app)
-  
+  #bring in another yield response file relating everything to crop type
+  yld_resp_crop_rip <- read.csv("yld_response_by_crop_ripping.csv")
+  cost_df <- left_join(cost_df, yld_resp_crop_rip, by = 'crop')
   
 }
