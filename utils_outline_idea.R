@@ -135,3 +135,27 @@ function_final_df <- function(join_price_df, treatments_df){
   b <- select(a, year, crop = crop.x, cost, yld_resp_since_applied,
               yr_since_app, yld_resp_perct_crop, discount, current_yld, potential_yld, price)
 }
+
+function_economic_indicators <- function(final_df) {
+  #work out the econmoic indicators
+  final_df <- final_df %>% 
+  mutate(
+    pres_value_fact = (1/(1+discount)^ year),
+    benefit = ((current_yld*(yld_resp_since_applied / 100)* yld_resp_perct_crop) * price), 
+    cashflow_no_dis_ann = benefit - cost,
+    cashflow_dis_ann = ((benefit*pres_value_fact) - (cost*pres_value_fact)), 
+    cashflow_cum_disc = cumsum(cashflow_dis_ann),
+    ROI_cum_no_disc = (cumsum(benefit) - cumsum(cost))/ cumsum(cost), 
+    ROI_cum_disc = (cumsum(benefit*pres_value_fact) - cumsum(cost*pres_value_fact))/ cumsum(cost*pres_value_fact), 
+    benefit_cost_ratio_disc = (sum(benefit*pres_value_fact) / sum(cost*pres_value_fact)), 
+    npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
+  )
+write.csv(final_df, file = "check_on_outputs.csv")
+return(final_df)
+}
+
+
+function_plot <- function(economic_indicators) {
+  ggplot(economic_indicators, aes(year, cashflow_cum_disc))+
+    geom_line()
+}

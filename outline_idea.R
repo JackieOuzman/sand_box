@@ -307,7 +307,9 @@ tabItem(
         box(
         tableOutput("df_progress"),
         tableOutput("df_progress_cost"),
-        tableOutput("df_progress_final")
+        tableOutput("df_progress_final"),
+        tableOutput("economic"),
+        plotOutput("plot")
         )#box2 bracket
         ) #fluid bracket
         ), #tabItem bracket
@@ -423,8 +425,14 @@ server <- function(input, output) {
   final_df <- reactive({
     function_final_df(join_price_df(), treatments_df())
   })
+  #economic indicators
+  economic_indicators <- reactive({
+    function_economic_indicators(final_df())
+  })
   
-  function_final_df
+  plot <- reactive({
+    function_plot(economic_indicators())
+  })
   
   #group of render outputs
 
@@ -432,17 +440,25 @@ server <- function(input, output) {
   paste("Total size of your farm is set to:", input$total_size_farm,"ha")
 })
 
- output$df_progress = renderTable({
-   join_price_df()
- })
+ #output$df_progress = renderTable({
+ #  join_price_df()
+ #})
 #cost outputs
- output$df_progress_cost = renderTable({
-   treatments_df()
- })
+ #output$df_progress_cost = renderTable({
+ #  treatments_df()
+ #})
  #final data frame
- output$df_progress_final = renderTable({
-   final_df()
+ #output$df_progress_final = renderTable({
+ #   final_df()
+ #})
+ #economic indicators
+ output$economic = renderTable({
+   economic_indicators()
  })
+ output$plot = renderPlot({
+   plot()
+ })
+ 
 }
 shinyApp(ui, server)
 
