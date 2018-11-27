@@ -381,6 +381,7 @@ server <- function(input, output) {
   fix_crop_name <- reactive({
     function_fix_crop_name (base_df1())
   })
+  #current yields 
   making_df_current <- reactive({
     function_making_df_current(input$aa, input$bb, input$cc, input$dd)
   })
@@ -390,6 +391,23 @@ server <- function(input, output) {
   join_current_df <- reactive({
     function_join_current_df(fix_crop_name(),flip_df_current())
   })
+  #potential yield 
+  making_df_potential <- reactive({
+    function_making_df_potential(input$aaa, input$bbb, input$ccc, input$ddd)
+  })
+  flip_df_potential <- reactive({
+    function_flip_df_potential(making_df_potential())
+  })
+  join_potential_df <- reactive({
+    function_join_potential_df(join_current_df(),flip_df_potential())
+  })
+  
+  
+  
+  
+  
+  
+  
   #group of render outputs
 
  output$text_size_farm = renderText({
@@ -397,7 +415,7 @@ server <- function(input, output) {
 })
 
  output$df_progress = renderTable({
-   join_current_df()
+   join_potential_df()
  })
 
 }

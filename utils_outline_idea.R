@@ -50,3 +50,22 @@ function_join_current_df <- function(fix_crop_name, flip_df_current){
   left_join(fix_crop_name, flip_df_current, by = 'crop')
 }
 
+#making a data frame of the potential yield two step process
+#make a data frame and then flip it using gather
+
+#step 1
+function_making_df_potential <- function(aaa,bbb,ccc,ddd){
+  data.frame( wheat = aaa,
+              barley = bbb,
+              canola = ccc,
+              legume = ddd) 
+}
+#step 2
+function_flip_df_potential <- function(making_df_potential){
+  gather(making_df_potential, crop, potential_yld)
+}
+#now join it to the df
+function_join_potential_df <- function(join_current_df, flip_df_potential){
+  left_join(join_current_df, flip_df_potential, by = 'crop')
+}
+
