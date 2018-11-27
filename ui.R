@@ -93,7 +93,8 @@ ui <- fluidPage(
       tableOutput("table3"),  #ripping depth
       tableOutput("test"),
       tableOutput("deciles_table"),
-      tableOutput("xxx")
+      tableOutput("xxx"),
+      textOutput("what_is")
       
       
       )

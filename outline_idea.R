@@ -307,7 +307,7 @@ tabItem(
         box(
         tableOutput("df_progress"),
         tableOutput("df_progress_cost"),
-        textOutput("cost_ripping")
+        tableOutput("df_progress_final")
         )#box2 bracket
         ) #fluid bracket
         ), #tabItem bracket
@@ -419,9 +419,12 @@ server <- function(input, output) {
   treatments_df <- reactive({
     function_treatments_df(join_price_df(), input$year_for_ripping, input$costs_ripping)
   })
+  #final data frame with the farm parameters and treatment
+  final_df <- reactive({
+    function_final_df(join_price_df(), treatments_df())
+  })
   
-  
-  
+  function_final_df
   
   #group of render outputs
 
@@ -436,9 +439,9 @@ server <- function(input, output) {
  output$df_progress_cost = renderTable({
    treatments_df()
  })
- 
- output$cost_ripping = renderText({
-   paste("ripping costs: $", input$costs_ripping, "applied in year:", input$year_for_ripping)
+ #final data frame
+ output$df_progress_final = renderTable({
+   final_df()
  })
 }
 shinyApp(ui, server)
