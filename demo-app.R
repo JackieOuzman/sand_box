@@ -41,7 +41,7 @@ ui <- fluidPage(
                        multiple = TRUE
         ),
          
-         selectInput("treatment",
+        checkboxGroupInput("treatment",
                      label = "Treatment",
                      choices = list("wetting agent", "ripping")),
         
