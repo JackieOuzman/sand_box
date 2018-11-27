@@ -90,6 +90,8 @@ function_join_price_df <- function(join_potential_df, flip_df_price){
 }
 
 #Now make a sep df for treatments with crops, year costs and yield response
+#having trouble with assigning cost to year zero but not the yield response
+#need to sort this out
 function_treatments_df <- function(join_price_df, year_for_ripping, costs_ripping){
   #a <- data_frame(select(join_price_df, year, crop))
   a <- join_price_df
@@ -99,7 +101,7 @@ function_treatments_df <- function(join_price_df, year_for_ripping, costs_rippin
   cost_df <- select(cost_df, year, crop, cost)
   
   #bring in a file with the yield response over the 10 years
-  yld_resp_crop_treat <- read.csv("cost_rip.csv")
+  yld_resp_crop_treat <- read.csv("yld_response.csv")
   cost_df <- left_join(cost_df,yld_resp_crop_treat, "year")
   #step3 cal to modify the yield response reflecting when the treatment was applied
   cost_df <- cost_df %>% 
@@ -112,15 +114,24 @@ function_treatments_df <- function(join_price_df, year_for_ripping, costs_rippin
       last_event = if_else(code, true = year, false = NA_integer_)) %>%
     fill(last_event) %>%
     mutate(yr_since_app = (year - last_event)+1) %>% 
-    select(year, cost, yld_reponse_ripping, crop, yr_since_app)
+    select(year, cost, treatment, yld_reponse, crop, yr_since_app)
   #making temp file for a join which has a dummy yr_since_app clm
-  treat <- select(cost_df, year, cost, yld_reponse_ripping)
+  treat <- select(cost_df, year, cost, yld_reponse)
   treat <- mutate(treat,yr_since_app = year )
   cost_df <- left_join(cost_df, treat, by = 'yr_since_app') %>% 
-    select(year = year.x, crop, cost = cost.x, yld_resp_since_applied
-           = yld_reponse_ripping.y, yr_since_app)
+    select(year = year.x, treatment, crop, cost = cost.x, yld_resp_since_applied
+           = yld_reponse.y, yr_since_app)
   #bring in another yield response file relating everything to crop type
   yld_resp_crop_rip <- read.csv("yld_response_by_crop_ripping.csv")
   cost_df <- left_join(cost_df, yld_resp_crop_rip, by = 'crop')
   
+}
+
+#join the two df - Need a better way if I have multiple
+
+
+function_final_df <- function(join_price_df, treatments_df){
+  a <- left_join(join_price_df, treatments_df, by = 'year')
+  b <- select(a, year, crop = crop.x, cost, yld_resp_since_applied,
+              yr_since_app, yld_resp_perct_crop, discount, current_yld, potential_yld, price)
 }
