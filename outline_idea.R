@@ -257,6 +257,7 @@ tabItem(
                              'year 8' = "8",
                              'year 9' = "9",
                              'year 10' = "10"),
+             selected = 1,
              multiple = TRUE),
  
   h6("Note we suggets assigning ripping cost at year 0"),
@@ -305,7 +306,8 @@ tabItem(
           ), #box1 bracket
         box(
         tableOutput("df_progress"),
-        tableOutput("df_progress_cost")
+        tableOutput("df_progress_cost"),
+        textOutput("cost_ripping")
         )#box2 bracket
         ) #fluid bracket
         ), #tabItem bracket
@@ -415,7 +417,7 @@ server <- function(input, output) {
   })
   #create a new df for treatments crop, yr, costs etc
   treatments_df <- reactive({
-    function_treatments_df(join_price_df())
+    function_treatments_df(join_price_df(), input$year_for_ripping, input$costs_ripping)
   })
   
   
@@ -430,9 +432,13 @@ server <- function(input, output) {
  output$df_progress = renderTable({
    join_price_df()
  })
-
+#cost outputs
  output$df_progress_cost = renderTable({
    treatments_df()
+ })
+ 
+ output$cost_ripping = renderText({
+   paste("ripping costs: $", input$costs_ripping, "applied in year:", input$year_for_ripping)
  })
 }
 shinyApp(ui, server)
