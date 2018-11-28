@@ -143,7 +143,7 @@ body <- dashboardBody(
                              "Year7"= c("Yr7_wh","Yr7_ba","Yr7_can","Yr7_leg","Yr7_pas"),
                              "Year8"= c("Yr8_wh","Yr8_ba","Yr8_can","Yr8_leg","Yr8_pas"),
                              "Year9"= c("Yr9_wh","Yr9_ba","Yr9_can","Yr9_leg","Yr9_pas"),
-                             "Year101"= c("Yr10_wh","Yr10_ba","Yr10_can","Yr10_leg","Yr10_pas")
+                             "Year10"= c("Yr10_wh","Yr10_ba","Yr10_can","Yr10_leg","Yr10_pas")
                            ),
                            selected = c("Yr1_wh", "Yr2_wh", "Yr3_wh" ,"Yr4_wh" ,"Yr5_wh", "Yr6_wh", "Yr7_wh", "Yr8_wh" ,"Yr9_wh", "Yr10_wh"),
                            options = list(maxItems = 10),
@@ -306,10 +306,10 @@ tabItem(
           ), #box1 bracket
         box(
         tableOutput("df_progress"),
-        tableOutput("df_progress_cost"),
-        tableOutput("df_progress_final"),
-        tableOutput("economic"),
-        plotOutput("plot")
+        tableOutput("df_progress_cost") #,
+        #tableOutput("df_progress_final"),
+        #tableOutput("economic"),
+        #plotOutput("plot")
         )#box2 bracket
         ) #fluid bracket
         ), #tabItem bracket
@@ -379,9 +379,25 @@ ui <- dashboardPage(header =dashboardHeader(),
 
 server <- function(input, output) {
   #group of reactive functions
+  
+  #orginal
+  #base_df1 <- reactive({
+  #  function_base_df1 (input$crop_seq_zone1, input$discount)
+  #})
+  
+  #my version 
   base_df1 <- reactive({
-    function_base_df1 (input$crop_seq_zone1, input$discount)
+    map_df(input$mangement_options,
+           function_base_df1, crop = input$crop_seq_zone1, 
+                              discount = input$discount)
   })
+  
+  #Alex work...
+  #start_df <- reactive({
+  #  map_df(input$treatment, function_df_1, 
+  #  crop = input$crop_seq_zone1, discount = input$discount)
+  #})  
+  
   
   fix_crop_name <- reactive({
     function_fix_crop_name (base_df1())
@@ -440,9 +456,9 @@ server <- function(input, output) {
   paste("Total size of your farm is set to:", input$total_size_farm,"ha")
 })
 
- #output$df_progress = renderTable({
- #  join_price_df()
- #})
+ output$df_progress = renderTable({
+   join_price_df()
+ })
 #cost outputs
  #output$df_progress_cost = renderTable({
  #  treatments_df()
@@ -452,12 +468,12 @@ server <- function(input, output) {
  #   final_df()
  #})
  #economic indicators
- output$economic = renderTable({
-   economic_indicators()
- })
- output$plot = renderPlot({
-   plot()
- })
+ #output$economic = renderTable({
+ #  economic_indicators()
+ #})
+ #output$plot = renderPlot({
+ #  plot()
+ #})
  
 }
 shinyApp(ui, server)

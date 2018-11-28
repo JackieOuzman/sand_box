@@ -1,10 +1,20 @@
 ##this just defines my function...
 
+#added treatments to get it like Alex example
+#orginal
+#function_base_df1 <- function(crop_seq_zone1, discount){
+#  x <- data.frame(year = 1:length(crop_seq_zone1),
+#                  crop = crop_seq_zone1,
+#                  discount = discount)
+#  y <- pre <- data.frame(year = 0)
+#  bind_rows(y, x)
+#}
 
-function_base_df1 <- function(crop_seq_zone1, discount){
-  x <- data.frame(year = 1:length(crop_seq_zone1),
-             crop = crop_seq_zone1,
-             discount = discount)
+function_base_df1 <- function(mangement_options,crop_seq_zone1, discount){
+  x <- data.frame(treatments = mangement_options,
+                  year = 1:length(crop_seq_zone1),
+                  crop = crop_seq_zone1,
+                  discount = discount)
   y <- pre <- data.frame(year = 0)
   bind_rows(y, x)
 }
@@ -128,13 +138,24 @@ function_treatments_df <- function(join_price_df, year_for_ripping, costs_rippin
 }
 
 #join the two df - Need a better way if I have multiple
-
+#fix up na for clm before they are used in cals
 
 function_final_df <- function(join_price_df, treatments_df){
   a <- left_join(join_price_df, treatments_df, by = 'year')
   b <- select(a, year, crop = crop.x, cost, yld_resp_since_applied,
               yr_since_app, yld_resp_perct_crop, discount, current_yld, potential_yld, price)
+  b <- replace_na(b,list(crop =0, cost=0, yld_resp_since_applied=0, 
+             yr_since_app =0, yld_resp_perct_crop =0, discount =0, 
+             current_yld =0, potential_yld =0, price =0))
 }
+
+#fix up na for clm before they are used in cals
+
+#function_final_df_na_rm <- function(final_df){
+#  replace_na(final_df,list(crop =0), cost=0, yld_resp_since_applied=0, 
+#             yr_since_app =0, yld_resp_perct_crop =0, discount =0, 
+#             current_yld =0, potential_yld =0, price =0)
+#}
 
 function_economic_indicators <- function(final_df) {
   #work out the econmoic indicators
@@ -150,12 +171,13 @@ function_economic_indicators <- function(final_df) {
     benefit_cost_ratio_disc = (sum(benefit*pres_value_fact) / sum(cost*pres_value_fact)), 
     npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
   )
+  
 write.csv(final_df, file = "check_on_outputs.csv")
 return(final_df)
 }
 
 
 function_plot <- function(economic_indicators) {
-  ggplot(economic_indicators, aes(year, cashflow_cum_disc))+
+  ggplot(economic_indicators, aes(year, cashflow_no_dis_ann))+
     geom_line()
 }
