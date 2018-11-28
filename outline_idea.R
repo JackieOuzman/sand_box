@@ -54,14 +54,17 @@ body <- dashboardBody(
                   label = h3("Where is your farm?"),
                   choices = c("Waikerie", "Carwarp","Ouyen", "Karoonda", "Murlong", "Yenda", "Lameroo", "Bute", "Brimpton Lake", "Cadgee"), 
                   selected = "Waikerie"),
-      
+      actionButton("refreash",
+                   label = "download met file"),
       numericInput(
         "total_size_farm",
         label = h3("Total size of yor farm ha"),
         value = 2500,
         min = 100,
         max = 6000,
-        step =100)
+        step =100),
+      
+      tableOutput("metfile") #this is new
       ), 
       
       
@@ -306,8 +309,8 @@ tabItem(
           ), #box1 bracket
         box(
         tableOutput("df_progress"),
-        tableOutput("df_progress_cost") #,
-        #tableOutput("df_progress_final"),
+        tableOutput("df_progress_cost"),
+        tableOutput("df_progress_final")#,
         #tableOutput("economic"),
         #plotOutput("plot")
         )#box2 bracket
@@ -380,23 +383,22 @@ ui <- dashboardPage(header =dashboardHeader(),
 server <- function(input, output) {
   #group of reactive functions
   
-  #orginal
-  #base_df1 <- reactive({
-  #  function_base_df1 (input$crop_seq_zone1, input$discount)
-  #})
   
-  #my version 
+  #This is new alex
+  stationID <- reactive({
+    isolate(input$stationID)
+    input$refreash
+  })
+  
+  test1 <- reactive({
+    getSiloMet_jax(stationID()) #this is the first function
+  })
+  
   base_df1 <- reactive({
     map_df(input$mangement_options,
            function_base_df1, crop = input$crop_seq_zone1, 
                               discount = input$discount)
   })
-  
-  #Alex work...
-  #start_df <- reactive({
-  #  map_df(input$treatment, function_df_1, 
-  #  crop = input$crop_seq_zone1, discount = input$discount)
-  #})  
   
   
   fix_crop_name <- reactive({
@@ -430,9 +432,15 @@ server <- function(input, output) {
   flip_df_price <- reactive({
     function_flip_df_price(making_df_price())
   })
+  
+  
   join_price_df <- reactive({
     function_join_price_df(join_potential_df(),flip_df_price())
   })
+ 
+  
+  
+  
   #create a new df for treatments crop, yr, costs etc
   treatments_df <- reactive({
     function_treatments_df(join_price_df(), input$year_for_ripping, input$costs_ripping)
@@ -451,6 +459,11 @@ server <- function(input, output) {
   })
   
   #group of render outputs
+  
+  #this is new
+  output$metfile <- renderTable({
+    test1() 
+  })
 
  output$text_size_farm = renderText({
   paste("Total size of your farm is set to:", input$total_size_farm,"ha")
@@ -459,14 +472,14 @@ server <- function(input, output) {
  output$df_progress = renderTable({
    join_price_df()
  })
-#cost outputs
- #output$df_progress_cost = renderTable({
- #  treatments_df()
- #})
+ #cost outputs
+ output$df_progress_cost = renderTable({
+   treatments_df()
+ })
  #final data frame
- #output$df_progress_final = renderTable({
- #   final_df()
- #})
+ output$df_progress_final = renderTable({
+    final_df()
+ })
  #economic indicators
  #output$economic = renderTable({
  #  economic_indicators()

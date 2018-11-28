@@ -1,5 +1,37 @@
 ##this just defines my function...
 
+getSiloMet_jax <- function(name = NULL) {
+  stationID <- ifelse(name == 'Waikerie', 24018,
+               ifelse(name == 'Carwarp', 76005,
+               ifelse(name == 'Ouyen', 76047,
+               ifelse(name == 'Karoonda', 25006,
+               ifelse(name == 'Murlong', 18046,
+               ifelse(name == 'Yenda', 75079,
+               ifelse(name == 'Lameroo', 25509,
+               ifelse(name == 'Bute', 21012,
+               ifelse(name == 'Brimpton Lake', 18005,
+               ifelse(name == 'Cadgee', 26099,18005))))))))))
+  
+  #check my apiKey it is Kvsj6LwGthiRRUoxGazEDLikHvDxh5kOJDvbRZp4
+  startDate <- paste('19600101',sep='')
+  finishDate <- paste('20171231',sep='')
+  
+  
+  siloUrl <- 'https://siloapi.longpaddock.qld.gov.au/pointdata'
+  siloUrl <- paste(siloUrl, '?apikey=','Kvsj6LwGthiRRUoxGazEDLikHvDxh5kOJDvbRZp4', sep='')
+  siloUrl <- paste(siloUrl,'&station=',sprintf('%05d', stationID), sep='')
+  siloUrl <- paste(siloUrl,'&start=', startDate, sep='')
+  siloUrl <- paste(siloUrl,'&finish=', finishDate, sep='')
+  siloUrl <- paste(siloUrl,'&format=CSV', sep='')
+  siloUrl <- paste(siloUrl,'&variables=daily_rain,max_temp,min_temp', sep='')
+  
+  print(siloUrl)
+  df <- read_csv(siloUrl)
+  return(df)
+}
+
+
+
 #added treatments to get it like Alex example
 #orginal
 #function_base_df1 <- function(crop_seq_zone1, discount){
@@ -10,6 +42,8 @@
 #  bind_rows(y, x)
 #}
 
+
+#this is working but the year 0 has no treatment assigned
 function_base_df1 <- function(mangement_options,crop_seq_zone1, discount){
   x <- data.frame(treatments = mangement_options,
                   year = 1:length(crop_seq_zone1),
@@ -95,6 +129,7 @@ function_flip_df_price <- function(making_df_price){
 }
 
 #now join it to the df
+
 function_join_price_df <- function(join_potential_df, flip_df_price){
   left_join(join_potential_df, flip_df_price, by = 'crop')
 }
