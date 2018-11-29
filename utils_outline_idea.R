@@ -252,6 +252,9 @@ function_final_farm_df <- function(join_price_df){
   join_price_df <- fill(join_price_df, treatment,.direction = c("up"))
   join_price_df <- unite(join_price_df, ID,
                          c(year,treatment), remove = FALSE)
+  write.csv(join_price_df, "final_farm_df.csv")
+  return(join_price_df)
+  
 }
 
 ###### DF FOR TREATMENTS ########
@@ -260,7 +263,7 @@ function_final_farm_df <- function(join_price_df){
 
 #Now make a sep df for treatments Ripping with no inputs first
 function_rip_noinputs_df <- function(final_farm_df, year_for_ripping, costs_ripping){
-  a <- final_farm_df
+  a <-  distinct(final_farm_df, year, .keep_all = TRUE)
   b <- data_frame(year = as.numeric(year_for_ripping), #as numeric
                   cost = costs_ripping) #,
                   #treatment = "rip_no_input")
@@ -283,18 +286,7 @@ function_rip_noinputs_df <- function(final_farm_df, year_for_ripping, costs_ripp
     fill(last_event) %>%
     mutate(yr_since_app = (year - last_event)) %>% 
     select(year, cost, yld_reponse, crop, yr_since_app)
-  #Rad help to get the yld response to offset and fill correctly
-  
-  #yearssinceapp <- 0
-  #for(i in 1:nrow(cost_rip_noinput_df)) {
-  #  if(!is.na(cost_rip_noinput_df$cost[i]) && yearssinceapp > 0){ 
-  #    cost_rip_noinput_df$yr_since_app[i] <- yearssinceapp+1
-    
-  #  yearssinceapp = cost_rip_noinput_df$yr_since_app[i]
-  #}
-#}
-  
-  #making temp file for a join which has a dummy yr_since_app clm
+ #making temp file for a join which has a dummy yr_since_app clm
   treat <- select(cost_rip_noinput_df, year, cost, yld_reponse)
   treat <- mutate(treat,yr_since_app = year )
   cost_rip_noinput_df <- left_join(cost_rip_noinput_df, treat, by = 'yr_since_app') %>% 
@@ -306,22 +298,74 @@ function_rip_noinputs_df <- function(final_farm_df, year_for_ripping, costs_ripp
   cost_rip_noinput_df <- mutate(cost_rip_noinput_df, treatment = "rip_no_inputs")
   cost_rip_noinput_df <- unite(cost_rip_noinput_df, ID,
                          c(year,treatment), remove = FALSE)
+  
+  write.csv(cost_rip_noinput_df, "cost_rip_noinput_df.csv")
+  return(cost_rip_noinput_df)
   }
 
 
+#Now make a sep df for treatments Ripping with shallow organic inputs 
+function_rip_shallow_organic_df <- function(final_farm_df, rip_shallow_organic_year, rip_shallow_organic_cost){
+  a <- distinct(final_farm_df, year, .keep_all = TRUE)
+  b <- data_frame(year = as.numeric(rip_shallow_organic_year), #as numeric
+                  cost = rip_shallow_organic_cost) #,
+  #treatment = "rip_no_input")
+  rip_shallow_organic_df <- left_join(a, b, "year")
+  rip_shallow_organic_df <- select(rip_shallow_organic_df, year, crop, cost)
   
+  #bring in a file with the yield response over the 10 years
+  yld_resp_crop_treat <- read.csv("yld_response.csv")
+  yld_resp_crop_treat <- filter(yld_resp_crop_treat, treatment == "rip_shallow_organic")
+  rip_shallow_organic_df <- left_join(rip_shallow_organic_df,yld_resp_crop_treat, "year")
+  #step3 cal to modify the yield response reflecting when the treatment was applied
+  rip_shallow_organic_df <- rip_shallow_organic_df %>% 
+    mutate(code = case_when(cost > 0 ~ 1,
+                            cost == 0 ~ 0)) 
+  rip_shallow_organic_df$year <- as.integer(rip_shallow_organic_df$year)
+  rip_shallow_organic_df <- rip_shallow_organic_df %>%
+    mutate(
+      code = as.logical(code),
+      last_event = if_else(code, true = year, false = NA_integer_)) %>%
+    fill(last_event) %>%
+    mutate(yr_since_app = (year - last_event)) %>% 
+    select(year, cost, yld_reponse, crop, yr_since_app)
   
+  #making temp file for a join which has a dummy yr_since_app clm
+  treat <- select(rip_shallow_organic_df, year, cost, yld_reponse)
+  treat <- mutate(treat,yr_since_app = year )
+  rip_shallow_organic_df <- left_join(rip_shallow_organic_df, treat, by = 'yr_since_app') %>% 
+    select(year = year.x, crop, cost = cost.x, yld_resp_since_applied
+           = yld_reponse.y, yr_since_app)
+  #bring in another yield response file relating everything to crop type
+  yld_resp_crop_rip <- read.csv("yld_response_by_crop_ripping.csv")
+  rip_shallow_organic_df <- left_join(rip_shallow_organic_df, yld_resp_crop_rip, by = 'crop')
+  rip_shallow_organic_df <- mutate(rip_shallow_organic_df, treatment = "rip_shallow_organic")
+  rip_shallow_organic_df <- unite(rip_shallow_organic_df, ID,
+                               c(year,treatment), remove = FALSE)
+  write.csv(rip_shallow_organic_df, "rip_shallow_organic_df.csv")
+  return(rip_shallow_organic_df)
+}
+
+###Join the treatment df together with rbind
+function_treatment_bind <- function(cost_rip_noinput_df, rip_shallow_organic_df){
+      treatment <- bind_rows(cost_rip_noinput_df, rip_shallow_organic_df)
+}
   #join the two df - Need a better way if I have multiple
 #fix up na for clm before they are used in cals
 
-function_final_join_rip_noninputs <- function(final_farm_df, rip_noinputs_df){
-  a <- left_join(final_farm_df, rip_noinputs_df, by = 'ID')
+function_final_treatment_farm <- function(final_farm_df, treatment_bind){
+  a <- left_join(final_farm_df, treatment_bind, by = 'ID')
   b <- select(a, ID, year = year.x, crop = crop.x, treatment = treatment.x, cost, yld_resp_since_applied,
               yr_since_app, yld_resp_perct_crop, discount, current_yld, potential_yld, price)
   b <- replace_na(b,list(crop =0, cost=0, yld_resp_since_applied=0, 
              yr_since_app =0, yld_resp_perct_crop =0, discount =0, 
              current_yld =0, potential_yld =0, price =0))
+  write.csv(b, "final_treatment_farm.csv")
+  return(b)
 }
+
+
+
 
 #fix up na for clm before they are used in cals
 

@@ -284,14 +284,14 @@ tabItem(
              multiple = TRUE)
   ), #wellpanel bracket
   wellPanel(
-  numericInput("rip_shallow_cost", 
+  numericInput("rip_shallow_organic_cost", 
                label = h4("Cost for ripping with shallow organic inputs"),
                value = 80, 
                min = 0,
                max = 2000,
                step = 10),
   
-  selectizeInput("rip_shallow_cost_year", 
+  selectizeInput("rip_shallow_organic_year", 
                  label = h4("Ripping applied in which year? (shallow organic)"),
                  choices = list('before analysis'= "0",
                                 'year 1' = "1",
@@ -521,12 +521,21 @@ server <- function(input, output) {
     function_rip_noinputs_df(final_farm_df(), input$year_for_ripping, input$costs_ripping)
   })
   
+  rip_shallow_organic_df <- reactive({
+    function_rip_shallow_organic_df(final_farm_df(), input$rip_shallow_organic_year, input$rip_shallow_organic_cost)
+  })
+  
+  treatment_bind <- reactive({
+    function_treatment_bind(rip_noinputs_df(), rip_shallow_organic_df())
+  })
   
   
   #### Join Treatment df to the farm df ###
-  final_join_rip_noninputs <- reactive({
-    function_final_join_rip_noninputs(final_farm_df(), rip_noinputs_df())
+  final_treatment_farm <- reactive({
+    function_final_treatment_farm(final_farm_df(), treatment_bind())
   })
+  
+  
   
   #final data frame with the farm parameters and treatment
   #final_df <- reactive({
@@ -576,13 +585,13 @@ server <- function(input, output) {
  })
  #cost outputs
  output$df_progress_cost = renderTable({
-   rip_noinputs_df()
+   treatment_bind()
  })
  
  
  #final data frame
  output$df_progress_final = renderTable({
-    final_join_rip_noninputs()
+   final_treatment_farm()
  })
  
  
