@@ -66,6 +66,8 @@ body <- dashboardBody(
                   selected = "Waikerie"),
       actionButton("refreash",
                    label = "not working download"),
+      actionButton("click",
+                   label = "update"),
       numericInput(
         "total_size_farm",
         label = h3("Total size of yor farm ha"),
@@ -73,10 +75,13 @@ body <- dashboardBody(
         min = 100,
         max = 6000,
         step =100),
+      
       textOutput("name_of_met"),
+      
       tableOutput("metfile"),
       tableOutput("Av_yld_pot_wheat"),
-      tableOutput("Av_yld_pot_pulses")
+      tableOutput("Av_yld_pot_pulses"),
+      valueBoxOutput("click_box")
       #textOutput("metfile_file_name")
       ), 
       
@@ -397,9 +402,10 @@ server <- function(input, output) {
   #group of reactive functions
   
   ####MET FILE WORK ####
-  #This is new Alex everytime I click this I get another number
+  #Alex everytime I click this I get another number
+  #It dosent hold onto the stationID input value
   #this is not behaving like its should
-  # I can't use the isolate button like this??
+  
   
   #stationID <- reactive({
   #  isolate(input$stationID)
@@ -424,6 +430,8 @@ server <- function(input, output) {
   decile5_yld_pot_pulses <- reactive({
     function_decile5_yld_pot_pulses(water_aval())
   })
+  
+  
   
   #### CREATING DF FOR FARM ########
   
@@ -491,7 +499,7 @@ server <- function(input, output) {
     function_plot(economic_indicators())
   })
   
-  ####### group of render outputs ########
+  ####### group of render OUTPUTS ########
   
   #this is new
   output$metfile <- renderTable({
@@ -502,6 +510,9 @@ server <- function(input, output) {
   })
   output$Av_yld_pot_pulses <- renderTable({
     decile5_yld_pot_pulses()
+  })
+  output$click_box <- renderValueBox({
+    valueBox(decile5_yld_pot_wheat(), "Yield potential of wheat / barley")
   })
   
   #output$metfile_file_name <- renderText({
