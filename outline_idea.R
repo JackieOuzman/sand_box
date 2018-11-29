@@ -328,8 +328,8 @@ tabItem(
           ), #box1 bracket
         box(
         tableOutput("df_progress"),
-        tableOutput("df_progress_cost"),
-        tableOutput("df_progress_final")#,
+        tableOutput("df_progress_cost")
+        #tableOutput("df_progress_final"),
         #tableOutput("economic"),
         #plotOutput("plot")
         )#box2 bracket
@@ -467,9 +467,7 @@ server <- function(input, output) {
     function_join_potential_df(join_current_df(),flip_df_potential())
   })
   
-  final_farm_df <- reactive({
-    function_final_farm_df(join_potential_df())
-  })
+  
   
   #price 
   making_df_price <- reactive({
@@ -483,26 +481,30 @@ server <- function(input, output) {
   join_price_df <- reactive({
     function_join_price_df(join_potential_df(),flip_df_price())
   })
- 
+  
+  
+  final_farm_df <- reactive({
+    function_final_farm_df(join_price_df())
+  })
   
   #### CREATING DF FOR TREATMENTS ########
   
   #create a new df for treatments crop, yr, costs etc
-  treatments_df <- reactive({
-    function_treatments_df(join_price_df(), input$year_for_ripping, input$costs_ripping)
+  rip_noinputs_df <- reactive({
+    function_rip_noinputs_df(final_farm_df(), input$year_for_ripping, input$costs_ripping)
   })
   #final data frame with the farm parameters and treatment
-  final_df <- reactive({
-    function_final_df(join_price_df(), treatments_df())
-  })
+  #final_df <- reactive({
+  #  function_final_df(join_price_df(), treatments_df())
+  #})
   #economic indicators
-  economic_indicators <- reactive({
-    function_economic_indicators(final_df())
-  })
+  #economic_indicators <- reactive({
+  #  function_economic_indicators(final_df())
+  #})
   
-  plot <- reactive({
-    function_plot(economic_indicators())
-  })
+  #plot <- reactive({
+  #  function_plot(economic_indicators())
+  #})
   
   ####### group of render OUTPUTS ########
   
@@ -539,13 +541,15 @@ server <- function(input, output) {
  })
  #cost outputs
  output$df_progress_cost = renderTable({
-   treatments_df()
+   rip_noinputs_df()
  })
  #final data frame
- output$df_progress_final = renderTable({
-    final_df()
- })
- #economic indicators
+ #output$df_progress_final = renderTable({
+  #  final_df()
+ #})
+ 
+ 
+ ##### economic indicators #####
  #output$economic = renderTable({
  #  economic_indicators()
  #})

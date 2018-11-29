@@ -255,43 +255,43 @@ function_final_farm_df <- function(join_price_df){
 }
 
 ###### DF FOR TREATMENTS ########
+##New plan is to make treatment df for each of the treatments we have ###
+## Then join to the final_farm_df the missing treatments wont join###
 
-#Now make a sep df for treatments with crops, year costs and yield response
-#having trouble with assigning cost to year zero but not the yield response
-#need to sort this out
-function_treatments_df <- function(join_price_df, year_for_ripping, costs_ripping){
-  #a <- data_frame(select(join_price_df, year, crop))
-  a <- join_price_df
+#Now make a sep df for treatments Ripping with no inputs first
+function_rip_noinputs_df <- function(final_farm_df, year_for_ripping, costs_ripping){
+  a <- final_farm_df
   b <- data_frame(year = as.numeric(year_for_ripping), #as numeric
-                  cost = costs_ripping)
-  cost_df <- left_join(a, b, "year")
-  cost_df <- select(cost_df, year, crop, cost)
+                  cost = costs_ripping) #,
+                  #treatment = "rip_no_input")
+  cost_rip_noinput_df <- left_join(a, b, "year")
+  cost_rip_noinput_df <- select(cost_rip_noinput_df, year, crop, cost)
   
   #bring in a file with the yield response over the 10 years
   yld_resp_crop_treat <- read.csv("yld_response.csv")
-  cost_df <- left_join(cost_df,yld_resp_crop_treat, "year")
+  cost_rip_noinput_df <- left_join(cost_rip_noinput_df,yld_resp_crop_treat, "year")
   #step3 cal to modify the yield response reflecting when the treatment was applied
-  cost_df <- cost_df %>% 
+  cost_rip_noinput_df <- cost_rip_noinput_df %>% 
     mutate(code = case_when(cost > 0 ~ 1,
                             cost == 0 ~ 0)) 
-  cost_df$year <- as.integer(cost_df$year)
-  cost_df <- cost_df %>%
+  cost_rip_noinput_df$year <- as.integer(cost_df$year)
+  cost_rip_noinput_df <- cost_rip_noinput_df %>%
     mutate(
       code = as.logical(code),
       last_event = if_else(code, true = year, false = NA_integer_)) %>%
     fill(last_event) %>%
     mutate(yr_since_app = (year - last_event)+1) %>% 
-    select(year, cost, treatment, yld_reponse, crop, yr_since_app)
+    select(year, cost, yld_reponse, crop, yr_since_app)
   #making temp file for a join which has a dummy yr_since_app clm
-  treat <- select(cost_df, year, cost, yld_reponse)
+  treat <- select(cost_rip_noinput_df, year, cost, yld_reponse)
   treat <- mutate(treat,yr_since_app = year )
-  cost_df <- left_join(cost_df, treat, by = 'yr_since_app') %>% 
-    select(year = year.x, treatment, crop, cost = cost.x, yld_resp_since_applied
+  cost_rip_noinput_df <- left_join(cost_rip_noinput_df, treat, by = 'yr_since_app') %>% 
+    select(year = year.x, crop, cost = cost.x, yld_resp_since_applied
            = yld_reponse.y, yr_since_app)
   #bring in another yield response file relating everything to crop type
   yld_resp_crop_rip <- read.csv("yld_response_by_crop_ripping.csv")
-  cost_df <- left_join(cost_df, yld_resp_crop_rip, by = 'crop')
-  
+  cost_rip_noinput_df <- left_join(cost_rip_noinput_df, yld_resp_crop_rip, by = 'crop')
+  cost_rip_noinput_df <- mutate(cost_rip_noinput_df, treatment = "rip_no_inputs")
 }
 
 #join the two df - Need a better way if I have multiple
