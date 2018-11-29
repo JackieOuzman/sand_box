@@ -303,7 +303,9 @@ function_rip_noinputs_df <- function(final_farm_df, year_for_ripping, costs_ripp
   yld_resp_crop_rip <- read.csv("yld_response_by_crop_ripping.csv")
   cost_rip_noinput_df <- left_join(cost_rip_noinput_df, yld_resp_crop_rip, by = 'crop')
   cost_rip_noinput_df <- mutate(cost_rip_noinput_df, treatment = "rip_no_inputs")
-}
+  cost_rip_noinput_df <- unite(cost_rip_noinput_df, ID,
+                         c(year,treatment), remove = FALSE)
+  }
 
 
   
