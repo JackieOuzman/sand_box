@@ -158,7 +158,7 @@ function_decile5_yld_pot_pulses <- function(water_aval) {
 
 #this is working but the year 0 has no treatment assigned
 function_base_df1 <- function(mangement_options,crop_seq_zone1, discount){
-  x <- data.frame(treatments = mangement_options,
+  x <- data.frame(treatment = mangement_options,
                   year = 1:length(crop_seq_zone1),
                   crop = crop_seq_zone1,
                   discount = discount)
@@ -249,9 +249,9 @@ function_join_price_df <- function(join_potential_df, flip_df_price){
   return(base_farm)
  }
 function_final_farm_df <- function(join_price_df){
-  join_price_df <- fill(join_price_df, treatments,.direction = c("up"))
+  join_price_df <- fill(join_price_df, treatment,.direction = c("up"))
   join_price_df <- unite(join_price_df, ID,
-                         c(year,treatments), remove = FALSE)
+                         c(year,treatment), remove = FALSE)
 }
 
 ###### DF FOR TREATMENTS ########
