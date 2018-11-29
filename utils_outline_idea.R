@@ -274,14 +274,25 @@ function_rip_noinputs_df <- function(final_farm_df, year_for_ripping, costs_ripp
   cost_rip_noinput_df <- cost_rip_noinput_df %>% 
     mutate(code = case_when(cost > 0 ~ 1,
                             cost == 0 ~ 0)) 
-  cost_rip_noinput_df$year <- as.integer(cost_df$year)
+  cost_rip_noinput_df$year <- as.integer(cost_rip_noinput_df$year)
   cost_rip_noinput_df <- cost_rip_noinput_df %>%
     mutate(
       code = as.logical(code),
       last_event = if_else(code, true = year, false = NA_integer_)) %>%
     fill(last_event) %>%
-    mutate(yr_since_app = (year - last_event)+1) %>% 
+    mutate(yr_since_app = (year - last_event)) %>% 
     select(year, cost, yld_reponse, crop, yr_since_app)
+  #Rad help to get the yld response to offset and fill correctly
+  
+  #yearssinceapp <- 0
+  #for(i in 1:nrow(cost_rip_noinput_df)) {
+  #  if(!is.na(cost_rip_noinput_df$cost[i]) && yearssinceapp > 0){ 
+  #    cost_rip_noinput_df$yr_since_app[i] <- yearssinceapp+1
+    
+  #  yearssinceapp = cost_rip_noinput_df$yr_since_app[i]
+  #}
+#}
+  
   #making temp file for a join which has a dummy yr_since_app clm
   treat <- select(cost_rip_noinput_df, year, cost, yld_reponse)
   treat <- mutate(treat,yr_since_app = year )
@@ -294,7 +305,10 @@ function_rip_noinputs_df <- function(final_farm_df, year_for_ripping, costs_ripp
   cost_rip_noinput_df <- mutate(cost_rip_noinput_df, treatment = "rip_no_inputs")
 }
 
-#join the two df - Need a better way if I have multiple
+
+  
+  
+  #join the two df - Need a better way if I have multiple
 #fix up na for clm before they are used in cals
 
 function_final_df <- function(join_price_df, treatments_df){
