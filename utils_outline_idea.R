@@ -121,7 +121,7 @@ function_decile5_yld_pot_wheat <- function(water_aval) {
               stdev_yld_pot = round(sd(FS_yld_pot_wheat),2))
   decile_5 <- subset(decile_av, Decile == "Decile5")
   
-  return(decile_5)
+  return(decile_5[[1,2]])
 }
 
 
@@ -148,8 +148,8 @@ function_decile5_yld_pot_pulses <- function(water_aval) {
     summarise(av_yld_pot= round(mean(FS_yld_pot_pulses),2),
               stdev_yld_pot = round(sd(FS_yld_pot_pulses),2))
   decile_5 <- subset(decile_av, Decile == "Decile5")
-  
-  return(decile_5)
+  #write.csv(decile_5, "decile_5.csv")
+  return(decile_5[[1,2]])
 }
 
 ######END OF MET WORK ######

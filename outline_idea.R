@@ -62,12 +62,14 @@ body <- dashboardBody(
                               "Lameroo" = 25509, 
                               "Bute" = 21012, 
                               "Brimpton Lake" = 18005, 
-                              "Cadgee" = 26009), 
+                              "Cadgee" = 26099), 
                   selected = "Waikerie"),
-      actionButton("refreash",
-                   label = "not working download"),
-      actionButton("click",
-                   label = "update"),
+      #actionButton("refreash",
+      #             label = "not working download"),
+      #actionButton("click",
+      #             label = "update wheat/barley"),
+      #actionButton("click2",
+      #             label = "update pulses"),
       numericInput(
         "total_size_farm",
         label = h3("Total size of yor farm ha"),
@@ -81,7 +83,8 @@ body <- dashboardBody(
       tableOutput("metfile"),
       tableOutput("Av_yld_pot_wheat"),
       tableOutput("Av_yld_pot_pulses"),
-      valueBoxOutput("click_box")
+      valueBoxOutput("click_box"),
+      valueBoxOutput("click_box2")
       #textOutput("metfile_file_name")
       ), 
       
@@ -505,21 +508,23 @@ server <- function(input, output) {
   output$metfile <- renderTable({
     decile() 
   })
-  output$Av_yld_pot_wheat <- renderTable({
-    decile5_yld_pot_wheat()
-  })
-  output$Av_yld_pot_pulses <- renderTable({
-    decile5_yld_pot_pulses()
-  })
+  #output$Av_yld_pot_wheat <- renderTable({
+  #  decile5_yld_pot_wheat()
+  #})
+  #output$Av_yld_pot_pulses <- renderTable({
+  #  decile5_yld_pot_pulses()
+  #})
   output$click_box <- renderValueBox({
-    valueBox(decile5_yld_pot_wheat(), "Yield potential of wheat / barley")
+    valueBox(decile5_yld_pot_wheat(), "Yield potential of wheat / barley t/ha")
   })
-  
+  output$click_box2 <- renderValueBox({
+    valueBox(decile5_yld_pot_pulses(), "Yield potential of pulses t/ha")
+  })
   #output$metfile_file_name <- renderText({
   #   test1() 
   # })
   output$name_of_met <- renderText({
-    input$stationID
+    paste0("station number: ",input$stationID)
   })
 
  output$text_size_farm = renderText({
