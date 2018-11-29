@@ -367,22 +367,19 @@ function_final_treatment_farm <- function(final_farm_df, treatment_bind){
 
 
 
-#fix up na for clm before they are used in cals
 
-#function_final_df_na_rm <- function(final_df){
-#  replace_na(final_df,list(crop =0), cost=0, yld_resp_since_applied=0, 
-#             yr_since_app =0, yld_resp_perct_crop =0, discount =0, 
-#             current_yld =0, potential_yld =0, price =0)
-#}
 
-function_economic_indicators <- function(final_df) {
+function_economic_indicators <- function(final_treatment_farm) {
   #work out the econmoic indicators
-  final_df <- final_df %>% 
+  
+  economic_indicators_rip_no_input <- filter(final_treatment_farm, treatment == 'rip_no_inputs')
+  economic_indicators_rip_no_input <-  economic_indicators_rip_no_input %>% 
   mutate(
     pres_value_fact = (1/(1+discount)^ year),
     benefit = ((current_yld*(yld_resp_since_applied / 100)* yld_resp_perct_crop) * price), 
     cashflow_no_dis_ann = benefit - cost,
     cashflow_dis_ann = ((benefit*pres_value_fact) - (cost*pres_value_fact)), 
+    cashflow_cum = cumsum(cashflow_no_dis_ann),
     cashflow_cum_disc = cumsum(cashflow_dis_ann),
     ROI_cum_no_disc = (cumsum(benefit) - cumsum(cost))/ cumsum(cost), 
     ROI_cum_disc = (cumsum(benefit*pres_value_fact) - cumsum(cost*pres_value_fact))/ cumsum(cost*pres_value_fact), 
@@ -390,12 +387,47 @@ function_economic_indicators <- function(final_df) {
     npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
   )
   
-write.csv(final_df, file = "check_on_outputs.csv")
-return(final_df)
+  economic_indicators_rip_shallow_organic <- filter(final_treatment_farm, treatment == 'rip_shallow_organic')
+  economic_indicators_rip_shallow_organic <-  economic_indicators_rip_shallow_organic %>% 
+    mutate(
+      pres_value_fact = (1/(1+discount)^ year),
+      benefit = ((current_yld*(yld_resp_since_applied / 100)* yld_resp_perct_crop) * price), 
+      cashflow_no_dis_ann = benefit - cost,
+      cashflow_dis_ann = ((benefit*pres_value_fact) - (cost*pres_value_fact)), 
+      cashflow_cum = cumsum(cashflow_no_dis_ann),
+      cashflow_cum_disc = cumsum(cashflow_dis_ann),
+      ROI_cum_no_disc = (cumsum(benefit) - cumsum(cost))/ cumsum(cost), 
+      ROI_cum_disc = (cumsum(benefit*pres_value_fact) - cumsum(cost*pres_value_fact))/ cumsum(cost*pres_value_fact), 
+      benefit_cost_ratio_disc = (sum(benefit*pres_value_fact) / sum(cost*pres_value_fact)), 
+      npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
+    )
+  economic_indicators <- bind_rows(economic_indicators_rip_no_input,
+                                   economic_indicators_rip_shallow_organic)
+  
+write.csv(economic_indicators, file = "economic_indicators.csv")
+return(economic_indicators)
 }
 
 
 function_plot <- function(economic_indicators) {
-  ggplot(economic_indicators, aes(year, cashflow_no_dis_ann))+
-    geom_line()
+  economic_indicators$year <- round(economic_indicators$year, 0)
+  
+  levels(economic_indicators$treatment)[levels(economic_indicators$treatment)=="rip_no_inputs"] <- "Ripping with no inputs"
+  levels(economic_indicators$treatment)[levels(economic_indicators$treatment)=="rip_shallow_organic"] <- "Ripping with shallow organic inputs"
+  
+  ggplot(economic_indicators, aes(year, cashflow_cum, colour= treatment))+
+    geom_line()+
+    theme_classic()+
+    theme(
+      axis.ticks.length = unit(-0.15, "cm"),
+      axis.text.y = element_text(size = 10, margin = unit(c(t = 4.0, r = 4.0, b = 4.0, l = 4.0), "mm")),
+      axis.text.x = element_text(size = 10, margin = unit(c(t = 4.0, r = 4.0, b = 4.0, l = 4.0), "mm")),
+      axis.title = element_text(size = 12, face = "bold"),
+      panel.border = element_rect(colour = "black", fill=NA, size=0.5)
+    )+
+    scale_y_continuous(sec.axis = sec_axis(~.+0, name = "",labels = NULL))+
+    scale_x_continuous( limits = c(1,10),
+                        sec.axis = sec_axis(~.+0, name = "",labels = NULL))+
+    labs(x = "Years",
+         y = "cash flow $")
 }

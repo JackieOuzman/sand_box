@@ -353,12 +353,12 @@ tabItem(
                                 selected = "cashflow_disc_ann") #checkboxInput bracket
           ), #box1 bracket
         box(
-        tableOutput("df_progress"),
-        tableOutput("df_progress_cost"),
+        #tableOutput("df_progress"),
+        #tableOutput("df_progress_cost"),
         
-        tableOutput("df_progress_final")
+        #tableOutput("df_progress_final"),
         #tableOutput("economic"),
-        #plotOutput("plot")
+        plotOutput("plot")
         )#box2 bracket
         ) #fluid bracket
         ), #tabItem bracket
@@ -536,19 +536,14 @@ server <- function(input, output) {
   })
   
   
-  
-  #final data frame with the farm parameters and treatment
-  #final_df <- reactive({
-  #  function_final_df(join_price_df(), treatments_df())
-  #})
   #economic indicators
-  #economic_indicators <- reactive({
-  #  function_economic_indicators(final_df())
-  #})
+  economic_indicators <- reactive({
+    function_economic_indicators(final_treatment_farm())
+  })
   
-  #plot <- reactive({
-  #  function_plot(economic_indicators())
-  #})
+  plot <- reactive({
+    function_plot(economic_indicators())
+  })
   
   ####### group of render OUTPUTS ########
   
@@ -596,12 +591,12 @@ server <- function(input, output) {
  
  
  ##### economic indicators #####
- #output$economic = renderTable({
- #  economic_indicators()
- #})
- #output$plot = renderPlot({
- #  plot()
- #})
+ output$economic = renderTable({
+   economic_indicators()
+ })
+ output$plot = renderPlot({
+   plot()
+ })
  
 }
 shinyApp(ui, server)
