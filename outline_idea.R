@@ -328,8 +328,9 @@ tabItem(
           ), #box1 bracket
         box(
         tableOutput("df_progress"),
-        tableOutput("df_progress_cost")
-        #tableOutput("df_progress_final"),
+        tableOutput("df_progress_cost"),
+        
+        tableOutput("df_progress_final")
         #tableOutput("economic"),
         #plotOutput("plot")
         )#box2 bracket
@@ -493,6 +494,14 @@ server <- function(input, output) {
   rip_noinputs_df <- reactive({
     function_rip_noinputs_df(final_farm_df(), input$year_for_ripping, input$costs_ripping)
   })
+  
+  
+  
+  #### Join Treatment df to the farm df ###
+  final_join_rip_noninputs <- reactive({
+    function_final_join_rip_noninputs(final_farm_df(), rip_noinputs_df())
+  })
+  
   #final data frame with the farm parameters and treatment
   #final_df <- reactive({
   #  function_final_df(join_price_df(), treatments_df())
@@ -543,10 +552,12 @@ server <- function(input, output) {
  output$df_progress_cost = renderTable({
    rip_noinputs_df()
  })
+ 
+ 
  #final data frame
- #output$df_progress_final = renderTable({
-  #  final_df()
- #})
+ output$df_progress_final = renderTable({
+    final_join_rip_noninputs()
+ })
  
  
  ##### economic indicators #####

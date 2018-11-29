@@ -313,9 +313,9 @@ function_rip_noinputs_df <- function(final_farm_df, year_for_ripping, costs_ripp
   #join the two df - Need a better way if I have multiple
 #fix up na for clm before they are used in cals
 
-function_final_df <- function(join_price_df, treatments_df){
-  a <- left_join(join_price_df, treatments_df, by = 'year')
-  b <- select(a, year, crop = crop.x, cost, yld_resp_since_applied,
+function_final_join_rip_noninputs <- function(final_farm_df, rip_noinputs_df){
+  a <- left_join(final_farm_df, rip_noinputs_df, by = 'ID')
+  b <- select(a, ID, year = year.x, crop = crop.x, treatment = treatment.x, cost, yld_resp_since_applied,
               yr_since_app, yld_resp_perct_crop, discount, current_yld, potential_yld, price)
   b <- replace_na(b,list(crop =0, cost=0, yld_resp_since_applied=0, 
              yr_since_app =0, yld_resp_perct_crop =0, discount =0, 
