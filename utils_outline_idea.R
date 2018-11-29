@@ -154,6 +154,8 @@ function_decile5_yld_pot_pulses <- function(water_aval) {
 
 ######END OF MET WORK ######
 
+#### MAKING A DF FOR THE FARM ZONE1 ######
+
 #this is working but the year 0 has no treatment assigned
 function_base_df1 <- function(mangement_options,crop_seq_zone1, discount){
   x <- data.frame(treatments = mangement_options,
@@ -242,8 +244,17 @@ function_flip_df_price <- function(making_df_price){
 #now join it to the df
 
 function_join_price_df <- function(join_potential_df, flip_df_price){
-  left_join(join_potential_df, flip_df_price, by = 'crop')
+  base_farm <-left_join(join_potential_df, flip_df_price, by = 'crop')
+  #write.csv(base_farm, "base_farm.csv")
+  return(base_farm)
+ }
+function_final_farm_df <- function(join_price_df){
+  join_price_df <- fill(join_price_df, treatments,.direction = c("up"))
+  join_price_df <- unite(join_price_df, ID,
+                         c(year,treatments), remove = FALSE)
 }
+
+###### DF FOR TREATMENTS ########
 
 #Now make a sep df for treatments with crops, year costs and yield response
 #having trouble with assigning cost to year zero but not the yield response

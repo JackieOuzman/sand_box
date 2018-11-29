@@ -81,11 +81,9 @@ body <- dashboardBody(
       textOutput("name_of_met"),
       
       tableOutput("metfile"),
-      tableOutput("Av_yld_pot_wheat"),
-      tableOutput("Av_yld_pot_pulses"),
-      valueBoxOutput("click_box"),
-      valueBoxOutput("click_box2")
-      #textOutput("metfile_file_name")
+      valueBoxOutput("yld_pot_wheat"),
+      valueBoxOutput("yld_pot_pulses")
+      
       ), 
       
       
@@ -284,8 +282,8 @@ tabItem(
              selected = 1,
              multiple = TRUE),
  
-  h6("Note we suggets assigning ripping cost at year 0"),
-  h6("Note costs for wetting agents applied and ... applied every year")
+  h6("For ripping we assign the yield repsonse after ripping has occured")
+  #h6("Note costs for wetting agents applied and ... applied every year")
   ), #column bracket
   
   column(6,
@@ -298,9 +296,9 @@ tabItem(
                max = 2000,
                step = 10),
   
-  h6("Note: inseason costs are likey to change with some treatment,"),
-  h6("for example we fertiliser, seeding rates and other costs may change if ripping with inputs was implmented"),
-  h6("this 'Average annual change in costs $/ha)' is an overall estimate how of variable costs will change.")
+  h6("Note : inseason costs are likey to change with some treatment,"),
+  h6("for example fertiliser, seeding rates and other costs may change if ripping with inputs was implmented"),
+  h6("'Average annual change in costs $/ha)' is an overall estimate how of variable costs will change.")
   ) #column bracket
   ) #fluidRow bracket
 )), #this is the tabItem bracket
@@ -469,6 +467,10 @@ server <- function(input, output) {
     function_join_potential_df(join_current_df(),flip_df_potential())
   })
   
+  final_farm_df <- reactive({
+    function_final_farm_df(join_potential_df())
+  })
+  
   #price 
   making_df_price <- reactive({
     function_making_df_price(input$a, input$b, input$c, input$d)
@@ -514,10 +516,10 @@ server <- function(input, output) {
   #output$Av_yld_pot_pulses <- renderTable({
   #  decile5_yld_pot_pulses()
   #})
-  output$click_box <- renderValueBox({
+  output$yld_pot_wheat <- renderValueBox({
     valueBox(decile5_yld_pot_wheat(), "Yield potential of wheat / barley t/ha")
   })
-  output$click_box2 <- renderValueBox({
+  output$yld_pot_pulses <- renderValueBox({
     valueBox(decile5_yld_pot_pulses(), "Yield potential of pulses t/ha")
   })
   #output$metfile_file_name <- renderText({
@@ -531,8 +533,9 @@ server <- function(input, output) {
   paste("Total size of your farm is set to:", input$total_size_farm,"ha")
 })
 
+ ## DF for the farm ##
  output$df_progress = renderTable({
-   join_price_df()
+   final_farm_df()
  })
  #cost outputs
  output$df_progress_cost = renderTable({
