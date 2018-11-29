@@ -13,6 +13,7 @@ library(shinyWidgets)
 library(readxl)
 library(dplyr)
 library(tidyverse)
+library(lubridate)
 
 source('utils_outline_idea.R')
 
@@ -52,10 +53,19 @@ body <- dashboardBody(
       fluidRow(column(6,
       selectInput("stationID", 
                   label = h3("Where is your farm?"),
-                  choices = c("Waikerie", "Carwarp","Ouyen", "Karoonda", "Murlong", "Yenda", "Lameroo", "Bute", "Brimpton Lake", "Cadgee"), 
+                  choices = c("Waikerie" =24018, 
+                              "Carwarp" = 76005,
+                              "Ouyen" = 76047, 
+                              "Karoonda" = 25006, 
+                              "Murlong" = 18046, 
+                              "Yenda" = 75079, 
+                              "Lameroo" = 25509, 
+                              "Bute" = 21012, 
+                              "Brimpton Lake" = 18005, 
+                              "Cadgee" = 26009), 
                   selected = "Waikerie"),
       actionButton("refreash",
-                   label = "download met file"),
+                   label = "not working download"),
       numericInput(
         "total_size_farm",
         label = h3("Total size of yor farm ha"),
@@ -63,8 +73,11 @@ body <- dashboardBody(
         min = 100,
         max = 6000,
         step =100),
-      
-      tableOutput("metfile") #this is new
+      textOutput("name_of_met"),
+      tableOutput("metfile"),
+      tableOutput("Av_yld_pot_wheat"),
+      tableOutput("Av_yld_pot_pulses")
+      #textOutput("metfile_file_name")
       ), 
       
       
@@ -383,16 +396,36 @@ ui <- dashboardPage(header =dashboardHeader(),
 server <- function(input, output) {
   #group of reactive functions
   
+  ####MET FILE WORK ####
+  #This is new Alex everytime I click this I get another number
+  #this is not behaving like its should
+  # I can't use the isolate button like this??
   
-  #This is new alex
-  stationID <- reactive({
-    isolate(input$stationID)
-    input$refreash
+  #stationID <- reactive({
+  #  isolate(input$stationID)
+  #  input$refreash
+  #})
+ 
+  met <- reactive({
+    function_met(input$stationID) #this is the first function
   })
   
-  test1 <- reactive({
-    getSiloMet_jax(stationID()) #this is the first function
+  water_aval<- reactive({
+    function_water_aval(met()) 
   })
+  decile<- reactive({
+    function_decile(water_aval()) 
+  })
+  
+  decile5_yld_pot_wheat <- reactive({
+    function_decile5_yld_pot_wheat(water_aval())
+  })
+  
+  decile5_yld_pot_pulses <- reactive({
+    function_decile5_yld_pot_pulses(water_aval())
+  })
+  
+  #### CREATING DF FOR FARM ########
   
   base_df1 <- reactive({
     map_df(input$mangement_options,
@@ -439,7 +472,7 @@ server <- function(input, output) {
   })
  
   
-  
+  #### CREATING DF FOR TREATMENTS ########
   
   #create a new df for treatments crop, yr, costs etc
   treatments_df <- reactive({
@@ -458,11 +491,24 @@ server <- function(input, output) {
     function_plot(economic_indicators())
   })
   
-  #group of render outputs
+  ####### group of render outputs ########
   
   #this is new
   output$metfile <- renderTable({
-    test1() 
+    decile() 
+  })
+  output$Av_yld_pot_wheat <- renderTable({
+    decile5_yld_pot_wheat()
+  })
+  output$Av_yld_pot_pulses <- renderTable({
+    decile5_yld_pot_pulses()
+  })
+  
+  #output$metfile_file_name <- renderText({
+  #   test1() 
+  # })
+  output$name_of_met <- renderText({
+    input$stationID
   })
 
  output$text_size_farm = renderText({
