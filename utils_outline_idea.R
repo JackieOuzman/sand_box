@@ -269,6 +269,7 @@ function_rip_noinputs_df <- function(final_farm_df, year_for_ripping, costs_ripp
   
   #bring in a file with the yield response over the 10 years
   yld_resp_crop_treat <- read.csv("yld_response.csv")
+  yld_resp_crop_treat <- filter(yld_resp_crop_treat, treatment == "rip_no_input")
   cost_rip_noinput_df <- left_join(cost_rip_noinput_df,yld_resp_crop_treat, "year")
   #step3 cal to modify the yield response reflecting when the treatment was applied
   cost_rip_noinput_df <- cost_rip_noinput_df %>% 

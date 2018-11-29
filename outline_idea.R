@@ -254,20 +254,21 @@ body <- dashboardBody(
 tabItem(
   tabName = "costs",
   tabsetPanel(
-    tabPanel(h3("Ripping with no inputs")), 
+    tabPanel(h3("Ripping")), 
   
   fluidRow(column(6,  
   h3("Upfront costs:"),
   h6("(Annual cost $/ha)"),
+  wellPanel(
   numericInput("costs_ripping", 
-             label = h4("Cost for ripping"),
+             label = h4("Cost for ripping with no inputs"),
               value = 80, 
               min = 0,
               max = 2000,
               step = 10),
   
   selectizeInput("year_for_ripping", 
-             label = h4("Ripping applied in which year?"),
+             label = h4("Ripping applied in which year?(no inputs)"),
              choices = list('before analysis'= "0",
                              'year 1' = "1",
                              'year 2' = "2",
@@ -280,26 +281,51 @@ tabItem(
                              'year 9' = "9",
                              'year 10' = "10"),
              selected = 1,
-             multiple = TRUE),
- 
-  h6("For ripping we assign the yield repsonse after ripping has occured")
-  #h6("Note costs for wetting agents applied and ... applied every year")
-  ), #column bracket
-  
-  column(6,
-  h3("Inseason costs:"),
-  h6("(Average annual change in costs $/ha)"),
-  numericInput("inseason_cost_ripping", 
-               label = h4("Average annual change in costs for ripping"),
+             multiple = TRUE)
+  ), #wellpanel bracket
+  wellPanel(
+  numericInput("rip_shallow_cost", 
+               label = h4("Cost for ripping with shallow organic inputs"),
                value = 80, 
                min = 0,
                max = 2000,
                step = 10),
   
-  h6("Note : inseason costs are likey to change with some treatment,"),
-  h6("for example fertiliser, seeding rates and other costs may change if ripping with inputs was implmented"),
-  h6("'Average annual change in costs $/ha)' is an overall estimate how of variable costs will change.")
+  selectizeInput("rip_shallow_cost_year", 
+                 label = h4("Ripping applied in which year? (shallow organic)"),
+                 choices = list('before analysis'= "0",
+                                'year 1' = "1",
+                                'year 2' = "2",
+                                'year 3' = "3",
+                                'year 4' = "4",
+                                'year 5' = "5",
+                                'year 6' = "6",
+                                'year 7' = "7",
+                                'year 8' = "8",
+                                'year 9' = "9",
+                                'year 10' = "10"),
+                 selected = 1,
+                 multiple = TRUE)
+  ),
+  
+  h6("For ripping we assign the yield repsonse after ripping has occured")
+  #h6("Note costs for wetting agents applied and ... applied every year")
   ) #column bracket
+  
+  #column(6,
+  #h3("Inseason costs:"),
+  #h6("(Average annual change in costs $/ha)"),
+  #numericInput("inseason_cost_ripping", 
+  #             label = h4("Average annual change in costs for ripping"),
+  #            value = 80, 
+  #             min = 0,
+  #             max = 2000,
+  #             step = 10),
+  
+  #h6("Note : inseason costs are likey to change with some treatment,"),
+  #h6("for example fertiliser, seeding rates and other costs may change if ripping with inputs was implmented"),
+  #h6("'Average annual change in costs $/ha)' is an overall estimate how of variable costs will change.")
+  #) #column bracket
   ) #fluidRow bracket
 )), #this is the tabItem bracket
 
