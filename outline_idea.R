@@ -23,13 +23,13 @@ header <-   dashboardHeader()
 #this is the list of all tabs in the app
 sidebar <-  dashboardSidebar(
             sidebarMenu(
-              menuItem("Tell me more",
+              menuItem("The farm and mitigation",
               tabName = "tell_me"),
-              menuItem("Set up farm",
+              menuItem("Crop sequence",
               tabName = "set_up_farm"),
-              menuItem("Costs",
+              menuItem("Costs of mitigation",
               tabName = "costs"),
-              menuItem("Extra modifications",
+              menuItem("Commodity prices",
               tabName = "extra"),
               menuItem("Results",
               tabName = "results")
@@ -70,19 +70,19 @@ body <- dashboardBody(
       #             label = "update wheat/barley"),
       #actionButton("click2",
       #             label = "update pulses"),
-      numericInput(
-        "total_size_farm",
-        label = h3("Total size of yor farm ha"),
-        value = 2500,
-        min = 100,
-        max = 6000,
-        step =100),
+      #numericInput(
+      #  "total_size_farm",
+      #  label = h3("Total size of yor farm ha"),
+      #  value = 2500,
+      #  min = 100,
+      #  max = 6000,
+      #  step =100),
       
       textOutput("name_of_met"),
       
-      tableOutput("metfile"),
-      valueBoxOutput("yld_pot_wheat"),
-      valueBoxOutput("yld_pot_pulses")
+      tableOutput("metfile")#,
+      #valueBoxOutput("yld_pot_wheat"),
+      #valueBoxOutput("yld_pot_pulses")
       
       ), 
       
@@ -110,15 +110,15 @@ body <- dashboardBody(
                        "Ripping with shallow fertiliser as inputs" = "rip_shallow_fert",
                        "Ripping with deep organic inputs"= "rip_deep_organic",
                        "Ripping with deep fertiliser as inputs" = "rip_deep_fert"), 
-        selected = "rip_no_inputs"),
-        radioButtons(
-        "depth",
-        label = h4("Depth of ripping?"),
-        choices = list("Ripping to 30 cm" = "30",
-                       "Ripping to 50 cm" = "50",
-                       "Ripping to 60 cm" = "60",
-                       "Ripping to 70 cm" = "70"),
-        selected ="30")
+        selected = "rip_no_inputs")
+        #radioButtons(
+        #"depth",
+        #label = h4("Depth of ripping?"),
+        #choices = list("Ripping to 30 cm" = "30",
+        #               "Ripping to 50 cm" = "50",
+        #               "Ripping to 60 cm" = "60",
+        #               "Ripping to 70 cm" = "70"),
+        #selected ="30")
       ) #well pannel
       ) #column bracket
       
@@ -132,8 +132,8 @@ body <- dashboardBody(
       tabName = "set_up_farm",
       
         
-        tabsetPanel(
-          tabPanel(h3("Zone1")), 
+        #tabsetPanel(
+          #tabPanel(h3("Zone1")), 
           
           
           
@@ -172,7 +172,7 @@ body <- dashboardBody(
                            multiple = TRUE
             ),
            
-            textOutput("text_size_farm"), # I want to move this up so its above select                   
+            #textOutput("text_size_farm"), # I want to move this up so its above select                   
            
             br(),
             
@@ -239,8 +239,12 @@ body <- dashboardBody(
           #tabPanel(h3("Zone2")),
           
           #tabPanel(h3("Zone3"))
-          ) 
-      )),
+          #) 
+          
+      ), #well pannel bracket
+      valueBoxOutput("yld_pot_wheat"),
+      valueBoxOutput("yld_pot_pulses")
+      ),
     
     
     
@@ -310,8 +314,8 @@ tabItem(
   
   h6("For ripping we assign the yield repsonse after ripping has occured")
   #h6("Note costs for wetting agents applied and ... applied every year")
-  ) #column bracket
-  
+  ), #column bracket
+  plotOutput("yield_resp_plot")
   #column(6,
   #h3("Inseason costs:"),
   #h6("(Average annual change in costs $/ha)"),
@@ -536,6 +540,8 @@ server <- function(input, output) {
   })
   
   
+  
+ 
   #economic indicators
   economic_indicators <- reactive({
     function_economic_indicators(final_treatment_farm())
