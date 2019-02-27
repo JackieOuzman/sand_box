@@ -346,9 +346,57 @@ function_rip_shallow_organic_df <- function(final_farm_df, rip_shallow_organic_y
   return(rip_shallow_organic_df)
 }
 
+
+#Now make a sep df for treatments Ripping with shallow fertliser inputs 
+function_rip_shallow_fert_df <- function(final_farm_df, rip_shallow_fert_year, rip_shallow_fert_cost){
+  a <- distinct(final_farm_df, year, .keep_all = TRUE)
+  b <- data_frame(year = as.numeric(rip_shallow_fert_year), #as numeric
+                  cost = rip_shallow_fert_cost) #,
+  #treatment = "rip_no_input")
+  rip_shallow_fert_df <- left_join(a, b, "year")
+  rip_shallow_fert_df <- select(rip_shallow_fert_df, year, crop, cost)
+  
+  #bring in a file with the yield response over the 10 years
+  yld_resp_crop_treat <- read.csv("yld_response.csv")
+  yld_resp_crop_treat <- filter(yld_resp_crop_treat, treatment == "rip_shallow_fert")
+  rip_shallow_fert_df <- left_join(rip_shallow_fert_df,yld_resp_crop_treat, "year")
+  #step3 cal to modify the yield response reflecting when the treatment was applied
+  rip_shallow_fert_df <- rip_shallow_fert_df %>% 
+    mutate(code = case_when(cost > 0 ~ 1,
+                            cost == 0 ~ 0)) 
+  rip_shallow_fert_df$year <- as.integer(rip_shallow_fert_df$year)
+  rip_shallow_fert_df <- rip_shallow_fert_df %>%
+    mutate(
+      code = as.logical(code),
+      last_event = if_else(code, true = year, false = NA_integer_)) %>%
+    fill(last_event) %>%
+    mutate(yr_since_app = (year - last_event)) %>% 
+    select(year, cost, yld_reponse, crop, yr_since_app)
+  
+  #making temp file for a join which has a dummy yr_since_app clm
+  treat <- select(rip_shallow_fert_df, year, cost, yld_reponse)
+  treat <- mutate(treat,yr_since_app = year )
+  rip_shallow_fert_df <- left_join(rip_shallow_fert_df, treat, by = 'yr_since_app') %>% 
+    select(year = year.x, crop, cost = cost.x, yld_resp_since_applied
+           = yld_reponse.y, yr_since_app)
+  #bring in another yield response file relating everything to crop type
+  yld_resp_crop_rip <- read.csv("yld_response_by_crop_ripping.csv")
+  rip_shallow_fert_df <- left_join(rip_shallow_fert_df, yld_resp_crop_rip, by = 'crop')
+  rip_shallow_fert_df <- mutate(rip_shallow_fert_df, treatment = "rip_shallow_fert")
+  rip_shallow_fert_df <- unite(rip_shallow_fert_df, ID,
+                                  c(year,treatment), remove = FALSE)
+  write.csv(rip_shallow_fert_df, "rip_shallow_fert_df.csv")
+  return(rip_shallow_fert_df)
+}
+
+
+
+
+
+
 ###Join the treatment df together with rbind
-function_treatment_bind <- function(cost_rip_noinput_df, rip_shallow_organic_df){
-      treatment <- bind_rows(cost_rip_noinput_df, rip_shallow_organic_df)
+function_treatment_bind <- function(cost_rip_noinput_df, rip_shallow_organic_df,rip_shallow_fert_df ){
+      treatment <- bind_rows(cost_rip_noinput_df, rip_shallow_organic_df, rip_shallow_fert_df)
 }
   #join the two df - Need a better way if I have multiple
 #fix up na for clm before they are used in cals
@@ -363,7 +411,6 @@ function_final_treatment_farm <- function(final_farm_df, treatment_bind){
   write.csv(b, "final_treatment_farm.csv")
   return(b)
 }
-
 
 
 
@@ -401,8 +448,24 @@ function_economic_indicators <- function(final_treatment_farm) {
       benefit_cost_ratio_disc = (sum(benefit*pres_value_fact) / sum(cost*pres_value_fact)), 
       npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
     )
+  
+  economic_indicators_rip_shallow_fert <- filter(final_treatment_farm, treatment == 'rip_shallow_fert')
+  economic_indicators_rip_shallow_fert <-  economic_indicators_rip_shallow_fert %>% 
+    mutate(
+      pres_value_fact = (1/(1+discount)^ year),
+      benefit = ((current_yld*(yld_resp_since_applied / 100)* yld_resp_perct_crop) * price), 
+      cashflow_no_dis_ann = benefit - cost,
+      cashflow_dis_ann = ((benefit*pres_value_fact) - (cost*pres_value_fact)), 
+      cashflow_cum = cumsum(cashflow_no_dis_ann),
+      cashflow_cum_disc = cumsum(cashflow_dis_ann),
+      ROI_cum_no_disc = (cumsum(benefit) - cumsum(cost))/ cumsum(cost), 
+      ROI_cum_disc = (cumsum(benefit*pres_value_fact) - cumsum(cost*pres_value_fact))/ cumsum(cost*pres_value_fact), 
+      benefit_cost_ratio_disc = (sum(benefit*pres_value_fact) / sum(cost*pres_value_fact)), 
+      npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
+    )
   economic_indicators <- bind_rows(economic_indicators_rip_no_input,
-                                   economic_indicators_rip_shallow_organic)
+                                   economic_indicators_rip_shallow_organic,
+                                   economic_indicators_rip_shallow_fert)
   
 write.csv(economic_indicators, file = "economic_indicators.csv")
 return(economic_indicators)

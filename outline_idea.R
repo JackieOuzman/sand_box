@@ -312,6 +312,30 @@ tabItem(
                  multiple = TRUE)
   ),
   
+  wellPanel(
+    numericInput("rip_shallow_fert_cost", 
+                 label = h4("Cost for ripping with shallow fertiliser inputs"),
+                 value = 80, 
+                 min = 0,
+                 max = 2000,
+                 step = 10),
+    
+    selectizeInput("rip_shallow_fert_year", 
+                   label = h4("Ripping applied in which year? (shallow with fertiliser)"),
+                   choices = list('before analysis'= "0",
+                                  'year 1' = "1",
+                                  'year 2' = "2",
+                                  'year 3' = "3",
+                                  'year 4' = "4",
+                                  'year 5' = "5",
+                                  'year 6' = "6",
+                                  'year 7' = "7",
+                                  'year 8' = "8",
+                                  'year 9' = "9",
+                                  'year 10' = "10"),
+                   selected = 1,
+                   multiple = TRUE)
+  ),
   h6("For ripping we assign the yield repsonse after ripping has occured")
   #h6("Note costs for wetting agents applied and ... applied every year")
   ), #column bracket
@@ -528,9 +552,12 @@ server <- function(input, output) {
   rip_shallow_organic_df <- reactive({
     function_rip_shallow_organic_df(final_farm_df(), input$rip_shallow_organic_year, input$rip_shallow_organic_cost)
   })
+  rip_shallow_fert_df <- reactive({
+    function_rip_shallow_fert_df(final_farm_df(), input$rip_shallow_fert_year, input$rip_shallow_fert_cost)
+  })
   
   treatment_bind <- reactive({
-    function_treatment_bind(rip_noinputs_df(), rip_shallow_organic_df())
+    function_treatment_bind(rip_noinputs_df(), rip_shallow_organic_df(),rip_shallow_fert_df() )
   })
   
   
