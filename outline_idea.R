@@ -638,7 +638,8 @@ server <- function(input, output) {
   })
   
   treatment_bind <- reactive({
-    function_treatment_bind(rip_noinputs_df(), rip_shallow_organic_df(),rip_shallow_fert_df(), rip_deep_organic_df(), rip_deep_fert_df(), function_wet_df() )
+    function_treatment_bind(rip_noinputs_df(), rip_shallow_organic_df(),rip_shallow_fert_df(), 
+                            rip_deep_organic_df(), rip_deep_fert_df(), function_wet_df() )
   })
   
   

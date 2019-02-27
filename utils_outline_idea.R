@@ -475,25 +475,25 @@ function_rip_deep_fert_df <- function(final_farm_df, rip_deep_fert_year, rip_dee
   return(rip_deep_fert_df)
 }
 
-#Now make a sep df for treatments wetting agents 
-function_wet_df <- function(final_farm_df, wet_year, wet_cost){
+#Now make a sep df for treatments wetting agents ####NEEDS WORKS#####
+function_wetter_df <- function(final_farm_df, wetter_year, wetter_cost){
   a <- distinct(final_farm_df, year, .keep_all = TRUE)
-  b <- data_frame(year = as.numeric(wet_year), #as numeric
-                  cost = wet_cost) #,
-  
-  wet_df <- left_join(a, b, "year")
-  wet_df <- select(wet_df, year, crop, cost)
+  b <- data_frame(year = as.numeric(wetter_year), #as numeric
+                  cost = wetter_cost) #,
+  #treatment = "rip_no_input")
+  wetter_df <- left_join(a, b, "year")
+  wetter_df <- select(wetter_df, year, crop, cost)
   
   #bring in a file with the yield response over the 10 years
   yld_resp_crop_treat <- read.csv("yld_response.csv")
-  yld_resp_crop_treat <- filter(yld_resp_crop_treat, treatment == "wet")
-  wet_df <- left_join(wet_df,yld_resp_crop_treat, "year")
+  yld_resp_crop_treat <- filter(yld_resp_crop_treat, treatment == "wetter")
+  wetter_df <- left_join(wetter_df,yld_resp_crop_treat, "year")
   #step3 cal to modify the yield response reflecting when the treatment was applied
-  wet_df <- wet_df %>% 
+  wetter_df <- wetter_df %>% 
     mutate(code = case_when(cost > 0 ~ 1,
                             cost == 0 ~ 0)) 
-  wet_df$year <- as.integer(wet_df$year)
-  wet_df <- wet_df %>%
+  wetter_df$year <- as.integer(wetter_df$year)
+  wetter_df <- wetter_df %>%
     mutate(
       code = as.logical(code),
       last_event = if_else(code, true = year, false = NA_integer_)) %>%
@@ -502,24 +502,27 @@ function_wet_df <- function(final_farm_df, wet_year, wet_cost){
     select(year, cost, yld_reponse, crop, yr_since_app)
   
   #making temp file for a join which has a dummy yr_since_app clm
-  treat <- select(wet_df, year, cost, yld_reponse)
+  treat <- select(wetter_df, year, cost, yld_reponse)
   treat <- mutate(treat,yr_since_app = year )
-  wet_df <- left_join(wet_df, treat, by = 'yr_since_app') %>% 
+  wetter_df <- left_join(wetter_df, treat, by = 'yr_since_app') %>% 
     select(year = year.x, crop, cost = cost.x, yld_resp_since_applied
            = yld_reponse.y, yr_since_app)
   #bring in another yield response file relating everything to crop type
   yld_resp_crop_rip <- read.csv("yld_response_by_crop_ripping.csv")
-  wet_df <- left_join(wet_df, yld_resp_crop_rip, by = 'crop')
-  wet_df <- mutate(wet_df, treatment = "wet")
-  wet_df <- unite(wet_df, ID,
+  wetter_df <- left_join(wetter_df, yld_resp_crop_rip, by = 'crop')
+  wetter_df <- mutate(wetter_df, treatment = "wetter")
+  wetter_df <- unite(wetter_df, ID,
                             c(year,treatment), remove = FALSE)
-  write.csv(wet_df, "wet_df.csv")
-  return(wet_df)
+  write.csv(wetter_df, "wetter_df.csv")
+  return(wetter_df)
 }
 
+
 ###Join the treatment df together with rbind
-function_treatment_bind <- function(cost_rip_noinput_df, rip_shallow_organic_df,rip_shallow_fert_df, rip_deep_organic_df, rip_deep_fert_df, wet_df ){
-      treatment <- bind_rows(cost_rip_noinput_df, rip_shallow_organic_df, rip_shallow_fert_df, rip_deep_organic_df, rip_deep_fert_df, wet_df)
+function_treatment_bind <- function(cost_rip_noinput_df, rip_shallow_organic_df,rip_shallow_fert_df, 
+                                    rip_deep_organic_df, rip_deep_fert_df,wet_df ){
+      treatment <- bind_rows(cost_rip_noinput_df, rip_shallow_organic_df, rip_shallow_fert_df, 
+                             rip_deep_organic_df, rip_deep_fert_df,wet_df )
 }
   #join the two df - Need a better way if I have multiple
 #fix up na for clm before they are used in cals
@@ -616,8 +619,8 @@ function_economic_indicators <- function(final_treatment_farm) {
       benefit_cost_ratio_disc = (sum(benefit*pres_value_fact) / sum(cost*pres_value_fact)), 
       npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
     )
-  economic_indicators_wet <- filter(final_treatment_farm, treatment == 'wet')
-  economic_indicators_wet <-  economic_indicators_wet %>% 
+  economic_indicators_wetter <- filter(final_treatment_farm, treatment == 'wetter')
+  economic_indicators_wetter <-  economic_indicators_wetter %>% 
     mutate(
       pres_value_fact = (1/(1+discount)^ year),
       benefit = ((current_yld*(yld_resp_since_applied / 100)* yld_resp_perct_crop) * price), 
@@ -635,7 +638,7 @@ function_economic_indicators <- function(final_treatment_farm) {
                                    economic_indicators_rip_shallow_fert,
                                    economic_indicators_rip_deep_organic,
                                    economic_indicators_rip_deep_fert,
-                                   economic_indicators_wet)
+                                   economic_indicators_wetter)
   
 write.csv(economic_indicators, file = "economic_indicators.csv")
 return(economic_indicators)
