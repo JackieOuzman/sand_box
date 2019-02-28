@@ -27,12 +27,13 @@ sidebar <-  dashboardSidebar(
               tabName = "tell_me"),
               menuItem("Crop sequence",
               tabName = "set_up_farm"),
-              menuItem("Costs of mitigation",
-              tabName = "costs"),
+              menuItem("mitigation cost",
+              tabName = "mitigation"),
               menuItem("Commodity prices",
               tabName = "extra"),
               menuItem("Results",
               tabName = "results")
+              
               
               
   )#sidebarMenu
@@ -255,163 +256,52 @@ body <- dashboardBody(
 #the thrid tab
 
 
-tabItem(
+tabItem(  
   tabName = "costs",
   tabsetPanel(
-    tabPanel(h3("Ripping")), 
+    tabPanel(h3("Ripping shallow")), 
   
   fluidRow(column(6,  
   h3("Upfront costs:"),
   h6("(Annual cost $/ha)"),
-  wellPanel(
-  numericInput("costs_ripping", 
-             label = h4("Cost for ripping with no inputs"),
-              value = 80, 
-              min = 0,
-              max = 2000,
-              step = 10),
+
+
+ 
+
+#  wellPanel(
+#    numericInput("rip_deep_fert_cost", 
+#                 label = h4("Cost for ripping with deep fertiliser inputs"),
+#                 value = 80, 
+#                 min = 0,
+#                 max = 2000,
+#                 step = 10),
+    
+#    selectizeInput("rip_deep_fert_year", 
+#                   label = h4("Ripping applied in which year? (deep with fertiliser)"),
+#                   choices = list('before analysis'= "0",
+#                                  'year 1' = "1",
+#                                  'year 2' = "2",
+#                                  'year 3' = "3",
+#                                  'year 4' = "4",
+#                                  'year 5' = "5",
+#                                  'year 6' = "6",
+#                                  'year 7' = "7",
+#                                  'year 8' = "8",
+#                                  'year 9' = "9",
+#                                  'year 10' = "10"),
+#                   selected = 1,
+#                   multiple = TRUE)
+#  ),
   
-  selectizeInput("year_for_ripping", 
-             label = h4("Ripping applied in which year?(no inputs)"),
-             choices = list('before analysis'= "0",
-                             'year 1' = "1",
-                             'year 2' = "2",
-                             'year 3' = "3",
-                             'year 4' = "4",
-                             'year 5' = "5",
-                             'year 6' = "6",
-                             'year 7' = "7",
-                             'year 8' = "8",
-                             'year 9' = "9",
-                             'year 10' = "10"),
-             selected = 1,
-             multiple = TRUE)
-  ), #wellpanel bracket
-  wellPanel(
-  numericInput("rip_shallow_organic_cost", 
-               label = h4("Cost for ripping with shallow organic inputs"),
-               value = 80, 
-               min = 0,
-               max = 2000,
-               step = 10),
-  
-  selectizeInput("rip_shallow_organic_year", 
-                 label = h4("Ripping applied in which year? (shallow organic)"),
-                 choices = list('before analysis'= "0",
-                                'year 1' = "1",
-                                'year 2' = "2",
-                                'year 3' = "3",
-                                'year 4' = "4",
-                                'year 5' = "5",
-                                'year 6' = "6",
-                                'year 7' = "7",
-                                'year 8' = "8",
-                                'year 9' = "9",
-                                'year 10' = "10"),
-                 selected = 1,
-                 multiple = TRUE)
-  ),
-  
-  wellPanel(
-    numericInput("rip_shallow_fert_cost", 
-                 label = h4("Cost for ripping with shallow fertiliser inputs"),
-                 value = 80, 
-                 min = 0,
-                 max = 2000,
-                 step = 10),
-    
-    selectizeInput("rip_shallow_fert_year", 
-                   label = h4("Ripping applied in which year? (shallow with fertiliser)"),
-                   choices = list('before analysis'= "0",
-                                  'year 1' = "1",
-                                  'year 2' = "2",
-                                  'year 3' = "3",
-                                  'year 4' = "4",
-                                  'year 5' = "5",
-                                  'year 6' = "6",
-                                  'year 7' = "7",
-                                  'year 8' = "8",
-                                  'year 9' = "9",
-                                  'year 10' = "10"),
-                   selected = 1,
-                   multiple = TRUE)
-  ),
-  wellPanel(
-    numericInput("rip_deep_organic_cost", 
-                 label = h4("Cost for ripping with deep organic inputs"),
-                 value = 80, 
-                 min = 0,
-                 max = 2000,
-                 step = 10),
-    
-    selectizeInput("rip_deep_organic_year", 
-                   label = h4("Ripping applied in which year? (deep with organic)"),
-                   choices = list('before analysis'= "0",
-                                  'year 1' = "1",
-                                  'year 2' = "2",
-                                  'year 3' = "3",
-                                  'year 4' = "4",
-                                  'year 5' = "5",
-                                  'year 6' = "6",
-                                  'year 7' = "7",
-                                  'year 8' = "8",
-                                  'year 9' = "9",
-                                  'year 10' = "10"),
-                   selected = 1,
-                   multiple = TRUE)
-  ),
-  wellPanel(
-    numericInput("rip_deep_fert_cost", 
-                 label = h4("Cost for ripping with deep fertiliser inputs"),
-                 value = 80, 
-                 min = 0,
-                 max = 2000,
-                 step = 10),
-    
-    selectizeInput("rip_deep_fert_year", 
-                   label = h4("Ripping applied in which year? (deep with fertiliser)"),
-                   choices = list('before analysis'= "0",
-                                  'year 1' = "1",
-                                  'year 2' = "2",
-                                  'year 3' = "3",
-                                  'year 4' = "4",
-                                  'year 5' = "5",
-                                  'year 6' = "6",
-                                  'year 7' = "7",
-                                  'year 8' = "8",
-                                  'year 9' = "9",
-                                  'year 10' = "10"),
-                   selected = 1,
-                   multiple = TRUE)
-  ),
-  wellPanel(
-    numericInput("wetter_cost", 
-                 label = h4("Cost for wetting agent"),
-                 value = 80, 
-                 min = 0,
-                 max = 2000,
-                 step = 10),
-    
-    selectizeInput("wetter_year", 
-                   label = h4("In which year was wetting agent applied?"),
-                   choices = list('before analysis'= "0",
-                                  'year 1' = "1",
-                                  'year 2' = "2",
-                                  'year 3' = "3",
-                                  'year 4' = "4",
-                                  'year 5' = "5",
-                                  'year 6' = "6",
-                                  'year 7' = "7",
-                                  'year 8' = "8",
-                                  'year 9' = "9",
-                                  'year 10' = "10"),
-                   selected = 1,
-                   multiple = TRUE)
-  ),
   h6("For ripping we assign the yield repsonse after ripping has occured")
   #h6("Note costs for wetting agents applied and ... applied every year")
-  ), #column bracket
+  ), 
+  
   plotOutput("yield_resp_plot")
+  
+  #column bracket
+  
+ 
   #column(6,
   #h3("Inseason costs:"),
   #h6("(Average annual change in costs $/ha)"),
@@ -427,7 +317,190 @@ tabItem(
   #h6("'Average annual change in costs $/ha)' is an overall estimate how of variable costs will change.")
   #) #column bracket
   ) #fluidRow bracket
-)), #this is the tabItem bracket
+   
+)), 
+
+  #####TRY MY mitigation costs again######
+
+#temp tab
+  tabItem(
+    tabName = "mitigation" ,
+    tabBox(
+
+###### NO Rippping ######
+
+      tabPanel(h4("non ripping mitigation"),
+        wellPanel(
+        numericInput("wetter_cost", 
+                               label = h4("Cost for wetting agent"),
+                               value = 80, 
+                               min = 0,
+                               max = 2000,
+                               step = 10),
+                
+                  selectizeInput("wetter_year", 
+                                 label = h4("In which year was wetting agent applied?"),
+                                 choices = list('before analysis'= "0",
+                                                'year 1' = "1",
+                                                'year 2' = "2",
+                                                'year 3' = "3",
+                                                'year 4' = "4",
+                                                'year 5' = "5",
+                                                'year 6' = "6",
+                                                'year 7' = "7",
+                                                'year 8' = "8",
+                                                'year 9' = "9",
+                                                'year 10' = "10"),
+                                 selected = 1,
+                                 multiple = TRUE)
+                )),#this tab panel and well pannel
+                
+  #########          Shallow ripping         #########              
+  ######### first one ripping with no inputs ####
+
+
+                tabPanel(h4("shallow ripping mitigation"),
+          wellPanel(
+          numericInput("costs_ripping", 
+                     label = h4("Cost for ripping with no inputs"),
+                      value = 80, 
+                      min = 0,
+                      max = 2000,
+                      step = 10),
+        
+          selectizeInput("year_for_ripping", 
+                     label = h4("Ripping applied in which year?(no inputs)"),
+                     choices = list('before analysis'= "0",
+                                     'year 1' = "1",
+                                     'year 2' = "2",
+                                     'year 3' = "3",
+                                     'year 4' = "4",
+                                     'year 5' = "5",
+                                     'year 6' = "6",
+                                     'year 7' = "7",
+                                     'year 8' = "8",
+                                     'year 9' = "9",
+                                     'year 10' = "10"),
+                     selected = 1,
+                     multiple = TRUE)
+          ), #well pannel
+          
+######### second  one ripping with ornganic  inputs ####      
+
+        wellPanel(
+        numericInput("rip_shallow_organic_cost", 
+                     label = h4("Cost for ripping with shallow organic inputs"),
+                     value = 80, 
+                     min = 0,
+                     max = 2000,
+                     step = 10),
+      
+        selectizeInput("rip_shallow_organic_year", 
+                       label = h4("Ripping applied in which year? (shallow organic)"),
+                       choices = list('before analysis'= "0",
+                                      'year 1' = "1",
+                                      'year 2' = "2",
+                                      'year 3' = "3",
+                                      'year 4' = "4",
+                                      'year 5' = "5",
+                                      'year 6' = "6",
+                                      'year 7' = "7",
+                                      'year 8' = "8",
+                                      'year 9' = "9",
+                                      'year 10' = "10"),
+                       selected = 1,
+                       multiple = TRUE)
+        ),   #well pannel 
+
+######### thrid  one ripping with fert inputs ####   
+
+ wellPanel(
+   numericInput("rip_shallow_fert_cost", 
+                 label = h4("Cost for ripping with shallow fertiliser inputs"),
+                 value = 80, 
+                min = 0,
+                 max = 2000,
+                 step = 10),
+
+    selectizeInput("rip_shallow_fert_year", 
+                   label = h4("Ripping applied in which year? (shallow with fertiliser)"),
+                   choices = list('before analysis'= "0",
+                                  'year 1' = "1",
+                                  'year 2' = "2",
+                                  'year 3' = "3",
+                                  'year 4' = "4",
+                                  'year 5' = "5",
+                                  'year 6' = "6",
+                                  'year 7' = "7",
+                                  'year 8' = "8",
+                                  'year 9' = "9",
+                                  'year 10' = "10"),
+                   selected = 1,
+                   multiple = TRUE)
+  )),#well pannel and tab pannel 
+
+
+#########          deep ripping         #########              
+######### first one ripping with organic inputs ####
+                
+               
+          tabPanel(h4("deep ripping mitigation"), 
+      wellPanel(
+                numericInput("rip_deep_organic_cost", 
+                 label = h4("Cost for ripping with deep organic inputs"),
+                                value = 80, 
+                                min = 0,
+                                    max = 2000,
+                                    step = 10),
+                   
+                  selectizeInput("rip_deep_organic_year", 
+                                      label = h4("Ripping applied in which year? (deep with organic)"),
+                                      choices = list('before analysis'= "0",
+                                                     'year 1' = "1",
+                                                     'year 2' = "2",
+                                                     'year 3' = "3",
+                                                     'year 4' = "4",
+                                                     'year 5' = "5",
+                                                     'year 6' = "6",
+                                                     'year 7' = "7",
+                                                     'year 8' = "8",
+                                                     'year 9' = "9",
+                                                     'year 10' = "10"),
+                                      selected = 1,
+                                      multiple = TRUE)
+                   
+                   ), #bracket for well pannel 
+                   
+
+######### second one ripping with fertiliser inputs ####    
+
+  wellPanel(
+    numericInput("rip_deep_fert_cost", 
+                 label = h4("Cost for ripping with deep fertiliser inputs"),
+                 value = 80, 
+                 min = 0,
+                 max = 2000,
+                 step = 10),
+
+    selectizeInput("rip_deep_fert_year", 
+                   label = h4("Ripping applied in which year? (deep with fertiliser)"),
+                   choices = list('before analysis'= "0",
+                                  'year 1' = "1",
+                                  'year 2' = "2",
+                                  'year 3' = "3",
+                                  'year 4' = "4",
+                                  'year 5' = "5",
+                                  'year 6' = "6",
+                                  'year 7' = "7",
+                                  'year 8' = "8",
+                                  'year 9' = "9",
+                                  'year 10' = "10"),
+                   selected = 1,
+                   multiple = TRUE)
+        )) #bracket for well pannel and tab box
+        )), #bracket for tab item
+
+
 
 
 

@@ -653,17 +653,25 @@ function_plot <- function(economic_indicators) {
                                                              "rip_deep_fert"))
   
   
-  ggplot(economic_indicators, aes(year, cashflow_cum, group= treatment))+
-    geom_line(aes(linetype = treatment))+
+  ggplot(economic_indicators, aes(year, cashflow_cum, colour= treatment))+
+    geom_line(aes(colour = treatment))+
     theme_classic()+
     theme(legend.position = "bottom")+
-    scale_linetype(name = "",
-                   labels=c("wetter", "ripping with no inputs", 
-                            "ripping with shallow organic inputs", 
-                            "ripping with shallow fertiliser inputs", 
-                            "ripping with deep organic inputs",
-                            "ripping with deep fertiliser inputs"))+
+    scale_color_manual(name = "",
+                       labels=c(wetter = "wetter", 
+                                rip_no_inputs ="ripping with no inputs", 
+                                rip_shallow_organic = "ripping with shallow organic inputs", 
+                                rip_shallow_fert ="ripping with shallow fertiliser inputs", 
+                                rip_deep_organic="ripping with deep organic inputs",
+                                rip_deep_fert = "ripping with deep fertiliser inputs"),
+                       values=c(wetter = "black", 
+                                rip_no_inputs = "grey",
+                                rip_shallow_organic = "light blue",
+                                rip_shallow_fert ="dark blue", 
+                                rip_deep_organic= "light green", 
+                                rip_deep_fert = "dark green"))+
     xlim(1,5)+
     labs(x = "Years",
          y = "cash flow $")
+  
 }
