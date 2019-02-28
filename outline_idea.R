@@ -256,71 +256,7 @@ body <- dashboardBody(
 #the thrid tab
 
 
-tabItem(  
-  tabName = "costs",
-  tabsetPanel(
-    tabPanel(h3("Ripping shallow")), 
-  
-  fluidRow(column(6,  
-  h3("Upfront costs:"),
-  h6("(Annual cost $/ha)"),
-
-
- 
-
-#  wellPanel(
-#    numericInput("rip_deep_fert_cost", 
-#                 label = h4("Cost for ripping with deep fertiliser inputs"),
-#                 value = 80, 
-#                 min = 0,
-#                 max = 2000,
-#                 step = 10),
-    
-#    selectizeInput("rip_deep_fert_year", 
-#                   label = h4("Ripping applied in which year? (deep with fertiliser)"),
-#                   choices = list('before analysis'= "0",
-#                                  'year 1' = "1",
-#                                  'year 2' = "2",
-#                                  'year 3' = "3",
-#                                  'year 4' = "4",
-#                                  'year 5' = "5",
-#                                  'year 6' = "6",
-#                                  'year 7' = "7",
-#                                  'year 8' = "8",
-#                                  'year 9' = "9",
-#                                  'year 10' = "10"),
-#                   selected = 1,
-#                   multiple = TRUE)
-#  ),
-  
-  h6("For ripping we assign the yield repsonse after ripping has occured")
-  #h6("Note costs for wetting agents applied and ... applied every year")
-  ), 
-  
-  plotOutput("yield_resp_plot")
-  
-  #column bracket
-  
- 
-  #column(6,
-  #h3("Inseason costs:"),
-  #h6("(Average annual change in costs $/ha)"),
-  #numericInput("inseason_cost_ripping", 
-  #             label = h4("Average annual change in costs for ripping"),
-  #            value = 80, 
-  #             min = 0,
-  #             max = 2000,
-  #             step = 10),
-  
-  #h6("Note : inseason costs are likey to change with some treatment,"),
-  #h6("for example fertiliser, seeding rates and other costs may change if ripping with inputs was implmented"),
-  #h6("'Average annual change in costs $/ha)' is an overall estimate how of variable costs will change.")
-  #) #column bracket
-  ) #fluidRow bracket
-   
-)), 
-
-  #####TRY MY mitigation costs again######
+  #####TRY MY mitigation costs ######
 
 #temp tab
   tabItem(
@@ -333,7 +269,7 @@ tabItem(
         wellPanel(
         numericInput("wetter_cost", 
                                label = h4("Cost for wetting agent"),
-                               value = 80, 
+                               value = 10, 
                                min = 0,
                                max = 2000,
                                step = 10),
@@ -363,7 +299,7 @@ tabItem(
           wellPanel(
           numericInput("costs_ripping", 
                      label = h4("Cost for ripping with no inputs"),
-                      value = 80, 
+                      value = 70, 
                       min = 0,
                       max = 2000,
                       step = 10),
@@ -417,7 +353,7 @@ tabItem(
  wellPanel(
    numericInput("rip_shallow_fert_cost", 
                  label = h4("Cost for ripping with shallow fertiliser inputs"),
-                 value = 80, 
+                 value = 90, 
                 min = 0,
                  max = 2000,
                  step = 10),
@@ -448,7 +384,7 @@ tabItem(
       wellPanel(
                 numericInput("rip_deep_organic_cost", 
                  label = h4("Cost for ripping with deep organic inputs"),
-                                value = 80, 
+                                value = 90, 
                                 min = 0,
                                     max = 2000,
                                     step = 10),
@@ -477,7 +413,7 @@ tabItem(
   wellPanel(
     numericInput("rip_deep_fert_cost", 
                  label = h4("Cost for ripping with deep fertiliser inputs"),
-                 value = 80, 
+                 value = 100, 
                  min = 0,
                  max = 2000,
                  step = 10),
@@ -509,6 +445,7 @@ tabItem(
         tabName = "results",
         fluidRow(
           box(
+            width = 12,
         selectInput("Results for", 
               label = h3("Over how many years?"),
               choices = c("5 years" = "5yrs", "10 years" ="10yrs"), 
@@ -524,17 +461,14 @@ tabItem(
                                 "Net Present Value" ="NPV",
                                 "Modified Internal Rate Return" ="MIRR"),
                                 selected = "cashflow_disc_ann") #checkboxInput bracket
-          ), #box1 bracket
-        box(
-        #tableOutput("df_progress"),
-        #tableOutput("df_progress_cost"),
         
-        #tableOutput("df_progress_final"),
-        #tableOutput("economic"),
+        ), #box1 bracket
+        #box(
+        
         plotOutput("plot")
         )#box2 bracket
-        ) #fluid bracket
-        ), #tabItem bracket
+        ), #fluid bracket
+        #), #tabItem bracket
 
 
 
