@@ -648,22 +648,22 @@ return(economic_indicators)
 function_plot <- function(economic_indicators) {
   economic_indicators$year <- round(economic_indicators$year, 0)
   
-  levels(economic_indicators$treatment)[levels(economic_indicators$treatment)=="rip_no_inputs"] <- "Ripping with no inputs"
-  levels(economic_indicators$treatment)[levels(economic_indicators$treatment)=="rip_shallow_organic"] <- "Ripping with shallow organic inputs"
+  economic_indicators$treatment <- factor(economic_indicators$treatment, c("wetter", "rip_no_inputs", "rip_shallow_organic",
+                                                             "rip_shallow_fert", "rip_deep_organic",
+                                                             "rip_deep_fert"))
   
-  ggplot(economic_indicators, aes(year, cashflow_cum, colour= treatment))+
-    geom_line()+
+  
+  ggplot(economic_indicators, aes(year, cashflow_cum, group= treatment))+
+    geom_line(aes(linetype = treatment))+
     theme_classic()+
-    theme(
-      axis.ticks.length = unit(-0.15, "cm"),
-      axis.text.y = element_text(size = 10, margin = unit(c(t = 4.0, r = 4.0, b = 4.0, l = 4.0), "mm")),
-      axis.text.x = element_text(size = 10, margin = unit(c(t = 4.0, r = 4.0, b = 4.0, l = 4.0), "mm")),
-      axis.title = element_text(size = 12, face = "bold"),
-      panel.border = element_rect(colour = "black", fill=NA, size=0.5)
-    )+
-    scale_y_continuous(sec.axis = sec_axis(~.+0, name = "",labels = NULL))+
-    scale_x_continuous( limits = c(1,10),
-                        sec.axis = sec_axis(~.+0, name = "",labels = NULL))+
+    theme(legend.position = "bottom")+
+    scale_linetype(name = "",
+                   labels=c("wetter", "ripping with no inputs", 
+                            "ripping with shallow organic inputs", 
+                            "ripping with shallow fertiliser inputs", 
+                            "ripping with deep organic inputs",
+                            "ripping with deep fertiliser inputs"))+
+    xlim(1,5)+
     labs(x = "Years",
          y = "cash flow $")
 }

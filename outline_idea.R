@@ -385,14 +385,14 @@ tabItem(
                    multiple = TRUE)
   ),
   wellPanel(
-    numericInput("wet_cost", 
+    numericInput("wetter_cost", 
                  label = h4("Cost for wetting agent"),
                  value = 80, 
                  min = 0,
                  max = 2000,
                  step = 10),
     
-    selectizeInput("wet_year", 
+    selectizeInput("wetter_year", 
                    label = h4("In which year was wetting agent applied?"),
                    choices = list('before analysis'= "0",
                                   'year 1' = "1",
@@ -633,13 +633,16 @@ server <- function(input, output) {
   rip_deep_fert_df <- reactive({
     function_rip_deep_fert_df(final_farm_df(), input$rip_deep_fert_year, input$rip_deep_fert_cost)
   })
-  wet_df <- reactive({
-    function_wet_df(final_farm_df(), input$wet_year, input$wet_cost)
+  rip_deep_fert1_df <- reactive({
+    function_rip_deep_fert_df(final_farm_df(), input$rip_deep_fert_year, input$rip_deep_fert_cost)
+  })
+  wetter_df <- reactive({
+    function_wetter_df(final_farm_df(), input$wetter_year, input$wetter_cost)
   })
   
   treatment_bind <- reactive({
     function_treatment_bind(rip_noinputs_df(), rip_shallow_organic_df(),rip_shallow_fert_df(), 
-                            rip_deep_organic_df(), rip_deep_fert_df(), function_wet_df() )
+                            rip_deep_organic_df(), rip_deep_fert_df(), wetter_df())
   })
   
   
