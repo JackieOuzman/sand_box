@@ -444,11 +444,13 @@ body <- dashboardBody(
         fluidRow(
           box(
             width = 12,
-        selectInput("Results_for", 
-              label = h3("Over how many years?"),
-              choices = c("5 years" = 5, "10 years" = 10), 
-              selected = "5 years"),
-        checkboxGroupInput("analysis", 
+        #selectInput("Results_for", 
+        #      label = h3("Over how many years?"),
+        #      choices = c("5 years" = 5, "10 years" = 10), 
+        #      selected = "5 years"),
+        
+        
+        radioButtons("analysis", 
                     label = h3("What analysis?"),
                     choices = c("Undiscounted annual cash flow" = "cashflow_no_dis_ann",
                                 "discounted annual net cash flow" ="cashflow_dis_ann",
@@ -456,13 +458,14 @@ body <- dashboardBody(
                                 "Cummulative ROI not discounted" ="ROI_cum_no_disc",
                                 "Cummulative ROI discounted" ="ROI_cum_disc",
                                 "Benefit:Cost Ratio (discounted)" ="benefit_cost_ratio_disc",
-                                "Net Present Value" ="NPV",
-                                "Modified Internal Rate Return" ="MIRR"),
-                                selected = "Cummulative discounted cash flow") #checkboxInput bracket
+                                "Net Present Value" ="npv"),
+                                #"Modified Internal Rate Return" ="MIRR"),
+                                selected = "cashflow_cum_disc") #checkboxInput bracket
         
         , #box1 bracket
         box(width=8,
-        title = "Results",
+        title = "Results over 5 years",
+        textOutput("name_of_results"),
         plotOutput("plot")
         ))#box2 bracket
         )), #fluid bracket
@@ -671,6 +674,11 @@ server <- function(input, output) {
     function_plot(economic_indicators(), input$analysis )
   })
   
+  
+  name_plot <- reactive({
+    function_metric_name(input$analysis)
+  })
+  
   ####### group of render OUTPUTS ########
   
   #this is new
@@ -696,6 +704,9 @@ server <- function(input, output) {
     paste0("station number: ",input$stationID)
   })
 
+  output$name_of_results <- renderText({
+    paste0("metric: ",input$analysis)
+  })
  output$text_size_farm = renderText({
   paste("Total size of your farm is set to:", input$total_size_farm,"ha")
 })

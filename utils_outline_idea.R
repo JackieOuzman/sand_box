@@ -670,8 +670,22 @@ function_plot <- function(economic_indicators,  metric) {
                                 rip_shallow_fert ="dark blue", 
                                 rip_deep_organic= "light green", 
                                 rip_deep_fert = "dark green"))+
-    xlim(0,5)+
+    xlim(1,5)+
     labs(x = "Years",
          y = "$")
   
+}
+
+function_metric_name <- function(metric){
+  
+    ifelse(metric == cashflow_no_dis_ann, "Undiscounted annual cash flow",
+                    ifelse(test_name == cashflow_dis_ann, "discounted annual net cash flow",
+                    ifelse(test_name == cashflow_cum_disc, "Cummulative discounted cash flow",
+                    ifelse(test_name == ROI_cum_no_disc, "Cummulative ROI not discounted",                         
+                    ifelse(test_name == ROI_cum_disc, "Cummulative ROI discounted",                         
+                    ifelse(test_name == benefit_cost_ratio_disc, "Benefit:Cost Ratio (discounted)",                         
+                    ifelse(test_name == npv, "Net Present Value",                        
+                    ifelse(test_name == MIRR, "Modified Internal Rate Return"      
+                    ))))))))      
+ print(metric) 
 }
