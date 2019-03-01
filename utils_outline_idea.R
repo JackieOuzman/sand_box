@@ -645,16 +645,16 @@ return(economic_indicators)
 }
 
 
-function_plot <- function(economic_indicators) {
+function_plot <- function(economic_indicators,  metric) {
   economic_indicators$year <- round(economic_indicators$year, 0)
   
   economic_indicators$treatment <- factor(economic_indicators$treatment, c("wetter", "rip_no_inputs", "rip_shallow_organic",
                                                              "rip_shallow_fert", "rip_deep_organic",
                                                              "rip_deep_fert"))
   
-  
-  ggplot(economic_indicators, aes(year, cashflow_cum, colour= treatment))+
-    geom_line(aes(colour = treatment))+
+  #m <- sym(metric)
+  ggplot(economic_indicators, aes_(x = as.name("year"), y=as.name(metric) , colour= as.name("treatment")))+
+    geom_line()+
     theme_classic()+
     theme(legend.position = "bottom")+
     scale_color_manual(name = "",
@@ -670,8 +670,8 @@ function_plot <- function(economic_indicators) {
                                 rip_shallow_fert ="dark blue", 
                                 rip_deep_organic= "light green", 
                                 rip_deep_fert = "dark green"))+
-    xlim(1,5)+
+    xlim(0,5)+
     labs(x = "Years",
-         y = "cash flow $")
+         y = "$")
   
 }

@@ -23,19 +23,18 @@ header <-   dashboardHeader()
 #this is the list of all tabs in the app
 sidebar <-  dashboardSidebar(
             sidebarMenu(
-              menuItem("The farm and mitigation",
-              tabName = "tell_me"),
-              menuItem("Crop sequence",
-              tabName = "set_up_farm"),
-              menuItem("mitigation cost",
-              tabName = "mitigation"),
-              menuItem("Commodity prices",
-              tabName = "extra"),
-              menuItem("Results",
-              tabName = "results")
+              menuItem("The farm and mitigation", tabName = "tell_me", icon = icon("question")),
+              menuItem("Crop sequence", tabName = "set_up_farm", icon = icon("th")),
+              menuItem("mitigation cost", tabName = "mitigation", icon = icon("list")),
+              menuItem("Commodity prices", tabName = "extra", icon = icon("dollar")),
+              menuItem("Results", tabName = "results", icon = icon("bar-chart-o"))
+              #,menuItem("test", tabName = "test")
               
-              
-              
+#icon(name, class = NULL, lib = "font-awesome")            
+#fa-cloud-sun", lib = "font-awesome") 
+
+
+             
   )#sidebarMenu
 )#dshboradSider
 
@@ -46,45 +45,45 @@ body <- dashboardBody(
     
     
     
-#the first tab    
+    #the first tab    
     
     tabItem(
       tabName = "tell_me",
       
       fluidRow(column(6,
-      selectInput("stationID", 
-                  label = h3("Where is your farm?"),
-                  choices = c("Waikerie" =24018, 
-                              "Carwarp" = 76005,
-                              "Ouyen" = 76047, 
-                              "Karoonda" = 25006, 
-                              "Murlong" = 18046, 
-                              "Yenda" = 75079, 
-                              "Lameroo" = 25509, 
-                              "Bute" = 21012, 
-                              "Brimpton Lake" = 18005, 
-                              "Cadgee" = 26099), 
-                  selected = "Waikerie"),
-      #actionButton("refreash",
-      #             label = "not working download"),
-      #actionButton("click",
-      #             label = "update wheat/barley"),
-      #actionButton("click2",
-      #             label = "update pulses"),
-      #numericInput(
-      #  "total_size_farm",
-      #  label = h3("Total size of yor farm ha"),
-      #  value = 2500,
-      #  min = 100,
-      #  max = 6000,
-      #  step =100),
-      
-      textOutput("name_of_met"),
-      
-      tableOutput("metfile")#,
-      #valueBoxOutput("yld_pot_wheat"),
-      #valueBoxOutput("yld_pot_pulses")
-      
+                      selectInput("stationID", 
+                                  label = h3("Where is your farm?"),
+                                  choices = c("Waikerie" =24018, 
+                                              "Carwarp" = 76005,
+                                              "Ouyen" = 76047, 
+                                              "Karoonda" = 25006, 
+                                              "Murlong" = 18046, 
+                                              "Yenda" = 75079, 
+                                              "Lameroo" = 25509, 
+                                              "Bute" = 21012, 
+                                              "Brimpton Lake" = 18005, 
+                                              "Cadgee" = 26099), 
+                                  selected = "Waikerie"),
+                      #actionButton("refreash",
+                      #             label = "not working download"),
+                      #actionButton("click",
+                      #             label = "update wheat/barley"),
+                      #actionButton("click2",
+                      #             label = "update pulses"),
+                      #numericInput(
+                      #  "total_size_farm",
+                      #  label = h3("Total size of yor farm ha"),
+                      #  value = 2500,
+                      #  min = 100,
+                      #  max = 6000,
+                      #  step =100),
+                      
+                      textOutput("name_of_met"),
+                      
+                      tableOutput("metfile")#,
+                      #valueBoxOutput("yld_pot_wheat"),
+                      #valueBoxOutput("yld_pot_pulses")
+                      
       ), 
       
       
@@ -96,36 +95,35 @@ body <- dashboardBody(
       #  selected = 1),
       
       column(6,
-      wellPanel(
-      
-        checkboxGroupInput(
-        "mangement_options",
-        label = h3("What are you considering?"),
-        choices = list("Wetting agents" = "wetter", 
-                       #"Sowing on edge of row" = "sow_edge", 
-                       #"Spading with no inputs" = "spade_no_inputs", 
-                       #"Spading with shallow organic inputs" = "spade_organic",
-                       #"Spading with shallow fertiliser as inputs" = "spade_fert",
-                       "Ripping with no inputs" = "rip_no_inputs",
-                       "Ripping with shallow organic inputs"= "rip_shallow_organic",
-                       "Ripping with shallow fertiliser as inputs" = "rip_shallow_fert",
-                       "Ripping with deep organic inputs"= "rip_deep_organic",
-                       "Ripping with deep fertiliser as inputs" = "rip_deep_fert"), 
-        selected = "rip_no_inputs")
-        #radioButtons(
-        #"depth",
-        #label = h4("Depth of ripping?"),
-        #choices = list("Ripping to 30 cm" = "30",
-        #               "Ripping to 50 cm" = "50",
-        #               "Ripping to 60 cm" = "60",
-        #               "Ripping to 70 cm" = "70"),
-        #selected ="30")
-      ) #well pannel
+             wellPanel(
+               
+               checkboxGroupInput(
+                 "mangement_options",
+                 label = h3("What are you considering?"),
+                 choices = list("Wetting agents" = "wetter", 
+                                #"Sowing on edge of row" = "sow_edge", 
+                                #"Spading with no inputs" = "spade_no_inputs", 
+                                #"Spading with shallow organic inputs" = "spade_organic",
+                                #"Spading with shallow fertiliser as inputs" = "spade_fert",
+                                "Ripping with no inputs" = "rip_no_inputs",
+                                "Ripping with shallow organic inputs"= "rip_shallow_organic",
+                                "Ripping with shallow fertiliser as inputs" = "rip_shallow_fert",
+                                "Ripping with deep organic inputs"= "rip_deep_organic",
+                                "Ripping with deep fertiliser as inputs" = "rip_deep_fert"), 
+                 selected = "rip_no_inputs")
+               #radioButtons(
+               #"depth",
+               #label = h4("Depth of ripping?"),
+               #choices = list("Ripping to 30 cm" = "30",
+               #               "Ripping to 50 cm" = "50",
+               #               "Ripping to 60 cm" = "60",
+               #               "Ripping to 70 cm" = "70"),
+               #selected ="30")
+             ) #well pannel
       ) #column bracket
       
       )#this is fluid Row bracket
     ), #tabItem  
-    
     
     
 #The second tab
@@ -446,29 +444,32 @@ body <- dashboardBody(
         fluidRow(
           box(
             width = 12,
-        selectInput("Results for", 
+        selectInput("Results_for", 
               label = h3("Over how many years?"),
-              choices = c("5 years" = "5yrs", "10 years" ="10yrs"), 
+              choices = c("5 years" = 5, "10 years" = 10), 
               selected = "5 years"),
         checkboxGroupInput("analysis", 
                     label = h3("What analysis?"),
-                    choices = c("Undiscounted annual cash flow" = "cashflow_no_disc",
-                                "discounted annual net cash flow" ="cashflow_disc_ann",
+                    choices = c("Undiscounted annual cash flow" = "cashflow_no_dis_ann",
+                                "discounted annual net cash flow" ="cashflow_dis_ann",
                                 "Cummulative discounted cash flow" ="cashflow_cum_disc",
                                 "Cummulative ROI not discounted" ="ROI_cum_no_disc",
                                 "Cummulative ROI discounted" ="ROI_cum_disc",
                                 "Benefit:Cost Ratio (discounted)" ="benefit_cost_ratio_disc",
                                 "Net Present Value" ="NPV",
                                 "Modified Internal Rate Return" ="MIRR"),
-                                selected = "cashflow_disc_ann") #checkboxInput bracket
+                                selected = "Cummulative discounted cash flow") #checkboxInput bracket
         
-        ), #box1 bracket
-        #box(
-        
+        , #box1 bracket
+        box(width=8,
+        title = "Results",
         plotOutput("plot")
-        )#box2 bracket
-        ), #fluid bracket
+        ))#box2 bracket
+        )), #fluid bracket
         #), #tabItem bracket
+
+
+
 
 
 
@@ -667,7 +668,7 @@ server <- function(input, output) {
   })
   
   plot <- reactive({
-    function_plot(economic_indicators())
+    function_plot(economic_indicators(), input$analysis )
   })
   
   ####### group of render OUTPUTS ########
