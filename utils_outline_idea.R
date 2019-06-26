@@ -252,7 +252,7 @@ function_final_farm_df <- function(join_price_df){
   join_price_df <- fill(join_price_df, treatment,.direction = c("up"))
   join_price_df <- unite(join_price_df, ID,
                          c(year,treatment), remove = FALSE)
-  write.csv(join_price_df, "final_farm_df.csv")
+  #write.csv(join_price_df, "final_farm_df.csv")
   return(join_price_df)
   
 }
@@ -299,7 +299,7 @@ function_rip_noinputs_df <- function(final_farm_df, year_for_ripping, costs_ripp
   cost_rip_noinput_df <- unite(cost_rip_noinput_df, ID,
                          c(year,treatment), remove = FALSE)
   
-  write.csv(cost_rip_noinput_df, "cost_rip_noinput_df.csv")
+  #write.csv(cost_rip_noinput_df, "cost_rip_noinput_df.csv")
   return(cost_rip_noinput_df)
   }
 
@@ -342,7 +342,7 @@ function_rip_shallow_organic_df <- function(final_farm_df, rip_shallow_organic_y
   rip_shallow_organic_df <- mutate(rip_shallow_organic_df, treatment = "rip_shallow_organic")
   rip_shallow_organic_df <- unite(rip_shallow_organic_df, ID,
                                c(year,treatment), remove = FALSE)
-  write.csv(rip_shallow_organic_df, "rip_shallow_organic_df.csv")
+  #write.csv(rip_shallow_organic_df, "rip_shallow_organic_df.csv")
   return(rip_shallow_organic_df)
 }
 
@@ -385,7 +385,7 @@ function_rip_shallow_fert_df <- function(final_farm_df, rip_shallow_fert_year, r
   rip_shallow_fert_df <- mutate(rip_shallow_fert_df, treatment = "rip_shallow_fert")
   rip_shallow_fert_df <- unite(rip_shallow_fert_df, ID,
                                   c(year,treatment), remove = FALSE)
-  write.csv(rip_shallow_fert_df, "rip_shallow_fert_df.csv")
+  #write.csv(rip_shallow_fert_df, "rip_shallow_fert_df.csv")
   return(rip_shallow_fert_df)
 }
 
@@ -428,7 +428,7 @@ function_rip_deep_organic_df <- function(final_farm_df, rip_deep_organic_year, r
   rip_deep_organic_df <- mutate(rip_deep_organic_df, treatment = "rip_deep_organic")
   rip_deep_organic_df <- unite(rip_deep_organic_df, ID,
                                c(year,treatment), remove = FALSE)
-  write.csv(rip_deep_organic_df, "rip_deep_organic_df.csv")
+  #write.csv(rip_deep_organic_df, "rip_deep_organic_df.csv")
   return(rip_deep_organic_df)
 }
 
@@ -471,7 +471,7 @@ function_rip_deep_fert_df <- function(final_farm_df, rip_deep_fert_year, rip_dee
   rip_deep_fert_df <- mutate(rip_deep_fert_df, treatment = "rip_deep_fert")
   rip_deep_fert_df <- unite(rip_deep_fert_df, ID,
                                c(year,treatment), remove = FALSE)
-  write.csv(rip_deep_fert_df, "rip_deep_fert_df.csv")
+  #write.csv(rip_deep_fert_df, "rip_deep_fert_df.csv")
   return(rip_deep_fert_df)
 }
 
@@ -513,7 +513,7 @@ function_wetter_df <- function(final_farm_df, wetter_year, wetter_cost){
   wetter_df <- mutate(wetter_df, treatment = "wetter")
   wetter_df <- unite(wetter_df, ID,
                             c(year,treatment), remove = FALSE)
-  write.csv(wetter_df, "wetter_df.csv")
+  #write.csv(wetter_df, "wetter_df.csv")
   return(wetter_df)
 }
 
@@ -534,7 +534,7 @@ function_final_treatment_farm <- function(final_farm_df, treatment_bind){
   b <- replace_na(b,list(crop =0, cost=0, yld_resp_since_applied=0, 
              yr_since_app =0, yld_resp_perct_crop =0, discount =0, 
              current_yld =0, potential_yld =0, price =0))
-  write.csv(b, "final_treatment_farm.csv")
+  #write.csv(b, "final_treatment_farm.csv")
   return(b)
 }
 
@@ -640,7 +640,7 @@ function_economic_indicators <- function(final_treatment_farm) {
                                    economic_indicators_rip_deep_fert,
                                    economic_indicators_wetter)
   
-write.csv(economic_indicators, file = "economic_indicators.csv")
+#write.csv(economic_indicators, file = "economic_indicators.csv")
 return(economic_indicators)
 }
 
