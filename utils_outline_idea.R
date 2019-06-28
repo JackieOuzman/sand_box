@@ -644,6 +644,46 @@ function_economic_indicators <- function(final_treatment_farm) {
 return(economic_indicators)
 }
 
+function_do_montecarlo_economic_indicators <- function(final_treatment_farm, num_simulation=NULL, dbn_name=NULL, decile_1=NULL, decile_9=NULL  ){
+    #do monte-carlo on the economic_indicators,
+    #distribution_properties is a named list with the minimal properties of attributes
+    #distribution_properties = list(name="", location=0, shape=1, rate)
+    
+    if(doDbg) browser()
+    #do a single simulation 
+    if(is.null(num_simulation) && is.null(dbn_name)){
+        economic_indicators = function_economic_indicators(final_treatment_farm)
+        return(economic_indicators)
+    } 
+    
+    #init montecarlo params  
+    if(is.null(num_simulation)) num_simulation <- 100
+    if(is.null(dbn_name)) dbn_name <- "log-logistic"
+    
+    nominal_yield_wheat = 3.0 
+    if(is.null(decile_1)) decile_1 <- nominal_yield_wheat*0.25 #pas067 change to realistic value
+    if(is.null(decile_9)) decile_9 <- nominal_yield_wheat*2.0 #pas067 change to realistic value
+    
+    #do montecarlo, place the first element of the list without randomness
+    mc_economic_indicators = list()
+    mc_economic_indicators[[1]] = function_economic_indicators(final_treatment_farm)
+    if(dbn_name == "log-logistic"){
+        scale = sqrt(decile_9 * decile_1)
+        shape = -2*log(3)/log(sqrt(decile_9*decile_1)/decile_9)
+        # montecarloloop through the randomness, #pas067 negative values draw another, potentially correlate with other variable
+        for(mc_idx in 2:num_simulation){
+            mc_current_yld <-actuar::rllogis(length(final_treatment_farm$current_yld), shape=shape, scale = scale)
+            final_treatment_farm$current_yld <- mc_current_yld
+            mc_economic_indicators[[mc_idx]] = function_economic_indicators(final_treatment_farm)
+        }
+        
+    }    
+    
+    return(mc_economic_indicators)
+    
+} #function_do_montecarlo_economic_indicators
+
+
 
 function_plot <- function(economic_indicators,  metric) {
   economic_indicators$year <- round(economic_indicators$year, 0)
