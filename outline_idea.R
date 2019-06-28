@@ -177,7 +177,7 @@ body <- dashboardBody(
             
             
             fluidRow(column(6,
-            
+            #pas067 aa is current wheat yield
            numericInput("aa",
                         label = "Current wheat (t/ha)",
                         value = 3,
@@ -584,7 +584,7 @@ server <- function(input, output) {
   fix_crop_name <- reactive({
     function_fix_crop_name (base_df1())
   })
-  #current yields 
+  #pas067 current yields aa is wheat
   making_df_current <- reactive({
     function_making_df_current(input$aa, input$bb, input$cc, input$dd)
   })
@@ -667,11 +667,13 @@ server <- function(input, output) {
  
   #economic indicators
   economic_indicators <- reactive({
-    function_economic_indicators(final_treatment_farm())
+    #pas067 function_economic_indicators(final_treatment_farm())
+    function_do_montecarlo_economic_indicators(final_treatment_farm())
   })
   
   plot <- reactive({
     function_plot(economic_indicators(), input$analysis )
+    
   })
   
   

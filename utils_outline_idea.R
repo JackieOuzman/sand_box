@@ -2,7 +2,10 @@
 #this get the downlaoded met files they are in a folder called met
 #I was thinking this would be quicker than using the uRL function I had before
 #But it is just as slow:(
+#
 
+#file wide vrbls
+doDbg = TRUE
 function_met <- function(stationID) {
   met_file <- read_csv(paste0("met_file/",stationID,".csv"))
     return(met_file)
