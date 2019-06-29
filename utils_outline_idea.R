@@ -6,8 +6,9 @@
 #### libraries ####
 library(reshape2)
 library(ggplot2)
+library(dplyr)
 #### file wide vrbls ####
-doDbg = TRUE
+doDbg = FALSE
 
 
 #### met function block ####
@@ -657,7 +658,7 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm, num
     #distribution_properties is a named list with the minimal properties of attributes
     #distribution_properties = list(name="", location=0, shape=1, rate)
     
-    if(doDbg) browser()
+    #if(doDbg) browser()
     #do a single simulation 
     if(is.null(num_simulation) && is.null(dbn_name)){
         economic_indicators = function_economic_indicators(final_treatment_farm)
@@ -686,7 +687,7 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm, num
         }
         
     }    
-    if(doDbg) browser()
+    #if(doDbg) browser()
     return(mc_economic_indicators)
     
 } #function_do_montecarlo_economic_indicators
@@ -727,9 +728,14 @@ function_plot <- function(economic_indicators,  metric) {
 function_plot_list_economic_indicators <- function(list_economic_indicators, metric){
     #pas067 plots economic_indicators of interest from a list of data.frames of economic indicators
     if(doDbg) browser() 
-    economic_indicators_1 = list_economic_indicators[[1]]
+    economic_indicators_1 <- list_economic_indicators[[1]]
     
     #from the list create a data.frame just containing the metric
+    list_dfmetric <- lapply(list_economic_indicators, function(x) x%>% select(metric))
+    list_dfmetric[[length(list_dfmetric)+1]] = economic_indicators_1["year"]
+    df_slctd_metric <- bind_cols(list_dfmetric)
+    dfs2plot <- reshape2::melt(df_slctd_metric, id.vars="year", variable.names="series")
+    if(TRUE) browser()
     
     economic_indicators_1$year <- round(economic_indicators_1$year, 0)
     
@@ -738,28 +744,35 @@ function_plot_list_economic_indicators <- function(list_economic_indicators, met
                                                                              "rip_deep_fert"))
     
     #from the list create a data.frame just containing the metric
-    
-    #m <- sym(metric)
-    ggplot(economic_indicators_1, aes_(x = as.name("year"), y=as.name(metric) , colour= as.name("treatment")))+
-        geom_line()+
-        theme_classic()+
-        theme(legend.position = "bottom")+
-        scale_color_manual(name = "",
-                           labels=c(wetter = "wetter", 
-                                    rip_no_inputs ="ripping with no inputs", 
-                                    rip_shallow_organic = "ripping with shallow organic inputs", 
-                                    rip_shallow_fert ="ripping with shallow fertiliser inputs", 
-                                    rip_deep_organic="ripping with deep organic inputs",
-                                    rip_deep_fert = "ripping with deep fertiliser inputs"),
-                           values=c(wetter = "black", 
-                                    rip_no_inputs = "grey",
-                                    rip_shallow_organic = "light blue",
-                                    rip_shallow_fert ="dark blue", 
-                                    rip_deep_organic= "light green", 
-                                    rip_deep_fert = "dark green"))+
-        xlim(1,5)+
-        labs(x = "Years",
-             y = "$")
+    is_many = TRUE
+    if(is_many){
+        gg = ggplot(data=dfs2plot,
+               aes(x=year, y=value)) +
+            geom_line()
+        return(gg)
+    } else{
+        #m <- sym(metric)
+        ggplot(economic_indicators_1, aes_(x = as.name("year"), y=as.name(metric) , colour= as.name("treatment")))+
+            geom_line()+
+            theme_classic()+
+            theme(legend.position = "bottom")+
+            scale_color_manual(name = "",
+                               labels=c(wetter = "wetter", 
+                                        rip_no_inputs ="ripping with no inputs", 
+                                        rip_shallow_organic = "ripping with shallow organic inputs", 
+                                        rip_shallow_fert ="ripping with shallow fertiliser inputs", 
+                                        rip_deep_organic="ripping with deep organic inputs",
+                                        rip_deep_fert = "ripping with deep fertiliser inputs"),
+                               values=c(wetter = "black", 
+                                        rip_no_inputs = "grey",
+                                        rip_shallow_organic = "light blue",
+                                        rip_shallow_fert ="dark blue", 
+                                        rip_deep_organic= "light green", 
+                                        rip_deep_fert = "dark green"))+
+            xlim(1,5)+
+            labs(x = "Years",
+                 y = "$")
+    }#is_many
     
 }
 
