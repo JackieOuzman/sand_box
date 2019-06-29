@@ -3,7 +3,9 @@
 #I was thinking this would be quicker than using the uRL function I had before
 #But it is just as slow:(
 #
-
+#### libraries ####
+library(reshape2)
+library(ggplot2)
 #### file wide vrbls ####
 doDbg = TRUE
 
@@ -730,6 +732,8 @@ function_plot_list_economic_indicators <- function(list_economic_indicators, met
     economic_indicators$treatment <- factor(economic_indicators$treatment, c("wetter", "rip_no_inputs", "rip_shallow_organic",
                                                                              "rip_shallow_fert", "rip_deep_organic",
                                                                              "rip_deep_fert"))
+    
+    #from the list create a data.frame just containing the metric
     
     #m <- sym(metric)
     ggplot(economic_indicators, aes_(x = as.name("year"), y=as.name(metric) , colour= as.name("treatment")))+

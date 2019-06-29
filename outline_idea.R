@@ -7,6 +7,7 @@
 #    http://shiny.rstudio.com/
 #
 
+#### libraries ####
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
@@ -17,7 +18,7 @@ library(lubridate)
 
 source('utils_outline_idea.R')
 
-#file side vrbls
+#### file side vrbls  ####
 do_montecarlo = FALSE
 
 #empty dashboard
@@ -666,8 +667,7 @@ server <- function(input, output) {
   })
   
   
-
-  #single economic indicators, #montecarlo on economic indicator
+  #### single economic indicators, montecarlo on economic indicator
   if(do_montecarlo){
       montecarlo_economic_indicators <- reactive({
           function_do_montecarlo_economic_indicators(final_treatment_farm(),dbn_name="log-logistic", decile_1 = NULL, decile_9=NULL)   
@@ -676,7 +676,7 @@ server <- function(input, output) {
       economic_indicators <- reactive({
           function_economic_indicators(final_treatment_farm())
       })
-  }
+  }#do_mc
   
   if(do_montecarlo){
       plot_list_economic_indicators <- reactive({
@@ -688,7 +688,7 @@ server <- function(input, output) {
           function_plot(economic_indicators(), input$analysis )
           
       })
-  }
+  }#do_mc
   
   
   name_plot <- reactive({
