@@ -747,7 +747,7 @@ server <- function(input, output) {
    economic_indicators()
  })
  if(do_montecarlo){
-     
+     output$plot = renderPlot({plot_list_economic_indicators()})
  } else{
      output$plot = renderPlot({
          plot()

@@ -686,7 +686,7 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm, num
         }
         
     }    
-    
+    if(doDbg) browser()
     return(mc_economic_indicators)
     
 } #function_do_montecarlo_economic_indicators
@@ -726,7 +726,8 @@ function_plot <- function(economic_indicators,  metric) {
 
 function_plot_list_economic_indicators <- function(list_economic_indicators, metric){
     #pas067 plots economic_indicators of interest from a list of data.frames of economic indicators
-    if(doDbg) browser()    
+    if(doDbg) browser() 
+    economic_indicators = list_economic_indicators[[1]]
     economic_indicators$year <- round(economic_indicators$year, 0)
     
     economic_indicators$treatment <- factor(economic_indicators$treatment, c("wetter", "rip_no_inputs", "rip_shallow_organic",
