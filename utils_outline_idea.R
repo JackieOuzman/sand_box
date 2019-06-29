@@ -734,7 +734,7 @@ function_plot_list_economic_indicators <- function(list_economic_indicators, met
     list_dfmetric <- lapply(list_economic_indicators, function(x) x%>% select(metric))
     list_dfmetric[[length(list_dfmetric)+1]] = economic_indicators_1["year"]
     df_slctd_metric <- bind_cols(list_dfmetric)
-    dfs2plot <- reshape2::melt(df_slctd_metric, id.vars="year", variable.names="series")
+    dfs2plot <- reshape2::melt(df_slctd_metric, id.vars="year")
     if(TRUE) browser()
     
     economic_indicators_1$year <- round(economic_indicators_1$year, 0)
@@ -746,10 +746,9 @@ function_plot_list_economic_indicators <- function(list_economic_indicators, met
     #from the list create a data.frame just containing the metric
     is_many = TRUE
     if(is_many){
-        gg = ggplot(data=dfs2plot,
+        ggplot(dfs2plot,
                aes(x=year, y=value)) +
             geom_line()
-        return(gg)
     } else{
         #m <- sym(metric)
         ggplot(economic_indicators_1, aes_(x = as.name("year"), y=as.name(metric) , colour= as.name("treatment")))+
