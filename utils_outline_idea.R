@@ -542,9 +542,6 @@ function_final_treatment_farm <- function(final_farm_df, treatment_bind){
 }
 
 
-
-
-
 function_economic_indicators <- function(final_treatment_farm) {
   #work out the econmoic indicators
   
@@ -717,6 +714,11 @@ function_plot <- function(economic_indicators,  metric) {
     labs(x = "Years",
          y = "$")
   
+}
+
+function_plot_list_economic_indicators <- function(list_economic_indicators, metric){
+    #pas067 plots economic_indicators of interest from a list of data.frames of economic indicators
+    
 }
 
 function_metric_name <- function(metric){

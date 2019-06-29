@@ -17,6 +17,9 @@ library(lubridate)
 
 source('utils_outline_idea.R')
 
+#file side vrbls
+do_montecarlo = FALSE
+
 #empty dashboard
 header <-   dashboardHeader()
 
@@ -663,18 +666,29 @@ server <- function(input, output) {
   })
   
   
+
+  #single economic indicators, #montecarlo on economic indicator
+  if(do_montecarlo){
+      montecarlo_economic_indicators <- reactive({
+          function_do_montecarlo_economic_indicators(final_treatment_farm(),dbn_name="log-logistic", decile_1 = NULL, decile_9=NULL)   
+      })      
+  } else{
+      economic_indicators <- reactive({
+          function_economic_indicators(final_treatment_farm())
+      })
+  }
   
- 
-  #economic indicators
-  economic_indicators <- reactive({
-    #pas067 function_economic_indicators(final_treatment_farm())
-    function_do_montecarlo_economic_indicators(final_treatment_farm())
-  })
-  
-  plot <- reactive({
-    function_plot(economic_indicators(), input$analysis )
-    
-  })
+  if(do_montecarlo){
+      plot_list_economic_indicators <- reactive({
+          function_plot_list_economic_indicators(montecarlo_economic_indicators(), input$analysis)
+      })
+      
+  } else{
+      plot <- reactive({
+          function_plot(economic_indicators(), input$analysis )
+          
+      })
+  }
   
   
   name_plot <- reactive({
