@@ -19,7 +19,8 @@ library(lubridate)
 source('utils_outline_idea.R')
 
 #### file side vrbls  ####
-do_montecarlo = FALSE
+do_montecarlo = TRUE
+doDbg = TRUE
 
 #empty dashboard
 header <-   dashboardHeader()
@@ -747,6 +748,7 @@ server <- function(input, output) {
    economic_indicators()
  })
  if(do_montecarlo){
+     if(doDbg) browser()
      output$plot = renderPlot({plot_list_economic_indicators()})
  } else{
      output$plot = renderPlot({

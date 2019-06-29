@@ -727,17 +727,20 @@ function_plot <- function(economic_indicators,  metric) {
 function_plot_list_economic_indicators <- function(list_economic_indicators, metric){
     #pas067 plots economic_indicators of interest from a list of data.frames of economic indicators
     if(doDbg) browser() 
-    economic_indicators = list_economic_indicators[[1]]
-    economic_indicators$year <- round(economic_indicators$year, 0)
+    economic_indicators_1 = list_economic_indicators[[1]]
     
-    economic_indicators$treatment <- factor(economic_indicators$treatment, c("wetter", "rip_no_inputs", "rip_shallow_organic",
+    #from the list create a data.frame just containing the metric
+    
+    economic_indicators_1$year <- round(economic_indicators_1$year, 0)
+    
+    economic_indicators_1$treatment <- factor(economic_indicators_1$treatment, c("wetter", "rip_no_inputs", "rip_shallow_organic",
                                                                              "rip_shallow_fert", "rip_deep_organic",
                                                                              "rip_deep_fert"))
     
     #from the list create a data.frame just containing the metric
     
     #m <- sym(metric)
-    ggplot(economic_indicators, aes_(x = as.name("year"), y=as.name(metric) , colour= as.name("treatment")))+
+    ggplot(economic_indicators_1, aes_(x = as.name("year"), y=as.name(metric) , colour= as.name("treatment")))+
         geom_line()+
         theme_classic()+
         theme(legend.position = "bottom")+
