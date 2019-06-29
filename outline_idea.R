@@ -682,7 +682,6 @@ server <- function(input, output) {
       plot_list_economic_indicators <- reactive({
           function_plot_list_economic_indicators(montecarlo_economic_indicators(), input$analysis)
       })
-      
   } else{
       plot <- reactive({
           function_plot(economic_indicators(), input$analysis )
@@ -747,9 +746,13 @@ server <- function(input, output) {
  output$economic = renderTable({
    economic_indicators()
  })
- output$plot = renderPlot({
-   plot()
- })
+ if(do_montecarlo){
+     
+ } else{
+     output$plot = renderPlot({
+         plot()
+     })
+ }#do_mc
  
 }
 shinyApp(ui, server)
