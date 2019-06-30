@@ -666,7 +666,7 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm, num
     } 
     
     #init montecarlo params  
-    if(is.null(num_simulation)) num_simulation <- 100
+    if(is.null(num_simulation)) num_simulation <- 10
     if(is.null(dbn_name)) dbn_name <- "log-logistic"
     
     nominal_yield_wheat = 3.0 
@@ -727,21 +727,23 @@ function_plot <- function(economic_indicators,  metric) {
 
 function_plot_list_economic_indicators <- function(list_economic_indicators, metric){
     #pas067 plots economic_indicators of interest from a list of data.frames of economic indicators
-    if(doDbg) browser() 
+    if(TRUE) browser() 
     economic_indicators_1 <- list_economic_indicators[[1]]
     
-    if(FALSE){
+    if(TRUE){
     #from the list create a data.frame just containing the metric
     list_dfmetric <- lapply(list_economic_indicators, function(x) x%>% select(metric))
     list_dfmetric[[length(list_dfmetric)+1]] = economic_indicators_1["year"]
     df_slctd_metric <- bind_cols(list_dfmetric)
-    dfs2plot <- reshape2::melt(df_slctd_metric, id.vars="year")
+    vrbl_names = names(df_slctd_metric)
+    vrbl_names = vrbl_names[1:length(vrbl_names)-1]
+    dfs2plot <- reshape2::melt(df_slctd_metric, id.vars="year", measure.vars = vrbl_names)
     } else{
         df <- data.frame(year = 1:10,
                          a = cumsum(rnorm(10)),
                          b = cumsum(rnorm(10)),
                          c = cumsum(rnorm(10)))
-        dfs2plot <- melt(df ,  id.vars = 'year', variable.name = 'series')        
+        dfs2plot <- melt(df ,  id.vars = 'year', measure.vars = c("a", "b", "c"))        
     }
 
     
@@ -757,7 +759,7 @@ function_plot_list_economic_indicators <- function(list_economic_indicators, met
     is_many = TRUE
     if(is_many){
         ggplot(dfs2plot,
-               aes(x=year, y=value)) +
+               aes(x=year, y=value, colour=variable)) +
             geom_line()
     } else{
         #m <- sym(metric)
