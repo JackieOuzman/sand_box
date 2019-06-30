@@ -727,10 +727,9 @@ function_plot <- function(economic_indicators,  metric) {
 
 function_plot_list_economic_indicators <- function(list_economic_indicators, metric){
     #pas067 plots economic_indicators of interest from a list of data.frames of economic indicators
-    if(TRUE) browser() 
+    if(doDbg) browser() 
     economic_indicators_1 <- list_economic_indicators[[1]]
     
-    if(TRUE){
     #from the list create a data.frame just containing the metric
     list_dfmetric <- lapply(list_economic_indicators, function(x) x%>% select(metric))
     list_dfmetric[[length(list_dfmetric)+1]] = economic_indicators_1["year"]
@@ -738,16 +737,6 @@ function_plot_list_economic_indicators <- function(list_economic_indicators, met
     vrbl_names = names(df_slctd_metric)
     vrbl_names = vrbl_names[1:length(vrbl_names)-1]
     dfs2plot <- reshape2::melt(df_slctd_metric, id.vars="year", measure.vars = vrbl_names)
-    } else{
-        df <- data.frame(year = 1:10,
-                         a = cumsum(rnorm(10)),
-                         b = cumsum(rnorm(10)),
-                         c = cumsum(rnorm(10)))
-        dfs2plot <- melt(df ,  id.vars = 'year', measure.vars = c("a", "b", "c"))        
-    }
-
-    
-    if(TRUE) browser()
     
     economic_indicators_1$year <- round(economic_indicators_1$year, 0)
     
