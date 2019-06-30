@@ -679,13 +679,16 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm, num
     if(dbn_name == "log-logistic"){
         scale = sqrt(decile_9 * decile_1)
         shape = -2*log(3)/log(sqrt(decile_9*decile_1)/decile_9)
-        # montecarloloop through the randomness, #pas067 negative values draw another, potentially correlate with other variable
-        for(mc_idx in 2:num_simulation){
+        if(doDbg) browser()
+        mc_idx <- 2
+        while(mc_idx<=num_simulation){
             mc_current_yld <-actuar::rllogis(length(final_treatment_farm$current_yld), shape=shape, scale = scale)
+            any_neg <- any(mc_current_yld < 0)
+            if(any_neg) next()
             final_treatment_farm$current_yld <- mc_current_yld
             mc_economic_indicators[[mc_idx]] = function_economic_indicators(final_treatment_farm)
+            mc_idx = mc_idx + 1
         }
-        
     }    
     #if(doDbg) browser()
     return(mc_economic_indicators)
@@ -749,7 +752,7 @@ function_plot_list_economic_indicators <- function(list_economic_indicators, met
     if(is_many){
         ggplot(dfs2plot,
                aes(x=year, y=value, colour=variable)) +
-            geom_line()
+               geom_line()
     } else{
         #m <- sym(metric)
         ggplot(economic_indicators_1, aes_(x = as.name("year"), y=as.name(metric) , colour= as.name("treatment")))+
