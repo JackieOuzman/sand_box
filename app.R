@@ -29,7 +29,7 @@ sidebar <-  dashboardSidebar(
               menuItem("Commodity prices", tabName = "extra", icon = icon("dollar")),
               menuItem("Results", tabName = "results", icon = icon("bar-chart-o"))
               #,menuItem("test", tabName = "test")
-              
+              #need to change tab names to something more meaninful              
 #icon(name, class = NULL, lib = "font-awesome")            
 #fa-cloud-sun", lib = "font-awesome") 
 
@@ -64,19 +64,7 @@ body <- dashboardBody(
                                               "Brimpton Lake" = 18005, 
                                               "Cadgee" = 26099), 
                                   selected = "Waikerie"),
-                      #actionButton("refreash",
-                      #             label = "not working download"),
-                      #actionButton("click",
-                      #             label = "update wheat/barley"),
-                      #actionButton("click2",
-                      #             label = "update pulses"),
-                      #numericInput(
-                      #  "total_size_farm",
-                      #  label = h3("Total size of yor farm ha"),
-                      #  value = 2500,
-                      #  min = 100,
-                      #  max = 6000,
-                      #  step =100),
+                     
                       
                       textOutput("name_of_met"),
                       
@@ -87,21 +75,14 @@ body <- dashboardBody(
       ), 
       
       
-      
-      #radioButtons(
-      #  "numb_zones",
-      #  label = h3("How many zones?"),
-      #  choices = list("1 zone" = 1, "2 zones" = 2, "3 zones" = 3),
-      #  selected = 1),
-      
       column(6,
              wellPanel(
                
                checkboxGroupInput(
                  "mangement_options",
                  label = h3("What are you considering?"),
-                 choices = list("Shallow ripping with inputs" = "rip_shallow_fert",
-                                "Deep ripping with inputs" = "rip_deep_fert"), 
+                 choices = list("Shallow ripping with inputs" = "rip_shallow_fert", #need to change this to something more meaninful
+                                "Deep ripping with inputs" = "rip_deep_fert"),  #need to change this to something more meaninful
                  selected = "rip_shallow_fert")
               
              ) #well pannel
@@ -119,25 +100,25 @@ body <- dashboardBody(
             wellPanel(
             h4("Wheat crop"),
            
-            #textOutput("text_size_farm"), # I want to move this up so its above select                   
+                      
            
             br(),
             
             
            
-           numericInput("aa",
+           numericInput("aa", #need to change this to something more meaninful
                         label = "P5 for wheat yield (t/ha)",
                         value = 3,
                         min = 0,
                         max= 8,
                         step = 0.5),
-           numericInput("bb",
+           numericInput("P50", #need to change this to something more meaninful
                         label = "P50 for wheat yield  (t/ha)",
                         value = 3,
                         min = 0,
                         max= 8,
                         step = 0.5),
-           numericInput("cc",
+           numericInput("P90", #need to change this to something more meaninful
                         label = "P90 for wheat yield  (t/ha)",
                         value = 3,
                         min = 0,
@@ -159,23 +140,23 @@ body <- dashboardBody(
 #the thrid tab
 
 
-  #####TRY MY mitigation costs ######
+  ##### costs of ripping ######
 
 #temp tab
   tabItem(
-    tabName = "mitigation" ,
+    tabName = "mitigation" , #need to change this to something more meaninful
     tabBox(
 
 
                 
   #########          Shallow ripping         #########              
-  ######### first one ripping with no inputs ####
+  ######### first one ripping with  inputs ####
 
 
                 tabPanel(h4("shallow ripping"),
           wellPanel(
           numericInput("costs_ripping", 
-                     label = h4("Cost for ripping with shallow inputs"),
+                     label = h4("Cost for ripping with shallow inputs"), #need to change this to something more meaninful
                       value = 70, 
                       min = 0,
                       max = 2000,
@@ -197,7 +178,7 @@ body <- dashboardBody(
 
 
 #########          deep ripping         #########              
-######### first one ripping with organic inputs ####
+######### first one ripping with inputs ####
                 
                
           tabPanel(h4("deep ripping"), 
@@ -209,51 +190,18 @@ body <- dashboardBody(
                                     max = 2000,
                                     step = 10),
                    
-                  selectizeInput("rip_deep_organic_year", 
+                  selectizeInput("rip_deep_organic_year", #need to change this to something more meaninful
                                       label = h4("Ripping applied in which year?"),
                                       choices = list('before analysis'= "0",
                                                      'year 1' = "1",
                                                      'year 2' = "2",
                                                      'year 3' = "3",
                                                      'year 4' = "4",
-                                                     'year 5' = "5",
-                                                     'year 6' = "6",
-                                                     'year 7' = "7",
-                                                     'year 8' = "8",
-                                                     'year 9' = "9",
-                                                     'year 10' = "10"),
+                                                     'year 5' = "5"),
                                       selected = 1,
                                       multiple = TRUE)
                    
-                   ), #bracket for well pannel 
-                   
-
-######### second one ripping with fertiliser inputs ####    
-
-  wellPanel(
-    numericInput("rip_deep_fert_cost", 
-                 label = h4("Cost for ripping with deep fertiliser inputs"),
-                 value = 100, 
-                 min = 0,
-                 max = 2000,
-                 step = 10),
-
-    selectizeInput("rip_deep_fert_year", 
-                   label = h4("Ripping applied in which year? (deep with fertiliser)"),
-                   choices = list('before analysis'= "0",
-                                  'year 1' = "1",
-                                  'year 2' = "2",
-                                  'year 3' = "3",
-                                  'year 4' = "4",
-                                  'year 5' = "5",
-                                  'year 6' = "6",
-                                  'year 7' = "7",
-                                  'year 8' = "8",
-                                  'year 9' = "9",
-                                  'year 10' = "10"),
-                   selected = 1,
-                   multiple = TRUE)
-        )) #bracket for well pannel and tab box
+                   )) #bracket for well pannel and tab box
         )), #bracket for tab item
 
 
@@ -317,26 +265,8 @@ body <- dashboardBody(
                      value = 290,
                      min = 0,
                      max= 400,
-                     step = 10),
-        numericInput("b",
-                     label = "Farm gate price barley ($/t)",
-                     value = 290,
-                     min = 0,
-                     max= 400,
-                     step = 10),
-        numericInput("c",
-                     label = "Farm gate price canola ($/t)",
-                     value = 290,
-                     min = 0,
-                     max= 400,
-                     step = 10),
-        numericInput("d",
-                     label = "Farm gate price legume ($/t)",
-                     value = 290,
-                     min = 0,
-                     max= 400,
                      step = 10)
-         )
+                 )
 
 
 
@@ -363,16 +293,7 @@ server <- function(input, output) {
   #group of reactive functions
   
   ####MET FILE WORK ####
-  #Alex everytime I click this I get another number
-  #It dosent hold onto the stationID input value
-  #this is not behaving like its should
   
-  
-  #stationID <- reactive({
-  #  isolate(input$stationID)
-  #  input$refreash
-  #})
- 
   met <- reactive({
     function_met(input$stationID) #this is the first function
   })
@@ -398,40 +319,39 @@ server <- function(input, output) {
   
   base_df1 <- reactive({
     map_df(input$mangement_options,
-           function_base_df1, crop = input$crop_seq_zone1, 
-                              discount = input$discount)
+           function_base_df1, discount = input$discount)
   })
   
   
-  fix_crop_name <- reactive({
-    function_fix_crop_name (base_df1())
-  })
+#  fix_crop_name <- reactive({
+#    function_fix_crop_name (base_df1())
+#  })
   #current yields 
   making_df_current <- reactive({
-    function_making_df_current(input$aa, input$bb, input$cc, input$dd)
+    function_making_df_current(input$aa)
   })
   flip_df_current <- reactive({
     function_flip_df_current(making_df_current())
   })
   join_current_df <- reactive({
-    function_join_current_df(fix_crop_name(),flip_df_current())
+    function_join_current_df(base_df1(),flip_df_current())
   })
   #potential yield 
-  making_df_potential <- reactive({
-    function_making_df_potential(input$aaa, input$bbb, input$ccc, input$ddd)
-  })
-  flip_df_potential <- reactive({
-    function_flip_df_potential(making_df_potential())
-  })
-  join_potential_df <- reactive({
-    function_join_potential_df(join_current_df(),flip_df_potential())
-  })
+  #making_df_potential <- reactive({
+  #  function_making_df_potential(input$aaa, input$bbb, input$ccc, input$ddd)
+  #})
+  #flip_df_potential <- reactive({
+  #  function_flip_df_potential(making_df_potential())
+  #})
+  #join_potential_df <- reactive({
+  #  function_join_potential_df(join_current_df(),flip_df_potential())
+ # })
   
   
   
   #price 
   making_df_price <- reactive({
-    function_making_df_price(input$a, input$b, input$c, input$d)
+    function_making_df_price(input$a)
   })
   flip_df_price <- reactive({
     function_flip_df_price(making_df_price())
@@ -439,7 +359,7 @@ server <- function(input, output) {
   
   
   join_price_df <- reactive({
-    function_join_price_df(join_potential_df(),flip_df_price())
+    function_join_price_df(join_current_df(),flip_df_price())
   })
   
   

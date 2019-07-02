@@ -151,51 +151,59 @@ function_decile5_yld_pot_pulses <- function(water_aval) {
   #write.csv(decile_5, "decile_5.csv")
   return(decile_5[[1,2]])
 }
+###########################################################################################################
+######                                      END OF MET WORK                               ################
+###########################################################################################################
 
-######END OF MET WORK ######
 
-#### MAKING A DF FOR THE FARM ZONE1 ######
+
+
+###########################################################################################################
+####                               MAKING A DF FOR THE FARM ZONE1                           ###############
+###########################################################################################################
+
 
 #this is working but the year 0 has no treatment assigned
-function_base_df1 <- function(mangement_options,crop_seq_zone1, discount){
+function_base_df1 <- function(mangement_options, discount){
   x <- data.frame(treatment = mangement_options,
-                  year = 1:length(crop_seq_zone1),
-                  crop = crop_seq_zone1,
+                  #year = 1:length(crop_seq_zone1),
+                  year = 1:10,
+                  crop = "wheat",
                   discount = discount)
   y <- pre <- data.frame(year = 0)
   bind_rows(y, x)
 }
 
 #this function changes the df crop names to something more useful
-function_fix_crop_name <- function(base_df1){
-  base_df1$crop <- sapply(base_df1$crop, 
-                    sub, 
-                    pattern = "Yr[[:digit:]]_", 
-                    replacement = "")
-  #sapply didnt get year 10
-  base_df1$crop <- sapply(base_df1$crop, 
-                    sub, 
-                    pattern = "Yr10_", 
-                    replacement = "")
+#function_fix_crop_name <- function(base_df1){
+#  base_df1$crop <- sapply(base_df1$crop, 
+#                    sub, 
+#                    pattern = "Yr[[:digit:]]_", 
+#                    replacement = "")
+#  #sapply didnt get year 10
+#  base_df1$crop <- sapply(base_df1$crop, 
+#                    sub, 
+#                    pattern = "Yr10_", 
+#                    replacement = "")
   #change name to long one
-  base_df1$crop <- ifelse(base_df1$crop == 'wh',"wheat",
-              ifelse(base_df1$crop == 'ba', "barley",
-               ifelse(base_df1$crop == 'can', "canola",
-               ifelse(base_df1$crop == 'leg', "legume",
-               ifelse(base_df1$crop == 'pas', "pasture","oops")))))
-  
-  return(base_df1) 
-}
+#  base_df1$crop <- ifelse(base_df1$crop == 'wh',"wheat",
+#              ifelse(base_df1$crop == 'ba', "barley",
+#               ifelse(base_df1$crop == 'can', "canola",
+#               ifelse(base_df1$crop == 'leg', "legume",
+#               ifelse(base_df1$crop == 'pas', "pasture","oops")))))
+#  
+#  return(base_df1) 
+#}
 
 #making a data frame of the current yield two step process
 #make a data frame and then flip it using gather
 
 #step 1
-function_making_df_current <- function(aa,bb,cc,dd){
-  data.frame( wheat = aa,
-              barley = bb,
-              canola = cc,
-              legume = dd) 
+function_making_df_current <- function(aa){
+  data.frame( wheat = aa)
+              #barley = bb,
+              #canola = cc,
+              #legume = dd) 
 }
 #step 2
 library(dplyr)
@@ -211,30 +219,30 @@ function_join_current_df <- function(fix_crop_name, flip_df_current){
 #make a data frame and then flip it using gather
 
 #step 1
-function_making_df_potential <- function(aaa,bbb,ccc,ddd){
-  data.frame( wheat = aaa,
-              barley = bbb,
-              canola = ccc,
-              legume = ddd) 
-}
+#function_making_df_potential <- function(aaa,bbb,ccc,ddd){
+#  data.frame( wheat = aaa,
+#              barley = bbb,
+#              canola = ccc,
+#              legume = ddd) 
+#}
 #step 2
-function_flip_df_potential <- function(making_df_potential){
-  gather(making_df_potential, crop, potential_yld)
-}
+#function_flip_df_potential <- function(making_df_potential){
+#  gather(making_df_potential, crop, potential_yld)
+#}
 #now join it to the df
-function_join_potential_df <- function(join_current_df, flip_df_potential){
-  left_join(join_current_df, flip_df_potential, by = 'crop')
-}
+#function_join_potential_df <- function(join_current_df, flip_df_potential){
+#  left_join(join_current_df, flip_df_potential, by = 'crop')
+#}
 
 #making a data frame of the prices two step process
 #make a data frame and then flip it using gather
 
 #step 1
-function_making_df_price <- function(a,b,c,d){
-  data.frame( wheat = a,
-              barley = b,
-              canola = c,
-              legume = d) 
+function_making_df_price <- function(a){
+  data.frame( wheat = a)
+              #barley = b,
+              #canola = c,
+              #legume = d) 
 }
 #step 2
 function_flip_df_price <- function(making_df_price){
@@ -243,8 +251,8 @@ function_flip_df_price <- function(making_df_price){
 
 #now join it to the df
 
-function_join_price_df <- function(join_potential_df, flip_df_price){
-  base_farm <-left_join(join_potential_df, flip_df_price, by = 'crop')
+function_join_price_df <- function(function_join_current_df, flip_df_price){
+  base_farm <-left_join(function_join_current_df, flip_df_price, by = 'crop')
   #write.csv(base_farm, "base_farm.csv")
   return(base_farm)
  }
