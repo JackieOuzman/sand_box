@@ -183,17 +183,16 @@ function_making_df_current <- function(aa, a, base_df1 ){
                        Wheat_P90 = 4.0,
                        Wheat_price = a)
   step3 <- mutate(step2, crop = "wheat")
-  step4 <- left_join(base_df1, step3, by = "crop")                     
+  step4 <- left_join(base_df1, step3, by = "crop") 
+  
+  step5 <- fill(step4, treatment,.direction = c("up"))
+  step6 <- unite(step5, ID,
+                         c(year,treatment), remove = FALSE)
   write_csv(step2, "step2_wheatP_5_50_90.csv")
   write_csv(step4, "step4_df_yld.csv")
+  write_csv(step5, "step5_df_yld.csv")
+  write_csv(step6, "step6_df_yld.csv")
 }
-
-
-#making a data frame of the prices two step process
-#make a data frame and then flip it using gather
-######################################################################################################
-
-
 
 
 function_final_farm_df <- function(join_price_df){
