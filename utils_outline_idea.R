@@ -174,18 +174,14 @@ function_base_df1 <- function(mangement_options, discount){
   step1 <- bind_rows(y, x)
   #write_csv(step1, "Step1_yr_crop_disc_mang.csv")
 }
-######################################################################################################
-#making a data frame of the current yield two step process
-#make a data frame and then flip it using gather
-######################################################################################################
-######################################################################################################
 
 
 #step 1
-function_making_df_current <- function(aa, base_df1 ){
+function_making_df_current <- function(aa, a, base_df1 ){
   step2 <- data.frame( Wheat_P5 = aa,
                        Wheat_P50 = 3.5,
-                       Wheat_P90 = 4.0)
+                       Wheat_P90 = 4.0,
+                       Wheat_price = a)
   step3 <- mutate(step2, crop = "wheat")
   step4 <- left_join(base_df1, step3, by = "crop")                     
   write_csv(step2, "step2_wheatP_5_50_90.csv")
@@ -198,26 +194,8 @@ function_making_df_current <- function(aa, base_df1 ){
 ######################################################################################################
 
 
-#step 1
-function_making_df_price <- function(a){
-  data.frame( wheat = a)
-              #barley = b,
-              #canola = c,
-              #legume = d) 
-}
-#step 2
-function_flip_df_price <- function(making_df_price){
-  gather(making_df_price, crop, price)
-}
 
-#now join it to the df
 
-function_join_price_df <- function(function_join_current_df, flip_df_price){
-  base_farm <-left_join(function_join_current_df, flip_df_price, by = 'crop')
-  #write.csv(base_farm, "base_farm.csv")
-  return(base_farm)
-  write.csv(base_farm, "function_join_price_df.csv")
- }
 function_final_farm_df <- function(join_price_df){
   join_price_df <- fill(join_price_df, treatment,.direction = c("up"))
   join_price_df <- unite(join_price_df, ID,

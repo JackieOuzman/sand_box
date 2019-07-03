@@ -327,7 +327,7 @@ server <- function(input, output) {
   
   #current yields  
   making_df_current <- reactive({
-    function_making_df_current(input$aa, base_df1())
+    function_making_df_current(input$aa, input$a, base_df1())
   })
   
   
