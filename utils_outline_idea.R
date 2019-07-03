@@ -159,11 +159,11 @@ function_decile5_yld_pot_pulses <- function(water_aval) {
 
 
 ###########################################################################################################
-####                               MAKING A DF FOR THE FARM ZONE1                           ###############
+####                               MAKING A DF FOR THE FARM                                ###############
 ###########################################################################################################
 
 
-#this is working but the year 0 has no treatment assigned
+
 function_base_df1 <- function(mangement_options, discount){
   x <- data.frame(treatment = mangement_options,
                   #year = 1:length(crop_seq_zone1),
@@ -171,71 +171,32 @@ function_base_df1 <- function(mangement_options, discount){
                   crop = "wheat",
                   discount = discount)
   y <- pre <- data.frame(year = 0)
-  bind_rows(y, x)
+  step1 <- bind_rows(y, x)
+  #write_csv(step1, "Step1_yr_crop_disc_mang.csv")
 }
-
-#this function changes the df crop names to something more useful
-#function_fix_crop_name <- function(base_df1){
-#  base_df1$crop <- sapply(base_df1$crop, 
-#                    sub, 
-#                    pattern = "Yr[[:digit:]]_", 
-#                    replacement = "")
-#  #sapply didnt get year 10
-#  base_df1$crop <- sapply(base_df1$crop, 
-#                    sub, 
-#                    pattern = "Yr10_", 
-#                    replacement = "")
-  #change name to long one
-#  base_df1$crop <- ifelse(base_df1$crop == 'wh',"wheat",
-#              ifelse(base_df1$crop == 'ba', "barley",
-#               ifelse(base_df1$crop == 'can', "canola",
-#               ifelse(base_df1$crop == 'leg', "legume",
-#               ifelse(base_df1$crop == 'pas', "pasture","oops")))))
-#  
-#  return(base_df1) 
-#}
-
+######################################################################################################
 #making a data frame of the current yield two step process
 #make a data frame and then flip it using gather
+######################################################################################################
+######################################################################################################
+
 
 #step 1
-function_making_df_current <- function(aa){
-  data.frame( wheat = aa)
-              #barley = bb,
-              #canola = cc,
-              #legume = dd) 
-}
-#step 2
-library(dplyr)
-function_flip_df_current <- function(making_df_current){
-  gather(making_df_current, crop, current_yld)
-}
-#now join it to the df
-function_join_current_df <- function(fix_crop_name, flip_df_current){
-  left_join(fix_crop_name, flip_df_current, by = 'crop')
+function_making_df_current <- function(aa, base_df1 ){
+  step2 <- data.frame( Wheat_P5 = aa,
+                       Wheat_P50 = 3.5,
+                       Wheat_P90 = 4.0)
+  step3 <- mutate(step2, crop = "wheat")
+  step4 <- left_join(base_df1, step3, by = "crop")                     
+  write_csv(step2, "step2_wheatP_5_50_90.csv")
+  write_csv(step4, "step4_df_yld.csv")
 }
 
-#making a data frame of the potential yield two step process
-#make a data frame and then flip it using gather
-
-#step 1
-#function_making_df_potential <- function(aaa,bbb,ccc,ddd){
-#  data.frame( wheat = aaa,
-#              barley = bbb,
-#              canola = ccc,
-#              legume = ddd) 
-#}
-#step 2
-#function_flip_df_potential <- function(making_df_potential){
-#  gather(making_df_potential, crop, potential_yld)
-#}
-#now join it to the df
-#function_join_potential_df <- function(join_current_df, flip_df_potential){
-#  left_join(join_current_df, flip_df_potential, by = 'crop')
-#}
 
 #making a data frame of the prices two step process
 #make a data frame and then flip it using gather
+######################################################################################################
+
 
 #step 1
 function_making_df_price <- function(a){
@@ -255,6 +216,7 @@ function_join_price_df <- function(function_join_current_df, flip_df_price){
   base_farm <-left_join(function_join_current_df, flip_df_price, by = 'crop')
   #write.csv(base_farm, "base_farm.csv")
   return(base_farm)
+  write.csv(base_farm, "function_join_price_df.csv")
  }
 function_final_farm_df <- function(join_price_df){
   join_price_df <- fill(join_price_df, treatment,.direction = c("up"))
@@ -264,6 +226,8 @@ function_final_farm_df <- function(join_price_df){
   return(join_price_df)
   
 }
+
+
 
 ###### DF FOR TREATMENTS ########
 ##New plan is to make treatment df for each of the treatments we have ###

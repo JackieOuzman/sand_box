@@ -236,10 +236,12 @@ body <- dashboardBody(
         box(width=8,
         title = "Results over 5 years",
         textOutput("name_of_results"),
+        textOutput("check_df"),
         plotOutput("plot")
         ))#box2 bracket
         )), #fluid bracket
         #), #tabItem bracket
+
 
 
 
@@ -318,24 +320,20 @@ server <- function(input, output) {
   #### CREATING DF FOR FARM ########
   
   base_df1 <- reactive({
-    map_df(input$mangement_options,
-           function_base_df1, discount = input$discount)
+   map_df(input$mangement_options,
+           function_base_df1,  
+           discount = input$discount)
   })
   
-  
-#  fix_crop_name <- reactive({
-#    function_fix_crop_name (base_df1())
-#  })
-  #current yields 
+  #current yields  
   making_df_current <- reactive({
-    function_making_df_current(input$aa)
+    function_making_df_current(input$aa, base_df1())
   })
-  flip_df_current <- reactive({
-    function_flip_df_current(making_df_current())
-  })
-  join_current_df <- reactive({
-    function_join_current_df(base_df1(),flip_df_current())
-  })
+  
+  
+  #####################################################################################
+  ####################                 REMOVE                   ######################
+  #####################################################################################
   #potential yield 
   #making_df_potential <- reactive({
   #  function_making_df_potential(input$aaa, input$bbb, input$ccc, input$ddd)
@@ -346,80 +344,83 @@ server <- function(input, output) {
   #join_potential_df <- reactive({
   #  function_join_potential_df(join_current_df(),flip_df_potential())
  # })
-  
+  #####################################################################################  
   
   
   #price 
-  making_df_price <- reactive({
-    function_making_df_price(input$a)
-  })
-  flip_df_price <- reactive({
-    function_flip_df_price(making_df_price())
-  })
+ # making_df_price <- reactive({
+ #   function_making_df_price(input$a)
+ # })
+ # flip_df_price <- reactive({
+ #   function_flip_df_price(making_df_price())
+ # })
   
   
-  join_price_df <- reactive({
-    function_join_price_df(join_current_df(),flip_df_price())
-  })
+#  join_price_df <- reactive({
+#    function_join_price_df(join_current_df(),flip_df_price())
+#  })
   
   
-  final_farm_df <- reactive({
-    function_final_farm_df(join_price_df())
-  })
+#  final_farm_df <- reactive({
+#    function_final_farm_df(join_price_df())
+#  })
   
+  #####################################################################################   
   #### CREATING DF FOR TREATMENTS ########
+  #####################################################################################  
+  
   
   #create a new df for treatments crop, yr, costs etc
-  rip_noinputs_df <- reactive({
-    function_rip_noinputs_df(final_farm_df(), input$year_for_ripping, input$costs_ripping)
-  })
+#  rip_noinputs_df <- reactive({
+#    function_rip_noinputs_df(final_farm_df(), input$year_for_ripping, input$costs_ripping)
+#  })
   
-  rip_shallow_organic_df <- reactive({
-    function_rip_shallow_organic_df(final_farm_df(), input$rip_shallow_organic_year, input$rip_shallow_organic_cost)
-  })
-  rip_shallow_fert_df <- reactive({
-    function_rip_shallow_fert_df(final_farm_df(), input$rip_shallow_fert_year, input$rip_shallow_fert_cost)
-  })
-  rip_deep_organic_df <- reactive({
-    function_rip_deep_organic_df(final_farm_df(), input$rip_deep_organic_year, input$rip_deep_organic_cost)
-  })
-  rip_deep_fert_df <- reactive({
-    function_rip_deep_fert_df(final_farm_df(), input$rip_deep_fert_year, input$rip_deep_fert_cost)
-  })
-  rip_deep_fert1_df <- reactive({
-    function_rip_deep_fert_df(final_farm_df(), input$rip_deep_fert_year, input$rip_deep_fert_cost)
-  })
-  wetter_df <- reactive({
-    function_wetter_df(final_farm_df(), input$wetter_year, input$wetter_cost)
-  })
+#  rip_shallow_organic_df <- reactive({
+#    function_rip_shallow_organic_df(final_farm_df(), input$rip_shallow_organic_year, input$rip_shallow_organic_cost)
+#  })
+#  rip_shallow_fert_df <- reactive({
+#    function_rip_shallow_fert_df(final_farm_df(), input$rip_shallow_fert_year, input$rip_shallow_fert_cost)
+#  })
+#  rip_deep_organic_df <- reactive({
+#    function_rip_deep_organic_df(final_farm_df(), input$rip_deep_organic_year, input$rip_deep_organic_cost)
+#  })
+#  rip_deep_fert_df <- reactive({
+#    function_rip_deep_fert_df(final_farm_df(), input$rip_deep_fert_year, input$rip_deep_fert_cost)
+#  })
+#  rip_deep_fert1_df <- reactive({
+#    function_rip_deep_fert_df(final_farm_df(), input$rip_deep_fert_year, input$rip_deep_fert_cost)
+#  })
+#  wetter_df <- reactive({
+#    function_wetter_df(final_farm_df(), input$wetter_year, input$wetter_cost)
+#  })
   
-  treatment_bind <- reactive({
-    function_treatment_bind(rip_noinputs_df(), rip_shallow_organic_df(),rip_shallow_fert_df(), 
-                            rip_deep_organic_df(), rip_deep_fert_df(), wetter_df())
-  })
+#  treatment_bind <- reactive({
+#    function_treatment_bind(rip_noinputs_df(), rip_shallow_organic_df(),rip_shallow_fert_df(), 
+#                            rip_deep_organic_df(), rip_deep_fert_df(), wetter_df())
+#  })
   
   
   #### Join Treatment df to the farm df ###
-  final_treatment_farm <- reactive({
-    function_final_treatment_farm(final_farm_df(), treatment_bind())
-  })
+#  final_treatment_farm <- reactive({
+#    function_final_treatment_farm(final_farm_df(), treatment_bind())
+#  })
   
   
   
  
   #economic indicators
-  economic_indicators <- reactive({
-    function_economic_indicators(final_treatment_farm())
-  })
+#  economic_indicators <- reactive({
+#    function_economic_indicators(final_treatment_farm())
+#  })
   
-  plot <- reactive({
-    function_plot(economic_indicators(), input$analysis )
-  })
+#  plot <- reactive({
+#    function_plot(economic_indicators(), input$analysis )
+#  })
   
   
-  name_plot <- reactive({
-    function_metric_name(input$analysis)
-  })
+#  name_plot <- reactive({
+#    function_metric_name(input$analysis)
+#  })
   
   ####### group of render OUTPUTS ########
   
@@ -427,55 +428,64 @@ server <- function(input, output) {
   output$metfile <- renderTable({
     decile() 
   })
+  #####################################################################################
+  ####################                 REMOVE                   ######################
+  #####################################################################################  
   #output$Av_yld_pot_wheat <- renderTable({
   #  decile5_yld_pot_wheat()
   #})
   #output$Av_yld_pot_pulses <- renderTable({
   #  decile5_yld_pot_pulses()
   #})
+  #####################################################################################  
+  
   output$yld_pot_wheat <- renderValueBox({
-    valueBox(decile5_yld_pot_wheat(), "Yield potential of wheat / barley t/ha")
+    valueBox(decile5_yld_pot_wheat(), "Yield potential of wheat  t/ha")
   })
-  output$yld_pot_pulses <- renderValueBox({
-    valueBox(decile5_yld_pot_pulses(), "Yield potential of pulses t/ha")
-  })
+## output$yld_pot_pulses <- renderValueBox({
+#    valueBox(decile5_yld_pot_pulses(), "Yield potential of pulses t/ha")
+#  })
   #output$metfile_file_name <- renderText({
   #   test1() 
   # })
   output$name_of_met <- renderText({
     paste0("station number: ",input$stationID)
   })
-
+  
   output$name_of_results <- renderText({
-    paste0("metric: ",input$analysis)
-  })
- output$text_size_farm = renderText({
-  paste("Total size of your farm is set to:", input$total_size_farm,"ha")
-})
+        paste0("check: ",making_df_current())
+      })
+
+#  output$name_of_results <- renderText({
+#    paste0("metric: ",input$analysis)
+#  })
+# output$text_size_farm = renderText({
+#  paste("Total size of your farm is set to:", input$total_size_farm,"ha")
+#})
 
  ## DF for the farm ##
- output$df_progress = renderTable({
-   final_farm_df()
- })
+# output$df_progress = renderTable({
+#   final_farm_df()
+# })
  #cost outputs
- output$df_progress_cost = renderTable({
-   treatment_bind()
- })
+# output$df_progress_cost = renderTable({
+#   treatment_bind()
+# })
  
  
  #final data frame
- output$df_progress_final = renderTable({
-   final_treatment_farm()
- })
+# output$df_progress_final = renderTable({
+#   final_treatment_farm()
+# })
  
  
  ##### economic indicators #####
- output$economic = renderTable({
-   economic_indicators()
- })
- output$plot = renderPlot({
-   plot()
- })
+# output$economic = renderTable({
+#   economic_indicators()
+# })
+# output$plot = renderPlot({
+#   plot()
+# })
  
 }
 shinyApp(ui, server)
