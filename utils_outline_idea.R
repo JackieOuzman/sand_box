@@ -177,32 +177,24 @@ function_base_df1 <- function(mangement_options, discount){
 
 
 #step 1
-function_making_df_current <- function(aa, a, base_df1 ){
-  step2 <- data.frame( Wheat_P5 = aa,
-                       Wheat_P50 = 3.5,
-                       Wheat_P90 = 4.0,
+function_making_df_current <- function(P5, P50, P90, a, base_df1 ){
+  step2 <- data.frame( Wheat_P5 = P5,
+                       Wheat_P50 = P50,
+                       Wheat_P90 = P90,
                        Wheat_price = a)
   step3 <- mutate(step2, crop = "wheat")
   step4 <- left_join(base_df1, step3, by = "crop") 
   
-  step5 <- fill(step4, treatment,.direction = c("up"))
+  step5 <- fill(step4, treatment,.direction = c("up")) #this fills in missing values
   step6 <- unite(step5, ID,
-                         c(year,treatment), remove = FALSE)
-  write_csv(step2, "step2_wheatP_5_50_90.csv")
-  write_csv(step4, "step4_df_yld.csv")
-  write_csv(step5, "step5_df_yld.csv")
+                         c(year,treatment), remove = FALSE) #this is making an ID clm
+  #write_csv(step2, "step2_wheatP_5_50_90.csv")
+  #write_csv(step4, "step4_df_yld.csv")
+  #write_csv(step5, "step5_df_yld.csv")
   write_csv(step6, "step6_df_yld.csv")
 }
 
 
-function_final_farm_df <- function(join_price_df){
-  join_price_df <- fill(join_price_df, treatment,.direction = c("up"))
-  join_price_df <- unite(join_price_df, ID,
-                         c(year,treatment), remove = FALSE)
-  #write.csv(join_price_df, "final_farm_df.csv")
-  return(join_price_df)
-  
-}
 
 
 

@@ -106,7 +106,7 @@ body <- dashboardBody(
             
             
            
-           numericInput("aa", #need to change this to something more meaninful
+           numericInput("P5", #need to change this to something more meaninful
                         label = "P5 for wheat yield (t/ha)",
                         value = 3,
                         min = 0,
@@ -327,38 +327,10 @@ server <- function(input, output) {
   
   #current yields  
   making_df_current <- reactive({
-    function_making_df_current(input$aa, input$a, base_df1())
+    function_making_df_current(input$P5, input$P50, input$P90, input$a, base_df1())
   })
   
   
-  #####################################################################################
-  ####################                 REMOVE                   ######################
-  #####################################################################################
-  #potential yield 
-  #making_df_potential <- reactive({
-  #  function_making_df_potential(input$aaa, input$bbb, input$ccc, input$ddd)
-  #})
-  #flip_df_potential <- reactive({
-  #  function_flip_df_potential(making_df_potential())
-  #})
-  #join_potential_df <- reactive({
-  #  function_join_potential_df(join_current_df(),flip_df_potential())
- # })
-  #####################################################################################  
-  
-  
-  #price 
- # making_df_price <- reactive({
- #   function_making_df_price(input$a)
- # })
- # flip_df_price <- reactive({
- #   function_flip_df_price(making_df_price())
- # })
-  
-  
-#  join_price_df <- reactive({
-#    function_join_price_df(join_current_df(),flip_df_price())
-#  })
   
   
 #  final_farm_df <- reactive({
