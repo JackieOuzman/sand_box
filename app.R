@@ -81,8 +81,8 @@ body <- dashboardBody(
                checkboxGroupInput(
                  "mangement_options",
                  label = h3("What are you considering?"),
-                 choices = list("Shallow ripping with inputs" = "rip_shallow_fert", #need to change this to something more meaninful
-                                "Deep ripping with inputs" = "rip_deep_fert"),  #need to change this to something more meaninful
+                 choices = list("Shallow ripping with inputs" = "rip_shallow_input", #need to change this to something more meaninful
+                                "Deep ripping with inputs" = "rip_deep_input"),  #need to change this to something more meaninful
                  selected = "rip_shallow_fert")
               
              ) #well pannel
@@ -183,14 +183,14 @@ body <- dashboardBody(
                
           tabPanel(h4("deep ripping"), 
       wellPanel(
-                numericInput("rip_deep_organic_cost", 
+                numericInput("rip_deep_cost", 
                  label = h4("Cost for ripping with deep inputs"),
                                 value = 90, 
                                 min = 0,
                                     max = 2000,
                                     step = 10),
                    
-                  selectizeInput("rip_deep_organic_year", #need to change this to something more meaninful
+                  selectizeInput("rip_deep_year",
                                       label = h4("Ripping applied in which year?"),
                                       choices = list('before analysis'= "0",
                                                      'year 1' = "1",
@@ -316,9 +316,9 @@ server <- function(input, output) {
   })
   
   
-  
-  #### CREATING DF FOR FARM ########
-  
+  #####################################################################################  
+  ###########                    CREATING DF FOR FARM                ##################
+  #####################################################################################  
   base_df1 <- reactive({
    map_df(input$mangement_options,
            function_base_df1,  
@@ -331,51 +331,35 @@ server <- function(input, output) {
   })
   
   
-  
-  
-#  final_farm_df <- reactive({
-#    function_final_farm_df(join_price_df())
-#  })
+
   
   #####################################################################################   
-  #### CREATING DF FOR TREATMENTS ########
+  ################               CREATING DF FOR TREATMENTS                    ########
   #####################################################################################  
   
   
   #create a new df for treatments crop, yr, costs etc
-#  rip_noinputs_df <- reactive({
-#    function_rip_noinputs_df(final_farm_df(), input$year_for_ripping, input$costs_ripping)
-#  })
-  
-#  rip_shallow_organic_df <- reactive({
-#    function_rip_shallow_organic_df(final_farm_df(), input$rip_shallow_organic_year, input$rip_shallow_organic_cost)
-#  })
-#  rip_shallow_fert_df <- reactive({
-#    function_rip_shallow_fert_df(final_farm_df(), input$rip_shallow_fert_year, input$rip_shallow_fert_cost)
-#  })
-#  rip_deep_organic_df <- reactive({
-#    function_rip_deep_organic_df(final_farm_df(), input$rip_deep_organic_year, input$rip_deep_organic_cost)
-#  })
-#  rip_deep_fert_df <- reactive({
-#    function_rip_deep_fert_df(final_farm_df(), input$rip_deep_fert_year, input$rip_deep_fert_cost)
-#  })
-#  rip_deep_fert1_df <- reactive({
-#    function_rip_deep_fert_df(final_farm_df(), input$rip_deep_fert_year, input$rip_deep_fert_cost)
-#  })
-#  wetter_df <- reactive({
-#    function_wetter_df(final_farm_df(), input$wetter_year, input$wetter_cost)
-#  })
-  
-#  treatment_bind <- reactive({
-#    function_treatment_bind(rip_noinputs_df(), rip_shallow_organic_df(),rip_shallow_fert_df(), 
-#                            rip_deep_organic_df(), rip_deep_fert_df(), wetter_df())
-#  })
+  rip_shallow_df <- reactive({
+    function_rip_shallow_input_df(making_df_current(), input$year_for_ripping, input$costs_ripping)
+  })
   
   
-  #### Join Treatment df to the farm df ###
-#  final_treatment_farm <- reactive({
-#    function_final_treatment_farm(final_farm_df(), treatment_bind())
-#  })
+  #create a new df for treatments crop, yr, costs etc
+  rip_deep_df <- reactive({
+    function_rip_deep_input_df(making_df_current(), input$rip_deep_year, input$rip_deep_cost)
+  })
+  
+  treatment_bind <- reactive({
+    function_treatment_bind(rip_shallow_df(), rip_deep_df())
+  })
+  
+  ####################################################################################   
+  ################               Join Treatment df to the farm df            ########
+  #####################################################################################  
+
+  final_treatment_farm <- reactive({
+    function_final_treatment_farm(making_df_current(), treatment_bind())
+  })
   
   
   
@@ -425,7 +409,7 @@ server <- function(input, output) {
   })
   
   output$name_of_results <- renderText({
-        paste0("check: ",making_df_current())
+        paste0("check: ",final_treatment_farm())
       })
 
 #  output$name_of_results <- renderText({
