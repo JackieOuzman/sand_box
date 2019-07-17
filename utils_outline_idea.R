@@ -8,7 +8,7 @@ library(reshape2)
 library(ggplot2)
 library(dplyr)
 #### file wide vrbls ####
-doDbg = FALSE
+doDbg = TRUE
 
 
 #### met function block ####
@@ -657,8 +657,9 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm, num
     #do monte-carlo on the economic_indicators,
     #distribution_properties is a named list with the minimal properties of attributes
     #distribution_properties = list(name="", location=0, shape=1, rate)
+    #log-logistic" actuar::rllogis
     
-    #if(doDbg) browser()
+    if(doDbg) browser()
     #do a single simulation 
     if(is.null(num_simulation) && is.null(dbn_name)){
         economic_indicators = function_economic_indicators(final_treatment_farm)
@@ -677,20 +678,22 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm, num
     mc_economic_indicators = list()
     mc_economic_indicators[[1]] = function_economic_indicators(final_treatment_farm)
     if(dbn_name == "log-logistic"){
-        scale = sqrt(decile_9 * decile_1)
+        scale = sqrt(decile_9 * decile_1) #TODO: check derivation 
         shape = -2*log(3)/log(sqrt(decile_9*decile_1)/decile_9)
         if(doDbg) browser()
         mc_idx <- 2
         while(mc_idx<=num_simulation){
-            mc_current_yld <-actuar::rllogis(length(final_treatment_farm$current_yld), shape=shape, scale = scale)
+            #generate random final final_treatment_farm$current_yld
+            mc_current_yld <-actuar::rllogis(length(final_treatment_farm$current_yld), shape=shape, scale = scale) #distribtuion
+            #remove this current_yld when negative
             any_neg <- any(mc_current_yld < 0)
-            if(any_neg) next()
+            if(any_neg) next() #go to while when negative
             final_treatment_farm$current_yld <- mc_current_yld
             mc_economic_indicators[[mc_idx]] = function_economic_indicators(final_treatment_farm)
             mc_idx = mc_idx + 1
         }
     }    
-    #if(doDbg) browser()
+    if(doDbg) browser()
     return(mc_economic_indicators)
     
 } #function_do_montecarlo_economic_indicators
@@ -739,6 +742,7 @@ function_plot_list_economic_indicators <- function(list_economic_indicators, met
     df_slctd_metric <- bind_cols(list_dfmetric)
     vrbl_names = names(df_slctd_metric)
     vrbl_names = vrbl_names[1:length(vrbl_names)-1]
+    #formats for plotting many lines 
     dfs2plot <- reshape2::melt(df_slctd_metric, id.vars="year", measure.vars = vrbl_names)
     
     economic_indicators_1$year <- round(economic_indicators_1$year, 0)

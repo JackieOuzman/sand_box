@@ -20,7 +20,7 @@ source('utils_outline_idea.R')
 
 #### file side vrbls  ####
 do_montecarlo = TRUE
-doDbg = FALSE
+doDbg = TRUE
 
 #empty dashboard
 header <-   dashboardHeader()
@@ -657,7 +657,7 @@ server <- function(input, output) {
   })
   
   treatment_bind <- reactive({
-    function_treatment_bind(rip_noinputs_df(), rip_shallow_organic_df(),rip_shallow_fert_df(), 
+    function_treatment_bind(rip_noinputs_df(), rip_shallow_organic_df(),rip_shallow_fert_df(),  
                             rip_deep_organic_df(), rip_deep_fert_df(), wetter_df())
   })
   
@@ -670,6 +670,7 @@ server <- function(input, output) {
   
   #### single economic indicators, montecarlo on economic indicator
   if(do_montecarlo){
+      if(doDbg) browser()
       montecarlo_economic_indicators <- reactive({
           function_do_montecarlo_economic_indicators(final_treatment_farm(),dbn_name="log-logistic", decile_1 = NULL, decile_9=NULL)   
       })      
