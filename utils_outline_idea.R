@@ -336,102 +336,40 @@ function_final_treatment_farm <- function(making_df_current, treatment_bind){
 function_economic_indicators <- function(final_treatment_farm) {
   #work out the econmoic indicators
   
-  economic_indicators_rip_no_input <- filter(final_treatment_farm, treatment == 'rip_no_inputs')
-  economic_indicators_rip_no_input <-  economic_indicators_rip_no_input %>% 
+  economic_indicators_rip_shallow_input <- filter(final_treatment_farm, treatment == 'rip_shallow_input')
+  economic_indicators_rip_shallow_input <-  economic_indicators_rip_shallow_input %>% 
   mutate(
-    pres_value_fact = (1/(1+discount)^ year),
-    benefit = ((current_yld*(yld_resp_since_applied / 100)* yld_resp_perct_crop) * price), 
-    cashflow_no_dis_ann = benefit - cost,
-    cashflow_dis_ann = ((benefit*pres_value_fact) - (cost*pres_value_fact)), 
-    cashflow_cum = cumsum(cashflow_no_dis_ann),
-    cashflow_cum_disc = cumsum(cashflow_dis_ann),
-    ROI_cum_no_disc = (cumsum(benefit) - cumsum(cost))/ cumsum(cost), 
-    ROI_cum_disc = (cumsum(benefit*pres_value_fact) - cumsum(cost*pres_value_fact))/ cumsum(cost*pres_value_fact), 
-    benefit_cost_ratio_disc = (sum(benefit*pres_value_fact) / sum(cost*pres_value_fact)), 
-    npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
+    m_c_yld = Wheat_P50, #check this out with Ric
+    new_yld = (m_c_yld * (yld_resp_since_applied / 100)* yld_resp_perct_crop) + m_c_yld,
+    revenue = (new_yld * 400) * Wheat_price, # need to make new UI input for 400ha as area of wheat production
+    N_cost = (200 * (560 /100) * 400), #rate of N kg/ha * cost of N $/t /100* area of production)
+    freight = 17* (400 * new_yld), # cost of freight $17, area of production
+    Insurance_levies = revenue * ((1.1+0)/100), # insurance and levies
+    variable_cost = (185.44 * 400), # sum of varaible cost * area
+    cost_treatmnet = (cost * 400), #cost of treatment $/ha * area,
+    total_direct_expenses = N_cost + freight +Insurance_levies + variable_cost + cost_treatmnet,
+    gross_margin = revenue - total_direct_expenses
   )
   
-  economic_indicators_rip_shallow_organic <- filter(final_treatment_farm, treatment == 'rip_shallow_organic')
-  economic_indicators_rip_shallow_organic <-  economic_indicators_rip_shallow_organic %>% 
+  economic_indicators_rip_deep_input <- filter(final_treatment_farm, treatment == 'rip_deep_input')
+  economic_indicators_rip_deep_input <-  economic_indicators_rip_deep_input %>% 
     mutate(
-      pres_value_fact = (1/(1+discount)^ year),
-      benefit = ((current_yld*(yld_resp_since_applied / 100)* yld_resp_perct_crop) * price), 
-      cashflow_no_dis_ann = benefit - cost,
-      cashflow_dis_ann = ((benefit*pres_value_fact) - (cost*pres_value_fact)), 
-      cashflow_cum = cumsum(cashflow_no_dis_ann),
-      cashflow_cum_disc = cumsum(cashflow_dis_ann),
-      ROI_cum_no_disc = (cumsum(benefit) - cumsum(cost))/ cumsum(cost), 
-      ROI_cum_disc = (cumsum(benefit*pres_value_fact) - cumsum(cost*pres_value_fact))/ cumsum(cost*pres_value_fact), 
-      benefit_cost_ratio_disc = (sum(benefit*pres_value_fact) / sum(cost*pres_value_fact)), 
-      npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
+      m_c_yld = Wheat_P50, #check this out with Ric
+      new_yld = (m_c_yld * (yld_resp_since_applied / 100)* yld_resp_perct_crop) + m_c_yld,
+      revenue = (new_yld * 400) * Wheat_price, # need to make new UI input for 400ha as area of wheat production
+      N_cost = (200 * (560 /100) * 400), #rate of N kg/ha * cost of N $/t /100* area of production)
+      freight = 17 *(400 * new_yld), # cost of freight $17, area of production
+      Insurance_levies = revenue * ((1.1+0)/100), # insurance and levies
+      variable_cost = (185.44 * 400), # sum of varaible cost * area
+      cost_treatmnet = (cost * 400), #cost of treatment $/ha * area,
+      total_direct_expenses = N_cost + freight +Insurance_levies + variable_cost + cost_treatmnet,
+      gross_margin = revenue - total_direct_expenses
     )
   
-  economic_indicators_rip_shallow_fert <- filter(final_treatment_farm, treatment == 'rip_shallow_fert')
-  economic_indicators_rip_shallow_fert <-  economic_indicators_rip_shallow_fert %>% 
-    mutate(
-      pres_value_fact = (1/(1+discount)^ year),
-      benefit = ((current_yld*(yld_resp_since_applied / 100)* yld_resp_perct_crop) * price), 
-      cashflow_no_dis_ann = benefit - cost,
-      cashflow_dis_ann = ((benefit*pres_value_fact) - (cost*pres_value_fact)), 
-      cashflow_cum = cumsum(cashflow_no_dis_ann),
-      cashflow_cum_disc = cumsum(cashflow_dis_ann),
-      ROI_cum_no_disc = (cumsum(benefit) - cumsum(cost))/ cumsum(cost), 
-      ROI_cum_disc = (cumsum(benefit*pres_value_fact) - cumsum(cost*pres_value_fact))/ cumsum(cost*pres_value_fact), 
-      benefit_cost_ratio_disc = (sum(benefit*pres_value_fact) / sum(cost*pres_value_fact)), 
-      npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
-    )
+  economic_indicators <- bind_rows(economic_indicators_rip_shallow_input,
+                                   economic_indicators_rip_deep_input)
   
-  economic_indicators_rip_deep_organic <- filter(final_treatment_farm, treatment == 'rip_deep_organic')
-  economic_indicators_rip_deep_organic <-  economic_indicators_rip_deep_organic %>% 
-    mutate(
-      pres_value_fact = (1/(1+discount)^ year),
-      benefit = ((current_yld*(yld_resp_since_applied / 100)* yld_resp_perct_crop) * price), 
-      cashflow_no_dis_ann = benefit - cost,
-      cashflow_dis_ann = ((benefit*pres_value_fact) - (cost*pres_value_fact)), 
-      cashflow_cum = cumsum(cashflow_no_dis_ann),
-      cashflow_cum_disc = cumsum(cashflow_dis_ann),
-      ROI_cum_no_disc = (cumsum(benefit) - cumsum(cost))/ cumsum(cost), 
-      ROI_cum_disc = (cumsum(benefit*pres_value_fact) - cumsum(cost*pres_value_fact))/ cumsum(cost*pres_value_fact), 
-      benefit_cost_ratio_disc = (sum(benefit*pres_value_fact) / sum(cost*pres_value_fact)), 
-      npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
-    )
-  
-  economic_indicators_rip_deep_fert <- filter(final_treatment_farm, treatment == 'rip_deep_fert')
-  economic_indicators_rip_deep_fert <-  economic_indicators_rip_deep_fert %>% 
-    mutate(
-      pres_value_fact = (1/(1+discount)^ year),
-      benefit = ((current_yld*(yld_resp_since_applied / 100)* yld_resp_perct_crop) * price), 
-      cashflow_no_dis_ann = benefit - cost,
-      cashflow_dis_ann = ((benefit*pres_value_fact) - (cost*pres_value_fact)), 
-      cashflow_cum = cumsum(cashflow_no_dis_ann),
-      cashflow_cum_disc = cumsum(cashflow_dis_ann),
-      ROI_cum_no_disc = (cumsum(benefit) - cumsum(cost))/ cumsum(cost), 
-      ROI_cum_disc = (cumsum(benefit*pres_value_fact) - cumsum(cost*pres_value_fact))/ cumsum(cost*pres_value_fact), 
-      benefit_cost_ratio_disc = (sum(benefit*pres_value_fact) / sum(cost*pres_value_fact)), 
-      npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
-    )
-  economic_indicators_wetter <- filter(final_treatment_farm, treatment == 'wetter')
-  economic_indicators_wetter <-  economic_indicators_wetter %>% 
-    mutate(
-      pres_value_fact = (1/(1+discount)^ year),
-      benefit = ((current_yld*(yld_resp_since_applied / 100)* yld_resp_perct_crop) * price), 
-      cashflow_no_dis_ann = benefit - cost,
-      cashflow_dis_ann = ((benefit*pres_value_fact) - (cost*pres_value_fact)), 
-      cashflow_cum = cumsum(cashflow_no_dis_ann),
-      cashflow_cum_disc = cumsum(cashflow_dis_ann),
-      ROI_cum_no_disc = (cumsum(benefit) - cumsum(cost))/ cumsum(cost), 
-      ROI_cum_disc = (cumsum(benefit*pres_value_fact) - cumsum(cost*pres_value_fact))/ cumsum(cost*pres_value_fact), 
-      benefit_cost_ratio_disc = (sum(benefit*pres_value_fact) / sum(cost*pres_value_fact)), 
-      npv = (sum(benefit*pres_value_fact) - sum(cost*pres_value_fact))
-    )
-  economic_indicators <- bind_rows(economic_indicators_rip_no_input,
-                                   economic_indicators_rip_shallow_organic,
-                                   economic_indicators_rip_shallow_fert,
-                                   economic_indicators_rip_deep_organic,
-                                   economic_indicators_rip_deep_fert,
-                                   economic_indicators_wetter)
-  
-#write.csv(economic_indicators, file = "economic_indicators.csv")
+write.csv(economic_indicators, file = "economic_indicators.csv")
 return(economic_indicators)
 }
 

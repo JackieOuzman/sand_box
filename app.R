@@ -365,9 +365,9 @@ server <- function(input, output) {
   
  
   #economic indicators
-#  economic_indicators <- reactive({
-#    function_economic_indicators(final_treatment_farm())
-#  })
+  economic_indicators <- reactive({
+    function_economic_indicators(final_treatment_farm())
+  })
   
 #  plot <- reactive({
 #    function_plot(economic_indicators(), input$analysis )
@@ -409,7 +409,7 @@ server <- function(input, output) {
   })
   
   output$name_of_results <- renderText({
-        paste0("check: ",final_treatment_farm())
+        paste0("check: ",economic_indicators())
       })
 
 #  output$name_of_results <- renderText({
