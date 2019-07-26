@@ -667,7 +667,7 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm, num
     } 
     
     #init montecarlo params  
-    if(is.null(num_simulation)) num_simulation <- 10
+    if(is.null(num_simulation)) num_simulation <- 200
     if(is.null(dbn_name)) dbn_name <- "log-logistic"
     
     nominal_yield_wheat = 3.0 
@@ -742,9 +742,17 @@ function_plot_list_economic_indicators <- function(list_economic_indicators, met
     df_slctd_metric <- bind_cols(list_dfmetric)
     vrbl_names = names(df_slctd_metric)
     vrbl_names = vrbl_names[1:length(vrbl_names)-1]
+    #calculate the quartles of df_slctd_metric
+    df_names <- names(df_slctd_metric)
+    df_no_year <- df_slctd_metric[, df_names != "year"]
+    mtx_slctd_metric <- as.matrix(df_no_year)
+    mtx_row_ntiles <- rowQuantiles(mtx_slctd_metric, probs=seq(0,1, 0.25))
+    df_rowDeciles <- as.data.frame(mtx_row_ntiles)
+    df_year_rowDeciles <- cbind(select(df_slctd_metric, "year"), df_rowDeciles)
+    
     #formats for plotting many lines 
     dfs2plot <- reshape2::melt(df_slctd_metric, id.vars="year", measure.vars = vrbl_names)
-    
+    dcl2plot<- reshape2::melt(df_year_rowDeciles, id.vars="year")
     economic_indicators_1$year <- round(economic_indicators_1$year, 0)
     
     economic_indicators_1$treatment <- factor(economic_indicators_1$treatment, c("wetter", "rip_no_inputs", "rip_shallow_organic",
@@ -754,7 +762,7 @@ function_plot_list_economic_indicators <- function(list_economic_indicators, met
     #from the list create a data.frame just containing the metric
     is_many = TRUE
     if(is_many){
-        ggplot(dfs2plot,
+        ggplot(dcl2plot,
                aes(x=year, y=value, colour=variable)) +
                geom_line()
     } else{
