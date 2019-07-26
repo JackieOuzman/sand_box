@@ -25,8 +25,8 @@ sidebar <-  dashboardSidebar(
             sidebarMenu(
               menuItem("The farm and ripping", tabName = "tell_me", icon = icon("question")),
               menuItem("Wheat", tabName = "set_up_farm", icon = icon("th")),
-              menuItem("Ripping cost", tabName = "mitigation", icon = icon("list")),
-              menuItem("Commodity prices", tabName = "extra", icon = icon("dollar")),
+              menuItem("Ripping cost", tabName = "cost_ripping", icon = icon("list")),
+              menuItem("Commodities & production costs", tabName = "extra", icon = icon("dollar")),
               menuItem("Results", tabName = "results", icon = icon("bar-chart-o"))
               #,menuItem("test", tabName = "test")
               #need to change tab names to something more meaninful              
@@ -64,13 +64,17 @@ body <- dashboardBody(
                                               "Brimpton Lake" = 18005, 
                                               "Cadgee" = 26099), 
                                   selected = "Waikerie"),
-                     
+                      numericInput("production_area", #need to change this to something more meaninful
+                                   label = "Area of production (ha)",
+                                   value = 400,
+                                   min = 10,
+                                   max= 10000,
+                                   step = 0.5),
                       
                       textOutput("name_of_met"),
                       
                       tableOutput("metfile")#,
-                      #valueBoxOutput("yld_pot_wheat"),
-                      #valueBoxOutput("yld_pot_pulses")
+                      
                       
       ), 
       
@@ -83,7 +87,7 @@ body <- dashboardBody(
                  label = h3("What are you considering?"),
                  choices = list("Shallow ripping with inputs" = "rip_shallow_input", #need to change this to something more meaninful
                                 "Deep ripping with inputs" = "rip_deep_input"),  #need to change this to something more meaninful
-                 selected = "rip_shallow_fert")
+                 selected = "rip_shallow_input")
               
              ) #well pannel
       ) #column bracket
@@ -144,7 +148,7 @@ body <- dashboardBody(
 
 #temp tab
   tabItem(
-    tabName = "mitigation" , #need to change this to something more meaninful
+    tabName = "cost_ripping" , #need to change this to something more meaninful
     tabBox(
 
 
@@ -156,7 +160,7 @@ body <- dashboardBody(
                 tabPanel(h4("shallow ripping"),
           wellPanel(
           numericInput("costs_ripping", 
-                     label = h4("Cost for ripping with shallow inputs"), #need to change this to something more meaninful
+                     label = h4("Cost for ripping with shallow inputs $/ha"), #need to change this to something more meaninful
                       value = 70, 
                       min = 0,
                       max = 2000,
@@ -184,7 +188,7 @@ body <- dashboardBody(
           tabPanel(h4("deep ripping"), 
       wellPanel(
                 numericInput("rip_deep_cost", 
-                 label = h4("Cost for ripping with deep inputs"),
+                 label = h4("Cost for ripping with deep inputs $/ha"),
                                 value = 90, 
                                 min = 0,
                                     max = 2000,
@@ -214,25 +218,10 @@ body <- dashboardBody(
         fluidRow(
           box(
             width = 12,
-        #selectInput("Results_for", 
-        #      label = h3("Over how many years?"),
-        #      choices = c("5 years" = 5, "10 years" = 10), 
-        #      selected = "5 years"),
+       
         
         
-        radioButtons("analysis", 
-                    label = h3("What analysis?"),
-                    choices = c("Undiscounted annual cash flow" = "cashflow_no_dis_ann",
-                                "discounted annual net cash flow" ="cashflow_dis_ann",
-                                "Cummulative discounted cash flow" ="cashflow_cum_disc",
-                                "Cummulative ROI not discounted" ="ROI_cum_no_disc",
-                                "Cummulative ROI discounted" ="ROI_cum_disc",
-                                "Benefit:Cost Ratio (discounted)" ="benefit_cost_ratio_disc",
-                                "Net Present Value" ="npv"),
-                                #"Modified Internal Rate Return" ="MIRR"),
-                                selected = "cashflow_cum_disc") #checkboxInput bracket
         
-        , #box1 bracket
         box(width=8,
         title = "Results over 5 years",
         textOutput("name_of_results"),
@@ -256,18 +245,53 @@ body <- dashboardBody(
 #the fifth tab
      tabItem(
         tabName = "extra",
-        numericInput("discount",
-                     label = "Discount factor",
-                     value = 0.6,
-                     min = 0,
-                     max= 1,
-                     step = 0.02),
+        h3("Price for wheat"),
         numericInput("a",
                      label = "Farm gate price wheat ($/t)",
                      value = 290,
                      min = 0,
                      max= 400,
-                     step = 10)
+                     step = 10),
+        h3("Nitrogen for average year - needs work"),
+        numericInput("N_applied",
+                     label = "Nitrogen applied (Kg/t)",
+                     value = 200,
+                     min = 0,
+                     max= 400,
+                     step = 5),
+        numericInput("cost_N",
+                     label = "Cost of nitrogen ($/t)",
+                     value = 560,
+                     min = 0,
+                     max= 1000,
+                     step = 10),
+        h3("Freight"),
+        numericInput("freight",
+                     label = "Freight per tonne",
+                     value = 17,
+                     min = 0,
+                     max= 100,
+                     step = 1),
+        h3("Insurance and levies"),
+        numericInput("insurance",
+                     label = "Insurance as % of revenue",
+                     value = 1.1,
+                     min = 0.1,
+                     max= 2.0,
+                     step = 0.1),
+        numericInput("levies",
+                     label = "Levies as % of revenue",
+                     value = 1.1,
+                     min = 0.1,
+                     max= 2.0,
+                     step = 0.1),
+        h3("Variable Costs"),
+        numericInput("variable_cost",
+                     label = "Variable cost",
+                     value = 185,
+                     min = 0,
+                     max= 300,
+                     step = 1)
                  )
 
 
@@ -321,8 +345,8 @@ server <- function(input, output) {
   #####################################################################################  
   base_df1 <- reactive({
    map_df(input$mangement_options,
-           function_base_df1,  
-           discount = input$discount)
+           function_base_df1)  
+           #,discount = input$discount)
   })
   
   #current yields  
@@ -362,11 +386,15 @@ server <- function(input, output) {
   })
   
   
-  
+  ####################################################################################   
+  ################      create gross margins from final_treatment_farm        ########
+  #####################################################################################  
  
   #economic indicators
   economic_indicators <- reactive({
-    function_economic_indicators(final_treatment_farm())
+    function_economic_indicators(final_treatment_farm(), input$production_area, 
+                                 input$N_applied, input$cost_N, input$insurance,
+                                 input$levies, input$freight, input$variable_cost)
   })
   
   plot <- reactive({
@@ -374,38 +402,17 @@ server <- function(input, output) {
   })
   
   
-#  name_plot <- reactive({
-#    function_metric_name(input$analysis)
-#  })
-  
+
   ####### group of render OUTPUTS ########
   
   #this is new
   output$metfile <- renderTable({
     decile() 
   })
-  #####################################################################################
-  ####################                 REMOVE                   ######################
-  #####################################################################################  
-  #output$Av_yld_pot_wheat <- renderTable({
-  #  decile5_yld_pot_wheat()
-  #})
-  #output$Av_yld_pot_pulses <- renderTable({
-  #  decile5_yld_pot_pulses()
-  #})
-  #####################################################################################  
+ 
   
   output$yld_pot_wheat <- renderValueBox({
     valueBox(decile5_yld_pot_wheat(), "Yield potential of wheat  t/ha")
-  })
-## output$yld_pot_pulses <- renderValueBox({
-#    valueBox(decile5_yld_pot_pulses(), "Yield potential of pulses t/ha")
-#  })
-  #output$metfile_file_name <- renderText({
-  #   test1() 
-  # })
-  output$name_of_met <- renderText({
-    paste0("station number: ",input$stationID)
   })
 
   
@@ -420,34 +427,8 @@ server <- function(input, output) {
 
   
   
-  
-  #  output$name_of_results <- renderText({
-#    paste0("metric: ",input$analysis)
-#  })
-# output$text_size_farm = renderText({
-#  paste("Total size of your farm is set to:", input$total_size_farm,"ha")
-#})
+ 
 
- ## DF for the farm ##
-# output$df_progress = renderTable({
-#   final_farm_df()
-# })
- #cost outputs
-# output$df_progress_cost = renderTable({
-#   treatment_bind()
-# })
- 
- 
- #final data frame
-# output$df_progress_final = renderTable({
-#   final_treatment_farm()
-# })
- 
- 
- ##### economic indicators #####
-# output$economic = renderTable({
-#   economic_indicators()
-# })
  output$plot = renderPlot({
    plot()
  })

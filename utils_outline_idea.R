@@ -164,12 +164,12 @@ function_decile5_yld_pot_pulses <- function(water_aval) {
 
 
 
-function_base_df1 <- function(mangement_options, discount){
+function_base_df1 <- function(mangement_options){
   x <- data.frame(treatment = mangement_options,
                   #year = 1:length(crop_seq_zone1),
                   year = 1:10,
-                  crop = "wheat",
-                  discount = discount)
+                  crop = "wheat")
+                  #discount = discount)
   y <- pre <- data.frame(year = 0)
   step1 <- bind_rows(y, x)
   #write_csv(step1, "Step1_yr_crop_disc_mang.csv")
@@ -321,7 +321,7 @@ function_final_treatment_farm <- function(making_df_current, treatment_bind){
   
   
   b <- replace_na(a,list(crop =0, cost=0, yld_resp_since_applied=0, 
-                         yr_since_app =0, yld_resp_perct_crop =0, discount =0, 
+                         yr_since_app =0, yld_resp_perct_crop =0,  
                          current_yld =0, potential_yld =0, price =0))
   write.csv(b, "final_treatment_farm.csv")
   return(b)
@@ -333,7 +333,8 @@ function_final_treatment_farm <- function(making_df_current, treatment_bind){
 ################################################################################################## 
 
 
-function_economic_indicators <- function(final_treatment_farm) {
+function_economic_indicators <- function(final_treatment_farm, production_area, N_applied, cost_N, insurance, levies,
+                                         freight, variable_cost) {
   #work out the econmoic indicators
   
   economic_indicators_rip_shallow_input <- filter(final_treatment_farm, treatment == 'rip_shallow_input')
@@ -341,12 +342,12 @@ function_economic_indicators <- function(final_treatment_farm) {
   mutate(
     m_c_yld = Wheat_P50, #check this out with Ric
     new_yld = (m_c_yld * (yld_resp_since_applied / 100)* yld_resp_perct_crop) + m_c_yld,
-    revenue = (new_yld * 400) * Wheat_price, # need to make new UI input for 400ha as area of wheat production
-    N_cost = (200 * (560 /100) * 400), #rate of N kg/ha * cost of N $/t /100* area of production)
-    freight = 17* (400 * new_yld), # cost of freight $17, area of production
-    Insurance_levies = revenue * ((1.1+0)/100), # insurance and levies
-    variable_cost = (185.44 * 400), # sum of varaible cost * area
-    cost_treatmnet = (cost * 400), #cost of treatment $/ha * area,
+    revenue = (new_yld * production_area) * Wheat_price, # need to make new UI input for 400ha as area of wheat production
+    N_cost = (N_applied * (cost_N /100) * production_area), #rate of N kg/ha * cost of N $/t /100* area of production)
+    freight = freight* (production_area * new_yld), # cost of freight $17, area of production
+    Insurance_levies = revenue * ((insurance + levies)/100), # insurance and levies
+    variable_cost = (variable_cost * production_area), # sum of varaible cost * area
+    cost_treatmnet = (cost * production_area), #cost of treatment $/ha * area,
     total_direct_expenses = N_cost + freight +Insurance_levies + variable_cost + cost_treatmnet,
     gross_margin = revenue - total_direct_expenses
   )
@@ -356,12 +357,12 @@ function_economic_indicators <- function(final_treatment_farm) {
     mutate(
       m_c_yld = Wheat_P50, #check this out with Ric
       new_yld = (m_c_yld * (yld_resp_since_applied / 100)* yld_resp_perct_crop) + m_c_yld,
-      revenue = (new_yld * 400) * Wheat_price, # need to make new UI input for 400ha as area of wheat production
-      N_cost = (200 * (560 /100) * 400), #rate of N kg/ha * cost of N $/t /100* area of production)
-      freight = 17 *(400 * new_yld), # cost of freight $17, area of production
-      Insurance_levies = revenue * ((1.1+0)/100), # insurance and levies
-      variable_cost = (185.44 * 400), # sum of varaible cost * area
-      cost_treatmnet = (cost * 400), #cost of treatment $/ha * area,
+      revenue = (new_yld * production_area) * Wheat_price, # need to make new UI input for 400ha as area of wheat production
+      N_cost = (N_applied * (cost_N /100) * production_area), #rate of N kg/ha * cost of N $/t /100* area of production)
+      freight = freight *(production_area * new_yld), # cost of freight $17, area of production
+      Insurance_levies = revenue * ((insurance +levies)/100), # insurance and levies
+      variable_cost = (variable_cost * production_area), # sum of varaible cost * area
+      cost_treatmnet = (cost * production_area), #cost of treatment $/ha * area,
       total_direct_expenses = N_cost + freight +Insurance_levies + variable_cost + cost_treatmnet,
       gross_margin = revenue - total_direct_expenses
     )
