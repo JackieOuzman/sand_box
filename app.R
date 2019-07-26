@@ -369,9 +369,9 @@ server <- function(input, output) {
     function_economic_indicators(final_treatment_farm())
   })
   
-#  plot <- reactive({
-#    function_plot(economic_indicators(), input$analysis )
-#  })
+  plot <- reactive({
+    function_plot(economic_indicators() )
+  })
   
   
 #  name_plot <- reactive({
@@ -407,12 +407,21 @@ server <- function(input, output) {
   output$name_of_met <- renderText({
     paste0("station number: ",input$stationID)
   })
-  
-  output$name_of_results <- renderText({
-        paste0("check: ",economic_indicators())
-      })
 
-#  output$name_of_results <- renderText({
+  
+  ####################################################################################
+  #############             I was using this as a check #############################
+  ####################################################################################
+    
+# output$name_of_results <- renderText({
+#        paste0("check: ",economic_indicators())
+#      })
+  ####################################################################################
+
+  
+  
+  
+  #  output$name_of_results <- renderText({
 #    paste0("metric: ",input$analysis)
 #  })
 # output$text_size_farm = renderText({
@@ -439,9 +448,9 @@ server <- function(input, output) {
 # output$economic = renderTable({
 #   economic_indicators()
 # })
-# output$plot = renderPlot({
-#   plot()
-# })
+ output$plot = renderPlot({
+   plot()
+ })
  
 }
 shinyApp(ui, server)

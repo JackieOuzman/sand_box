@@ -374,47 +374,26 @@ return(economic_indicators)
 }
 
 
-function_plot <- function(economic_indicators,  metric) {
+function_plot <- function(economic_indicators) {
   economic_indicators$year <- round(economic_indicators$year, 0)
   
-  economic_indicators$treatment <- factor(economic_indicators$treatment, c("wetter", "rip_no_inputs", "rip_shallow_organic",
-                                                             "rip_shallow_fert", "rip_deep_organic",
-                                                             "rip_deep_fert"))
+  economic_indicators$treatment <- factor(economic_indicators$treatment, c("rip_shallow_input", "rip_deep_input"))
   
   #m <- sym(metric)
-  ggplot(economic_indicators, aes_(x = as.name("year"), y=as.name(metric) , colour= as.name("treatment")))+
+  ggplot(economic_indicators, aes_(x = as.name("year"),  y= as.name("gross_margin") , colour= as.name("treatment")))+
     geom_line()+
     theme_classic()+
     theme(legend.position = "bottom")+
     scale_color_manual(name = "",
-                       labels=c(wetter = "wetter", 
-                                rip_no_inputs ="ripping with no inputs", 
-                                rip_shallow_organic = "ripping with shallow organic inputs", 
-                                rip_shallow_fert ="ripping with shallow fertiliser inputs", 
-                                rip_deep_organic="ripping with deep organic inputs",
-                                rip_deep_fert = "ripping with deep fertiliser inputs"),
-                       values=c(wetter = "black", 
-                                rip_no_inputs = "grey",
-                                rip_shallow_organic = "light blue",
-                                rip_shallow_fert ="dark blue", 
-                                rip_deep_organic= "light green", 
-                                rip_deep_fert = "dark green"))+
+                       labels=c(rip_shallow_input = "rip shallow with input", 
+                                rip_deep_input ="rip deep with input"),
+                       values=c(rip_shallow_input = "black", 
+                                rip_deep_input = "grey"
+                                ))+
     xlim(1,5)+
     labs(x = "Years",
-         y = "$")
+         y = "GM")
   
 }
 
-function_metric_name <- function(metric){
-  
-    ifelse(metric == cashflow_no_dis_ann, "Undiscounted annual cash flow",
-                    ifelse(test_name == cashflow_dis_ann, "discounted annual net cash flow",
-                    ifelse(test_name == cashflow_cum_disc, "Cummulative discounted cash flow",
-                    ifelse(test_name == ROI_cum_no_disc, "Cummulative ROI not discounted",                         
-                    ifelse(test_name == ROI_cum_disc, "Cummulative ROI discounted",                         
-                    ifelse(test_name == benefit_cost_ratio_disc, "Benefit:Cost Ratio (discounted)",                         
-                    ifelse(test_name == npv, "Net Present Value",                        
-                    ifelse(test_name == MIRR, "Modified Internal Rate Return"      
-                    ))))))))      
- print(metric) 
-}
+
