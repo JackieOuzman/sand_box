@@ -159,7 +159,7 @@ body <- dashboardBody(
 
                 tabPanel(h4("shallow ripping"),
           wellPanel(
-          numericInput("costs_ripping", 
+          numericInput("cost_shallow", 
                      label = h4("Cost for ripping with shallow inputs $/ha"), #need to change this to something more meaninful
                       value = 70, 
                       min = 0,
@@ -343,6 +343,7 @@ server <- function(input, output) {
   #####################################################################################  
   ###########                    CREATING DF FOR FARM                ##################
   #####################################################################################  
+ 
   base_df1 <- reactive({
    map_df(input$mangement_options,
            function_base_df1)  
@@ -362,16 +363,16 @@ server <- function(input, output) {
   #####################################################################################  
   
   
-  #create a new df for treatments crop, yr, costs etc
-  rip_shallow_df <- reactive({
-    function_rip_shallow_input_df(making_df_current(), input$year_for_ripping, input$costs_ripping)
+  #######create a new df for treatments crop, yr, costs etc
+ rip_shallow_df <- reactive({
+    function_rip_shallow_input_df(making_df_current(), input$year_for_ripping, input$cost_shallow)
   })
   
   
-  #create a new df for treatments crop, yr, costs etc
+  #########create a new df for treatments crop, yr, costs etc
   rip_deep_df <- reactive({
     function_rip_deep_input_df(making_df_current(), input$rip_deep_year, input$rip_deep_cost)
-  })
+ })
   
   treatment_bind <- reactive({
     function_treatment_bind(rip_shallow_df(), rip_deep_df())
@@ -390,9 +391,9 @@ server <- function(input, output) {
   ################      create gross margins from final_treatment_farm        ########
   #####################################################################################  
  
-  #economic indicators
+ ##########economic indicators
   economic_indicators <- reactive({
-    function_economic_indicators(final_treatment_farm(), input$production_area, 
+   function_economic_indicators(final_treatment_farm(), input$production_area, 
                                  input$N_applied, input$cost_N, input$insurance,
                                  input$levies, input$freight, input$variable_cost)
   })
@@ -420,9 +421,9 @@ server <- function(input, output) {
   #############             I was using this as a check #############################
   ####################################################################################
     
-# output$name_of_results <- renderText({
-#        paste0("check: ",economic_indicators())
-#      })
+ #output$name_of_results <- renderText({
+ #       paste0("check: ",economic_indicators())
+ #     })
   ####################################################################################
 
   

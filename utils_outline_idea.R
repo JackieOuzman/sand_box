@@ -166,12 +166,12 @@ function_decile5_yld_pot_pulses <- function(water_aval) {
 
 function_base_df1 <- function(mangement_options){
   x <- data.frame(treatment = mangement_options,
-                  #year = 1:length(crop_seq_zone1),
+                  #year = 1:length(crop_seq),
                   year = 1:10,
                   crop = "wheat")
                   #discount = discount)
   y <- pre <- data.frame(year = 0)
-  step1 <- bind_rows(y, x)
+  bind_rows(y, x)
   #write_csv(step1, "Step1_yr_crop_disc_mang.csv")
 }
 
@@ -191,7 +191,7 @@ function_making_df_current <- function(P5, P50, P90, a, base_df1 ){
   #write_csv(step2, "step2_wheatP_5_50_90.csv")
   #write_csv(step4, "step4_df_yld.csv")
   #write_csv(step5, "step5_df_yld.csv")
-  write_csv(step6, "step6_df_yld.csv")
+  write_csv(step6, "step6_df_yld.csv") #happy with
 }
 
 
@@ -207,10 +207,10 @@ function_making_df_current <- function(P5, P50, P90, a, base_df1 ){
 ## Then join to the final_farm_df the missing treatments wont join###
 
 #Now make a sep df for treatments Ripping with shallow inputs first
-function_rip_shallow_input_df <- function(making_df_current, year_for_ripping, costs_ripping){
+function_rip_shallow_input_df <- function(making_df_current, year_for_ripping, cost_shallow){
   a <-  distinct(making_df_current, year, .keep_all = TRUE)
   b <-  data_frame(year = as.numeric(year_for_ripping), #as numeric
-                  cost = costs_ripping) 
+                  cost = cost_shallow) 
                   
   cost_rip_shallow_input_df <- left_join(a, b, "year")
   cost_rip_shallow_input_df <- select(cost_rip_shallow_input_df, year, crop, cost)
@@ -244,8 +244,9 @@ function_rip_shallow_input_df <- function(making_df_current, year_for_ripping, c
   cost_rip_shallow_input_df <- unite(cost_rip_shallow_input_df, ID,
                          c(year,treatment), remove = FALSE)
   
-  write.csv(cost_rip_shallow_input_df, "step1_treatment.csv")
+  write.csv(cost_rip_shallow_input_df, "step1_treatment_shallow.csv")
   return(cost_rip_shallow_input_df)
+ 
   }
 ######################################################################################
 ###########                   deep_input            ############################## 
@@ -295,7 +296,7 @@ function_rip_deep_input_df <- function(making_df_current, rip_deep_year, rip_dee
   cost_rip_deep_input_df <- unite(cost_rip_deep_input_df, ID,
                                      c(year,treatment), remove = FALSE)
   
-  write.csv(cost_rip_deep_input_df, "step2_treatment_deep.csv")
+  write.csv(cost_rip_deep_input_df, "step1_treatment_deep.csv")
   return(cost_rip_deep_input_df)
 }
 
@@ -310,6 +311,7 @@ function_treatment_bind <- function(cost_rip_deep_input_df, cost_rip_shallow_inp
              ID, cost, yld_resp_since_applied, yr_since_app,
              yld_resp_perct_crop )
       write.csv(treatment, "step1_2_treament.csv")
+      return(treatment)
 }
 
 ####################################################################################################
@@ -317,7 +319,7 @@ function_treatment_bind <- function(cost_rip_deep_input_df, cost_rip_shallow_inp
 ################################################################################################## 
 function_final_treatment_farm <- function(making_df_current, treatment_bind){
   
-  a <- left_join(making_df_current, treatment_bind_a, by = 'ID')
+  a <- left_join(making_df_current, treatment_bind, by = 'ID')
   
   
   b <- replace_na(a,list(crop =0, cost=0, yld_resp_since_applied=0, 
