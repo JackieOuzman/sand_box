@@ -678,8 +678,8 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm, num
     mc_economic_indicators = list()
     mc_economic_indicators[[1]] = function_economic_indicators(final_treatment_farm)
     if(dbn_name == "log-logistic"){
-        scale = sqrt(decile_9 * decile_1) #TODO: check derivation 
-        shape = -2*log(3)/log(sqrt(decile_9*decile_1)/decile_9)
+        scale = sqrt(decile_9 * decile_1) #TODO: check derivation, pas067 this is good for actua::loglogistic
+        shape = -2*log(3)/log(sqrt(decile_9*decile_1)/decile_9) #pas067, this is good for actua::loglogisitc
         if(doDbg) browser()
         mc_idx <- 2
         while(mc_idx<=num_simulation){
