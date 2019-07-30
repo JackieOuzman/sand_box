@@ -346,11 +346,11 @@ function_economic_indicators <- function(final_treatment_farm, production_area, 
     new_yld = (m_c_yld * (yld_resp_since_applied / 100)* yld_resp_perct_crop) + m_c_yld,
     revenue = (new_yld * production_area) * Wheat_price, # need to make new UI input for 400ha as area of wheat production
     N_cost = (N_applied * (cost_N /100) * production_area), #rate of N kg/ha * cost of N $/t /100* area of production)
-    freight = freight* (production_area * new_yld), # cost of freight $17, area of production
+    freight_cost = freight* (production_area * new_yld), # cost of freight $17, area of production
     Insurance_levies = revenue * ((insurance + levies)/100), # insurance and levies
-    variable_cost = (variable_cost * production_area), # sum of varaible cost * area
+    variable_cost_cal = (variable_cost * production_area), # sum of varaible cost * area
     cost_treatmnet = (cost * production_area), #cost of treatment $/ha * area,
-    total_direct_expenses = N_cost + freight +Insurance_levies + variable_cost + cost_treatmnet,
+    total_direct_expenses = N_cost + freight_cost +Insurance_levies + variable_cost_cal + cost_treatmnet,
     gross_margin = revenue - total_direct_expenses
   )
   
@@ -361,11 +361,11 @@ function_economic_indicators <- function(final_treatment_farm, production_area, 
       new_yld = (m_c_yld * (yld_resp_since_applied / 100)* yld_resp_perct_crop) + m_c_yld,
       revenue = (new_yld * production_area) * Wheat_price, # need to make new UI input for 400ha as area of wheat production
       N_cost = (N_applied * (cost_N /100) * production_area), #rate of N kg/ha * cost of N $/t /100* area of production)
-      freight = freight *(production_area * new_yld), # cost of freight $17, area of production
+      freight_cost = freight *(production_area * new_yld), # cost of freight $17, area of production
       Insurance_levies = revenue * ((insurance +levies)/100), # insurance and levies
-      variable_cost = (variable_cost * production_area), # sum of varaible cost * area
+      variable_cost_cal = (variable_cost * production_area), # sum of varaible cost * area
       cost_treatmnet = (cost * production_area), #cost of treatment $/ha * area,
-      total_direct_expenses = N_cost + freight +Insurance_levies + variable_cost + cost_treatmnet,
+      total_direct_expenses = N_cost + freight_cost +Insurance_levies + variable_cost_cal + cost_treatmnet,
       gross_margin = revenue - total_direct_expenses
     )
   
@@ -376,6 +376,64 @@ write.csv(economic_indicators, file = "economic_indicators.csv")
 return(economic_indicators)
 }
 
+###################################################################################
+###############  mc sim needs some changes #######################################
+#################################################################################
+
+function_do_montecarlo_economic_indicators <- function(final_treatment_farm, 
+                                                       num_simulation=NULL, 
+                                                       dbn_name=NULL, decile_1=NULL, decile_9=NULL  ){
+  #do monte-carlo on the economic_indicators,
+  #distribution_properties is a named list with the minimal properties of attributes
+  #distribution_properties = list(name="", location=0, shape=1, rate)
+  #log-logistic" actuar::rllogis
+  
+  ###  JAX   #### REMOVED because I don't understand how this works if(doDbg) browser()
+  #do a single simulation 
+  if(is.null(num_simulation) && is.null(dbn_name)){
+    economic_indicators = function_economic_indicators(final_treatment_farm, production_area, N_applied, cost_N, insurance, levies,
+                                                       freight, variable_cost)
+    return(economic_indicators)
+  } 
+  
+  #init montecarlo params  
+  if(is.null(num_simulation)) num_simulation <- 200
+  if(is.null(dbn_name)) dbn_name <- "log-logistic"
+  
+  nominal_yield_wheat = 3.0 
+  if(is.null(decile_1)) decile_1 <- nominal_yield_wheat*0.25 #pas067 change to realistic value
+  if(is.null(decile_9)) decile_9 <- nominal_yield_wheat*2.0 #pas067 change to realistic value
+  
+  #do montecarlo, place the first element of the list without randomness
+  mc_economic_indicators = list()
+  mc_economic_indicators[[1]] = function_economic_indicators(final_treatment_farm, production_area, N_applied, cost_N, insurance, levies,
+                                                             freight, variable_cost)
+  if(dbn_name == "log-logistic"){
+    scale = sqrt(decile_9 * decile_1) #TODO: check derivation, pas067 this is good for actua::loglogistic
+    shape = -2*log(3)/log(sqrt(decile_9*decile_1)/decile_9) #pas067, this is good for actua::loglogisitc
+    if(doDbg) browser()
+    mc_idx <- 2
+    while(mc_idx<=num_simulation){
+      #generate random final final_treatment_farm$current_yld
+      mc_current_yld <-actuar::rllogis(length(final_treatment_farm$Wheat_P50), shape=shape, scale = scale) #distribtuion
+      #remove this current_yld when negative
+      any_neg <- any(mc_Wheat_P50 < 0)
+      if(any_neg) next() #go to while when negative
+      final_treatment_farm$Wheat_P50 <- mc_Wheat_P50
+      mc_economic_indicators[[mc_idx]] = function_economic_indicators(final_treatment_farm)
+      mc_idx = mc_idx + 1
+    }
+  }    
+  #### JAX removed because I don't understand how this works  if(doDbg) browser()
+  return(mc_economic_indicators)
+  
+} #function_do_montecarlo_economic_indicators
+
+
+
+#############################################################################################################
+################    This is my old plot of results     ####################################################
+###########################################################################################################
 
 function_plot <- function(economic_indicators) {
   economic_indicators$year <- round(economic_indicators$year, 0)
@@ -384,7 +442,7 @@ function_plot <- function(economic_indicators) {
   
   #m <- sym(metric)
   ggplot(economic_indicators, aes_(x = as.name("year"),  y= as.name("gross_margin") , colour= as.name("treatment")))+
-    geom_line()+
+    geom_line(size=3)+
     theme_classic()+
     theme(legend.position = "bottom")+
     scale_color_manual(name = "",
@@ -394,9 +452,69 @@ function_plot <- function(economic_indicators) {
                                 rip_deep_input = "grey"
                                 ))+
     xlim(1,5)+
+    scale_y_continuous(labels = scales::dollar_format())+
     labs(x = "Years",
          y = "GM")
   
 }
 
-
+#####################################################################################
+########Plot for mc needs some changes #############
+#####################################################################################
+function_plot_list_economic_indicators <- function(list_economic_indicators
+                                                   #, metric
+                                                   ){
+  #pas067 plots economic_indicators of interest from a list of data.frames of economic indicators
+  #if(doDbg) browser() 
+  economic_indicators_1 <- list_economic_indicators[[1]]
+  
+  #####from the list create a data.frame just containing the metric
+  #list_dfmetric <- lapply(list_economic_indicators, function(x) x%>% select(metric))
+  #list_dfmetric[[length(list_dfmetric)+1]] = economic_indicators_1["year"]
+  #df_slctd_metric <- bind_cols(list_dfmetric)
+  #vrbl_names = names(df_slctd_metric)
+  #vrbl_names = vrbl_names[1:length(vrbl_names)-1]
+  ######calculate the quartles of df_slctd_metric
+  #df_names <- names(df_slctd_metric)
+  #df_no_year <- df_slctd_metric[, df_names != "year"]
+  #mtx_slctd_metric <- as.matrix(df_no_year)
+  #mtx_row_ntiles <- rowQuantiles(mtx_slctd_metric, probs=seq(0,1, 0.25))
+  #df_rowDeciles <- as.data.frame(mtx_row_ntiles)
+  #df_year_rowDeciles <- cbind(select(df_slctd_metric, "year"), df_rowDeciles)
+  
+  #####formats for plotting many lines 
+  #dfs2plot <- reshape2::melt(df_slctd_metric, id.vars="year", measure.vars = vrbl_names)
+  #dcl2plot<- reshape2::melt(df_year_rowDeciles, id.vars="year")
+  economic_indicators_1$year <- round(economic_indicators_1$year, 0)
+  
+  economic_indicators$treatment <- factor(economic_indicators$treatment, c("rip_shallow_input", "rip_deep_input"))
+  
+  #economic_indicators_1$treatment <- factor(economic_indicators_1$treatment, c("wetter", "rip_no_inputs", "rip_shallow_organic",
+  #                                                                             "rip_shallow_fert", "rip_deep_organic",
+  #                                                                             "rip_deep_fert"))
+  
+  #from the list create a data.frame just containing the metric
+  is_many = TRUE
+  if(is_many){
+    ggplot(dcl2plot,
+           aes(x=year, y=value, colour=variable)) +
+      geom_line()
+  } else{
+    #m <- sym(metric)
+    ggplot(economic_indicators_1, aes_(x = as.name("year"),  y= as.name("gross_margin") , colour= as.name("treatment")))+
+      geom_line(size=3)+
+      theme_classic()+
+      theme(legend.position = "bottom")+
+      scale_color_manual(name = "",
+                         labels=c(rip_shallow_input = "rip shallow with input", 
+                                  rip_deep_input ="rip deep with input"),
+                         values=c(rip_shallow_input = "black", 
+                                  rip_deep_input = "grey"
+                         ))+
+      xlim(1,5)+
+      scale_y_continuous(labels = scales::dollar_format())+
+      labs(x = "Years",
+           y = "GM")
+  }#is_many
+  
+}
