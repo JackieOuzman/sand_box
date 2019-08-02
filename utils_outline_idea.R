@@ -1,7 +1,10 @@
 ##this just defines my function...
 #this get the downlaoded met files they are in a folder called met
 #I was thinking this would be quicker than using the uRL function I had before
-#But it is just as slow:(
+#But it is just as slow:
+#
+#vrbl to stop at the browser() command when doDbg == TRUE 
+doDbg <- TRUE
 
 function_met <- function(stationID) {
   met_file <- read_csv(paste0("met_file/",stationID,".csv"))
@@ -402,8 +405,7 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm,
                                                        freight, variable_cost)
    
   } 
-  return(economic_indicators)
-    
+  if(doDbg) browser()
   #init montecarlo params  
   if(is.null(num_simulation)) num_simulation <- 200
   if(is.null(dbn_name)) dbn_name <- "log-logistic"
@@ -423,12 +425,13 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm,
     mc_idx <- 2
     while(mc_idx<=num_simulation){
       #generate random final final_treatment_farm$current_yld
-      mc_current_yld <-actuar::rllogis(length(final_treatment_farm$Wheat_P50), shape=shape, scale = scale) #distribtuion
+        mc_Wheat_P50 <-actuar::rllogis(length(final_treatment_farm$Wheat_P50), shape=shape, scale = scale) #distribtuion
       #remove this current_yld when negative
       any_neg <- any(mc_Wheat_P50 < 0)
       if(any_neg) next() #go to while when negative
       final_treatment_farm$Wheat_P50 <- mc_Wheat_P50
-      mc_economic_indicators[[mc_idx]] = function_economic_indicators(final_treatment_farm)
+      mc_economic_indicators[[mc_idx]] = function_economic_indicators(final_treatment_farm, production_area, N_applied, cost_N, insurance, levies,
+                                                                      freight, variable_cost)
       mc_idx = mc_idx + 1
     }
   }    

@@ -15,6 +15,9 @@ library(dplyr)
 library(tidyverse)
 library(lubridate)
 
+#this clear the global env of functions and symbols
+rm(list = ls(), envir = .GlobalEnv)
+
 source('utils_outline_idea.R')
 
 do_mc <- TRUE
