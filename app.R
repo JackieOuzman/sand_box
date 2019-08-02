@@ -425,10 +425,17 @@ server <- function(input, output) {
       })    
   } #do_mc
 
-  
-  plot <- reactive({
-    function_plot(economic_indicators() )
-  })
+  if(do_mc){
+      plot <- reactive({
+          function_plot(economic_indicators() )
+      })      
+      
+  } else{
+      plot <- reactive({
+          function_plot(economic_indicators() )
+      })      
+  }
+
   
   
 
@@ -454,13 +461,20 @@ server <- function(input, output) {
  #     })
   ####################################################################################
 
-  
-  
- 
+ if(do_mc)
+ {
+     output$plot = renderPlot({
+         plot()
+     })     
+     
+     
+ } else{
+     output$plot = renderPlot({
+         plot()
+     })     
+     
+ }
 
- output$plot = renderPlot({
-   plot()
- })
  
 }
 shinyApp(ui, server)
