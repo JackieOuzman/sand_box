@@ -17,6 +17,8 @@ library(lubridate)
 
 source('utils_outline_idea.R')
 
+do_mc <- TRUE
+
 #empty dashboard
 header <-   dashboardHeader()
 
@@ -392,11 +394,37 @@ server <- function(input, output) {
   #####################################################################################  
  
  ##########economic indicators
-  economic_indicators <- reactive({
-   function_economic_indicators(final_treatment_farm(), input$production_area, 
-                                 input$N_applied, input$cost_N, input$insurance,
-                                 input$levies, input$freight, input$variable_cost)
-  })
+ 
+  if(do_mc){
+      economic_indicators <- reactive({
+          print("do monte-carlo")
+          browser()
+          function_do_montecarlo_economic_indicators(
+              final_treatment_farm(),
+              input$production_area,
+              input$N_applied,
+              input$cost_N,
+              input$insurance,
+              input$levies,
+              input$freight,
+              input$variable_cost
+          )
+      })
+  } else{
+      economic_indicators <- reactive({
+          function_economic_indicators(
+              final_treatment_farm(),
+              input$production_area,
+              input$N_applied,
+              input$cost_N,
+              input$insurance,
+              input$levies,
+              input$freight,
+              input$variable_cost
+          )
+      })    
+  } #do_mc
+
   
   plot <- reactive({
     function_plot(economic_indicators() )

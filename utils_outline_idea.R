@@ -380,7 +380,14 @@ return(economic_indicators)
 ###############  mc sim needs some changes #######################################
 #################################################################################
 
-function_do_montecarlo_economic_indicators <- function(final_treatment_farm, 
+function_do_montecarlo_economic_indicators <- function(final_treatment_farm,
+                                                       production_area,
+                                                       N_applied,
+                                                       cost_N,
+                                                       insurance, 
+                                                       levies, 
+                                                       freight, 
+                                                       variable_cost,
                                                        num_simulation=NULL, 
                                                        dbn_name=NULL, decile_1=NULL, decile_9=NULL  ){
   #do monte-carlo on the economic_indicators,
@@ -393,9 +400,10 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm,
   if(is.null(num_simulation) && is.null(dbn_name)){
     economic_indicators = function_economic_indicators(final_treatment_farm, production_area, N_applied, cost_N, insurance, levies,
                                                        freight, variable_cost)
-    return(economic_indicators)
+   
   } 
-  
+  return(economic_indicators)
+    
   #init montecarlo params  
   if(is.null(num_simulation)) num_simulation <- 200
   if(is.null(dbn_name)) dbn_name <- "log-logistic"

@@ -471,16 +471,6 @@ body <- dashboardBody(
         )), #fluid bracket
         #), #tabItem bracket
 
-
-
-
-
-
-     
-    
-    
-    
-    
 #the fifth tab
      tabItem(
         tabName = "extra",
