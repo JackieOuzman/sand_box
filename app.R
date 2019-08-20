@@ -20,7 +20,7 @@ source('utils_outline_idea.R')
 
 #### file side vrbls  ####
 do_montecarlo = TRUE
-doDbg = TRUE
+doDbg = FALSE
 
 #empty dashboard
 header <-   dashboardHeader()
