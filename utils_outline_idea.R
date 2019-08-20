@@ -7,6 +7,7 @@
 library(reshape2)
 library(ggplot2)
 library(dplyr)
+library(matrixStats)
 #### file wide vrbls ####
 doDbg = TRUE
 
