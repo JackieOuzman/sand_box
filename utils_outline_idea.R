@@ -407,7 +407,7 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm,
   } 
   if(doDbg) browser()
   #init montecarlo params  
-  if(is.null(num_simulation)) num_simulation <- 200
+  if(is.null(num_simulation)) num_simulation <- 8
   if(is.null(dbn_name)) dbn_name <- "log-logistic"
   
   nominal_yield_wheat = 3.0 
@@ -436,8 +436,9 @@ function_do_montecarlo_economic_indicators <- function(final_treatment_farm,
     }
   }    
   #### JAX removed because I don't understand how this works  if(doDbg) browser()
-  return(mc_economic_indicators)
-  
+  saveRDS(mc_economic_indicators, file = "mc_economic_indicators.rds")
+   return(mc_economic_indicators)
+ 
 } #function_do_montecarlo_economic_indicators
 
 
