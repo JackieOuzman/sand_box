@@ -1,0 +1,145 @@
+---
+title: "Sandbox 2020"
+author: "Jackie Ouzman"
+#date: "Last run: `r Sys.Date()`"
+date: "Last run: `r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+ 
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 2020 Sandbox / Ripper
+
+This R Markdown document, will be used collate development ideas for the sanbox tool.
+The aim of the app is to help farmers make profitable management decisions, when dealing with sandy soils.
+
+The idea is that I will have chucks of code and widgets that can be used in a R shiny app.
+
+
+
+```{r import lib, include=FALSE}
+library(dplyr)
+library(tidyverse)
+library(shiny)
+library(DT)
+```
+
+## Bring in the template data
+
+This will be replaced with data supplied by Rick.
+This will conatin a number of fields which will help with filtering functions.
+The template data will guide the user with values, but they will be able to override these will there own data.
+
+```{r import_data, echo=FALSE}
+df <- read_csv(file = "input_sheet_template.csv")
+
+#path <- file.path("C:","Users","ouz001","working_from_home","ripper","2020")
+#df <- read_csv(paste0(path, "/" ,"input_sheet_template.csv"))
+head(df, 3)
+```
+
+## Add a widget for the user to select
+All we are doing here is selecting a grouping. 
+Then it returns a df that is filtered for the selection.
+
+
+```{r select_grouping, echo=FALSE}
+
+# df <- df %>% 
+#   filter(grouping == "mixing")
+# head(df, 10)
+
+ radioButtons("grouping", label = h3("Grouping"), 
+     choices = list("Mixing" = "mixing", "Fracturing" = "fracturing", "Fix pH" = "fix_pH"),
+     selected = "mixing")
+    
+ 
+ renderDataTable({
+ df_grouping <- df %>% 
+    filter(grouping == input$grouping)
+ })
+
+
+```
+
+## Build on this I want now to say if you select mixing what type of mixing do you want to do?
+https://excelquick.com/r-shiny/selectinput-dependent-on-another-input/
+2 metods listed here
+
+
+```{r select_nested_grouping, echo=FALSE}
+
+
+selectInput(inputId="choose_grouping",
+            label="Select grouping",
+            choices=unique(df$grouping),
+            selected="mixing")
+
+# display the second selectInput control - note that we can
+#  define the output further down in the R script, R will find the output
+
+uiOutput("cat_choice")
+
+#display the table with the user's choices from the selectInputs
+tableOutput("tb_chosen")
+
+output$tb_chosen <- renderTable(subset(df,
+ df$grouping==input$choose_grouping & 
+ df$intervenion==input$choose_item), rownames = TRUE)
+
+# The SECOND selectInput control
+# create an output variable based on the first control
+# wrap the variable in a reactive function renderUI() 
+#  so that we can capture the dynamic output from
+#  the first selectInput.
+# We've used 'unique' when subsetting the choices
+#  because we have duplicate intervenion
+
+output$cat_choice <- renderUI({
+  selectInput(inputId="choose_item",
+            label="Select item",
+            choices=unique(df 
+            [df$grouping==input$choose_grouping,"intervenion"]))
+})
+
+```
+
+## Build on this now I want now to say if you select mixing what type of mixing do you want to do and what site is it most like.
+
+```{r select_nested_grouping2,echo=FALSE }
+
+# create both selectInput selection control
+# in this example we also show how to add the controls
+#  into a formatted input panel
+
+# start of inputPanel
+inputPanel(
+ 
+ selectInput(inputId="choose_grouping2",
+            label="Select grouping2",
+            choices=unique(df$grouping),
+            selected=unique(df$grouping)[1]),
+
+ selectInput(inputId="choose_item2",
+            label="Select item2",
+            choices=unique(df$intervenion),
+            selected=unique(df$intervenion)[1])
+# end of inputPanel
+          )
+
+tableOutput("tb_chosen2")
+
+output$tb_chosen2 <- renderTable(subset(df,df$grouping==input$choose_grouping2 & df$intervenion==input$choose_item2), rownames=TRUE)
+
+# observe function which updates the second selectInput when the 
+#  first selectInput is changed
+ observe({ updateSelectInput(session,
+                            inputId="choose_item2", choices=unique(df[df$grouping == input$choose_grouping2,"intervenion"])
+                            )
+        })
+
+```

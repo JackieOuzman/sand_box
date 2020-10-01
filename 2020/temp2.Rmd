@@ -1,0 +1,62 @@
+---
+title: "Shiny selectInput based on another selectInput"
+runtime: shiny
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, error=TRUE)
+
+```
+
+```{r create_table_of_choices, eval=TRUE}
+
+# table of choices for the selectInput controls
+# note there's a duplicate item 'Pear'
+
+  x <- c("Fruit","Animal","Animal","Fruit","Fruit","Animal","Animal","Fruit")
+  y <- c("Pear","Dog","Cat","Apple","Banana","Monkey","Giraffe","Pear")
+
+#bind x and y into a dataframe with two columns, using cbind() (column bind)
+  choices_table <- as.data.frame(cbind(x,y))
+  colnames(choices_table) <- c("category","items")
+
+# look at the table of choices
+#   choices_table
+#   choices_table$category
+
+```
+
+```{r observe_updateSelectInput event, eval=TRUE, error=TRUE}
+
+# create both selectInput selection control
+# in this example we also show how to add the controls
+#  into a formatted input panel
+
+# start of inputPanel
+inputPanel(
+ 
+ selectInput(inputId="choose_category",
+            label="Select category",
+            choices=unique(choices_table$category),
+            selected=unique(choices_table$category)[1]),
+
+ selectInput(inputId="choose_item",
+            label="Select item",
+            choices=unique(choices_table$items),
+            selected=unique(choices_table$items)[1])
+# end of inputPanel
+          )
+
+tableOutput("tb_chosen")
+
+output$tb_chosen <- renderTable(subset(choices_table,choices_table$category==input$choose_category & choices_table$items==input$choose_item), rownames=TRUE)
+
+# observe function which updates the second selectInput when the 
+#  first selectInput is changed
+ observe({ updateSelectInput(session,
+                            inputId="choose_item", choices=unique(choices_table[choices_table$category == input$choose_category,"items"])
+                            )
+        })
+
+```
