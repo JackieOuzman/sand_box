@@ -208,43 +208,35 @@ observe({
 
 method 2 with another layer
 
-```{r method2_site, echo=FALSE}
+```{r method3_site, echo=FALSE}
 
-# create both selectInput selection control
-# in this example we also show how to add the controls
-#  into a formatted input panel
 
-# start of inputPanel
-inputPanel(
- 
- selectInput(inputId="choose_grouping3",
-            label="Select grouping3",
-            choices=unique(df$grouping),
-            selected=unique(df$grouping)[1]),
-
- selectInput(inputId="choose_intervenion3",
-            label="Select intervenion3",
-            choices=unique(df$intervenion),
-            selected=unique(df$intervenion)[1]),
- 
- selectInput(inputId="choose_site3",
-            label="Select site3",
-            choices=unique(df$site),
-            selected=unique(df$site)[1])
-# end of inputPanel
-          )
+inputPanel(uiOutput("data1"),   ## uiOutput - gets the UI from the server
+      uiOutput("data2"),
+      uiOutput("data3"))
 
 tableOutput("tb_chosen3")
+  
+ output$data1 <- renderUI({
+    selectInput("data1", "Select grouping",      
+                choices = c(df$grouping))
+  })
+  ## input dependant on the choices in `data1`
+   output$data2 <- renderUI({
+    selectInput("data2", "select intervenion",   
+                choices = c(df$intervenion[df$grouping == input$data1]))
+   })
+  ## input dependant on the choices in `data2`
+  output$data3 <- renderUI({
+    selectInput("data3", "select site",          
+                choices = c(df$site[df$intervenion == input$data2]))
+  })
 
 output$tb_chosen3 <- renderTable(subset(df,
-                                       df$grouping==input$choose_grouping3 &                                                           df$intervenion==input$choose_intervenion3), 
+                                       df$grouping==input$data1 &                                                                      df$intervenion==input$data2 &
+                                       df$site==input$data3
+                                       ), 
                                        rownames=TRUE)
 
-# observe function which updates the second selectInput when the 
-#  first selectInput is changed
-observe({
-  updateSelectInput(session,
-                    inputId = "choose_intervenion3",
-                    choices = unique(df[df$grouping == input$choose_grouping3, "intervenion"]))
-        })
+ 
 ```
