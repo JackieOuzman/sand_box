@@ -43,6 +43,7 @@ head(df, 3)
 ```
 
 ## Add a widget for the user to select
+## This will filter the data frame to retain what grouping was selected
 All we are doing here is selecting a grouping. 
 Then it returns a df that is filtered for the selection.
 
@@ -66,9 +67,14 @@ Then it returns a df that is filtered for the selection.
 
 ```
 
-## Build on this I want now to say if you select mixing what type of mixing do you want to do?
+## Build on this;
+## I want now to say if you select mixing, what type of mixing do you want to do?
+In this code I am retruning a table callled - 'tb_chosen'
+
+The method used here is from:
 https://excelquick.com/r-shiny/selectinput-dependent-on-another-input/
-2 metods listed here
+2 metods listed here 
+This is method 1
 
 
 ```{r select_nested_grouping, echo=FALSE}
@@ -80,16 +86,18 @@ selectInput(inputId="choose_grouping",
             selected="mixing")
 
 # display the second selectInput control - note that we can
-#  define the output further down in the R script, R will find the output
+# define the output further down in the R script, R will find the output
 
 uiOutput("cat_choice")
 
 #display the table with the user's choices from the selectInputs
 tableOutput("tb_chosen")
 
-output$tb_chosen <- renderTable(subset(df,
+output$tb_chosen <- renderTable(
+  subset(df,
  df$grouping==input$choose_grouping & 
- df$intervenion==input$choose_item), rownames = TRUE)
+ df$intervenion==input$choose_intervenion), 
+ rownames = TRUE)
 
 # The SECOND selectInput control
 # create an output variable based on the first control
@@ -100,17 +108,69 @@ output$tb_chosen <- renderTable(subset(df,
 #  because we have duplicate intervenion
 
 output$cat_choice <- renderUI({
-  selectInput(inputId="choose_item",
-            label="Select item",
+  selectInput(inputId="choose_intervenion",
+            label="Select intervenion",
             choices=unique(df 
             [df$grouping==input$choose_grouping,"intervenion"]))
 })
 
 ```
 
-## Build on this now I want now to say if you select mixing what type of mixing do you want to do and what site is it most like.
+## Build on this agian:
+## now I want now to say if you select mixing what type of mixing do you want to do
+## And what site is it most like.
+ Try with method 1 - this is not working for me
 
-```{r select_nested_grouping2,echo=FALSE }
+```{r select_nested_grouping2, eval=FALSE, include=FALSE}
+
+
+selectInput(inputId="choose_grouping",
+            label="Select grouping",
+            choices=unique(df$grouping),
+            selected="mixing")
+
+# display the second selectInput control - note that we can
+# define the output further down in the R script, R will find the output
+
+uiOutput("cat_choice")
+
+#display the table with the user's choices from the selectInputs
+tableOutput("tb_chosen")
+
+output$tb_chosen <- renderTable(
+  subset(df,
+ df$grouping==input$choose_grouping & 
+ df$intervenion==input$choose_intervenion &
+ df$site==input$choose_site
+   ), 
+ rownames = TRUE)
+
+# The SECOND selectInput control
+# create an output variable based on the first control
+# wrap the variable in a reactive function renderUI() 
+#  so that we can capture the dynamic output from
+#  the first selectInput.
+# We've used 'unique' when subsetting the choices
+#  because we have duplicate intervenion
+
+output$cat_choice <- renderUI({
+  selectInput(inputId="choose_intervenion",
+            label="Select intervenion",
+            choices=unique(df 
+            [df$grouping==input$choose_grouping|
+             df$intervenion==input$choose_intervenion,  "site"]))
+  
+  
+})
+
+```
+
+The try and do this using method 2 
+
+
+
+
+```{r method2, echo=FALSE}
 
 # create both selectInput selection control
 # in this example we also show how to add the controls
@@ -124,8 +184,8 @@ inputPanel(
             choices=unique(df$grouping),
             selected=unique(df$grouping)[1]),
 
- selectInput(inputId="choose_item2",
-            label="Select item2",
+ selectInput(inputId="choose_intervenion2",
+            label="Select intervenion2",
             choices=unique(df$intervenion),
             selected=unique(df$intervenion)[1])
 # end of inputPanel
@@ -133,13 +193,58 @@ inputPanel(
 
 tableOutput("tb_chosen2")
 
-output$tb_chosen2 <- renderTable(subset(df,df$grouping==input$choose_grouping2 & df$intervenion==input$choose_item2), rownames=TRUE)
+output$tb_chosen2 <- renderTable(subset(df,
+                                       df$grouping==input$choose_grouping2 &                                                           df$intervenion==input$choose_intervenion2), 
+                                       rownames=TRUE)
 
 # observe function which updates the second selectInput when the 
 #  first selectInput is changed
- observe({ updateSelectInput(session,
-                            inputId="choose_item2", choices=unique(df[df$grouping == input$choose_grouping2,"intervenion"])
-                            )
+observe({
+  updateSelectInput(session,
+                    inputId = "choose_intervenion2",
+                    choices = unique(df[df$grouping == input$choose_grouping2, "intervenion"]))
         })
+```
 
+method 2 with another layer
+
+```{r method2_site, echo=FALSE}
+
+# create both selectInput selection control
+# in this example we also show how to add the controls
+#  into a formatted input panel
+
+# start of inputPanel
+inputPanel(
+ 
+ selectInput(inputId="choose_grouping3",
+            label="Select grouping3",
+            choices=unique(df$grouping),
+            selected=unique(df$grouping)[1]),
+
+ selectInput(inputId="choose_intervenion3",
+            label="Select intervenion3",
+            choices=unique(df$intervenion),
+            selected=unique(df$intervenion)[1]),
+ 
+ selectInput(inputId="choose_site3",
+            label="Select site3",
+            choices=unique(df$site),
+            selected=unique(df$site)[1])
+# end of inputPanel
+          )
+
+tableOutput("tb_chosen3")
+
+output$tb_chosen3 <- renderTable(subset(df,
+                                       df$grouping==input$choose_grouping3 &                                                           df$intervenion==input$choose_intervenion3), 
+                                       rownames=TRUE)
+
+# observe function which updates the second selectInput when the 
+#  first selectInput is changed
+observe({
+  updateSelectInput(session,
+                    inputId = "choose_intervenion3",
+                    choices = unique(df[df$grouping == input$choose_grouping3, "intervenion"]))
+        })
 ```
