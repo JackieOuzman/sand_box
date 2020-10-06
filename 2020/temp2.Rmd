@@ -50,13 +50,16 @@ inputPanel(
 
 tableOutput("tb_chosen")
 
-output$tb_chosen <- renderTable(subset(choices_table,choices_table$category==input$choose_category & choices_table$items==input$choose_item), rownames=TRUE)
+output$tb_chosen <- renderTable(subset(choices_table,
+                                       choices_table$category==input$choose_category &                                                 choices_table$items==input$choose_item), 
+                                       rownames=TRUE)
 
 # observe function which updates the second selectInput when the 
 #  first selectInput is changed
- observe({ updateSelectInput(session,
-                            inputId="choose_item", choices=unique(choices_table[choices_table$category == input$choose_category,"items"])
-                            )
+observe({
+  updateSelectInput(session,
+                    inputId = "choose_item",
+                    choices = unique(choices_table[choices_table$category == input$choose_category, "items"]))
         })
 
 ```

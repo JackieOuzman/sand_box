@@ -4,7 +4,7 @@ author: "Jackie Ouzman"
 #date: "Last run: `r Sys.Date()`"
 date: "Last run: `r format(Sys.time(), '%d %B %Y')`"
 output: html_document
- 
+
 runtime: shiny
 ---
 
@@ -24,10 +24,13 @@ The idea is that I will have chucks of code and widgets that can be used in a R 
 ```{r import lib, include=FALSE}
 #install.packages("dplyr")
 
+
 library(dplyr)
 library(tidyverse)
 library(shiny)
 library(DT)
+library(flexdashboard)
+
 ```
 
 ## Bring in the template data
@@ -230,29 +233,115 @@ df_selection <- reactive({
 
 ```
 
-##  Creat a record of what was selected by making a df
-This df can be used in a reactive enviorment and can be feed into function
-or even as inputs.
+### step 2 - use selection as prefilled value
 
-Ahh this is not working what we want is a min value for the yield for the data selected
-and a max value (this will be the range to set with the slider input)
+I am skipping a step here so this documnet doesnt get too messy.
 
-Not even sure thats what you want because you might have times when you want the yield to be higher or lower
+I am using the template data and filtering it in a non dynamic way.
 
-Maybe I just want a text box?
+In the app this would be dynamic with a reactive object.
 
-```{r min_yld_max_yld, eval=FALSE, include=FALSE}
-tableOutput("df_minYld")
+The idea is that the default / prefilled value would be what the user selected.
 
-df_minYld <- reactive({
-   df %>% 
-   filter(grouping == input$data1&
-          intervenion==input$data2 &
-           site==input$data3  ) %>% 
-   select(grouping, intervenion, site, yield_t_ha ) %>% 
-   slice_min(yield_t_ha, n = 1)
-   
- })
-output$df_minYld <- renderTable(df_minYld())
+#### Yield slider
+
+This first one is the yield for all sites.
+In this example its 
+grouping        = mixing
+intervension    = spading
+
+The scale is:
+
+min yield value for the mixing / spading -1.5
+
+max yield value for the mixing / spading +1.5
+
+
+
+```{r min_yld_max_yld filter, echo=FALSE}
+
+
+#this would be in the input data that the user selected
+data_x <-  "mixing"  #"grouping"      input$data1
+data_y <- "spading"  #"intervenion"   input$data2
+data_z <- "Karoonda" #"site"          input$data3
+
+all_sites_mix_spad <-   subset(df,
+                           df$grouping == data_x  &
+                           df$intervenion == data_y )
+
+
+all_sites_mix_spad_yr1 <- all_sites_mix_spad %>% filter(year == 1)
+sliderInput(
+  inputId = "yield_year1",
+  label = h3("Yield t/ha yr 1"),
+  min =    round(min(all_sites_mix_spad_yr1$yield_t_ha), digits = 2)-1.5,
+  max =    round(max(all_sites_mix_spad_yr1$yield_t_ha), digits = 2)+1.5,
+  value =  round(mean(all_sites_mix_spad_yr1$yield_t_ha), digits = 2),
+  step =   0.01, round = TRUE
+  
+) 
+    
+output$value <- renderPrint({ input$yield_year1 })
 
 ```
+
+#### Cost slider
+
+This first one is the yield for all sites.
+In this example its 
+grouping        = mixing
+intervension    = spading
+
+Very similar to above
+The scale is:
+
+min cost value for the  mixing / spading  -20% (*0.8)
+
+max yield value for the mixing / spading  +20% (*1.1)
+
+
+
+```{r min_cost_max_cost filter, echo=FALSE}
+
+
+#this would be in the input data that the user selected
+data_x <-  "mixing"  #"grouping"      input$data1
+data_y <- "spading"  #"intervenion"   input$data2
+data_z <- "Karoonda" #"site"          input$data3
+
+all_sites_mix_spad <-   subset(df,
+                           df$grouping == data_x  &
+                           df$intervenion == data_y )
+
+
+all_sites_mix_spad_yr1 <- all_sites_mix_spad %>% filter(year == 1)
+sliderInput(
+  inputId = "cost_year1",
+  label = h3("Cost $per ha yr 1"),
+  min =    round(min(all_sites_mix_spad_yr1$cost_per_ha), digits = 2)*0.8,
+  max =    round(max(all_sites_mix_spad_yr1$cost_per_ha), digits = 2)*1.1,
+  value =  round(mean(all_sites_mix_spad_yr1$cost_per_ha), digits = 2),
+  step =   1.00, round = TRUE
+  
+) 
+    
+output$value <- renderPrint({ input$cost_year1 })
+
+```
+
+
+
+
+
+# Example of shiny app that look great
+
+This is a nice example of a app comparing 2 properties
+It also has a page just on area 
+We could think of the properties and areas as intervetions and grouping with more image
+
+https://shiny.rstudio.com/gallery/real-estate-investment.html
+
+Another example but this is for pasture in NZ
+
+https://shiny.rstudio.com/gallery/dairy-farms.html

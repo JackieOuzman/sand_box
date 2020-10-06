@@ -1,0 +1,88 @@
+---
+title: "Interactive components"
+output: flexdashboard::flex_dashboard
+runtime: shiny    
+---
+
+```{r import lib, include=FALSE}
+#install.packages("dplyr")
+
+
+library(dplyr)
+library(tidyverse)
+library(shiny)
+library(DT)
+library(flexdashboard)
+
+```
+
+
+```{r import_data, include=FALSE}
+df <- read_csv(file = "input_sheet_template.csv")
+
+head(df, 3)
+```
+
+##  Create text box to display the min and max values of for the intervention selected 
+
+I am skipping a step here so this documnet doesnt get too messy.
+I am using the template data and filtering it in a non dynamic way.
+In the app this would be dynamic with a reactive object.
+
+
+
+
+
+# Dashboard
+###  {.value-box}
+
+```{r}
+
+data_x <-  "mixing"  #"grouping"      input$data1
+data_y <- "spading"  #"intervenion"   input$data2
+data_z <- "Karoonda" #"site"          input$data3
+
+non_dynamic_subset <-   subset(df,
+                           df$grouping == data_x  &
+                             df$intervenion == data_y )
+renderValueBox({
+  valueBox(
+      value = paste0(
+        "Yield (t/ha) from: ",
+      min(non_dynamic_subset$yield_t_ha),
+      " to "  ,
+      max(non_dynamic_subset$yield_t_ha)),
+      caption = paste0("for all sites: ",  data_y),
+      icon = "fa-area-chart"
+  )
+})
+
+
+
+```
+
+
+```{r min_yld_max_yld filter, eval=FALSE, include=FALSE}
+
+
+#this would be in the input data that the user selected
+data_x <-  "mixing"  #"grouping"      input$data1
+data_y <- "spading"  #"intervenion"   input$data2
+data_z <- "Karoonda" #"site"          input$data3
+
+non_dynamic_subset <-   subset(df,
+                           df$grouping == data_x  &
+                             df$intervenion == data_y )
+
+
+non_dynamic_subset_summary <-
+  non_dynamic_subset %>% group_by(intervenion) %>%
+  summarise(
+    min_yld = min(yield_t_ha),
+    min_yld_site = site[which.min(yield_t_ha)],
+    max_yld = max(yield_t_ha),
+    max_yld_site = site[which.max(yield_t_ha)]
+  )
+
+
+```
