@@ -14,6 +14,8 @@ cost_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_f
                          sheet = "DT_cost")
 yld_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
                          sheet = "DT_yld")
+extra_cost_benefits_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
+                                          sheet = "DT_extra_cost_benefits")
 gapminder_df <- gapminder
 
 
@@ -73,10 +75,28 @@ MyChanges2 <- reactive({
   }
 })
 
+
+#################################################################################### 
+# Initiate your table for extra costs
+# the filtering will adjusted to reflect selection
+extra_selection <- extra_cost_benefits_table %>% filter(modification == "Ripping 40cm" &
+                                              site == "Murlong")
+previous_extra <- reactive({extra_selection[,4:8]})
+
+MyChanges3 <- reactive({
+  if(is.null(input$hotable3)){return(previous_extra())}
+  else if(!identical(previous_yld(),input$hotable3)){
+    # hot.to.df function will convert your updated table into the dataframe
+    as.data.frame(hot.to.df(input$hotable3))
+  }
+})
+
+
+
 output$hotable1 <- renderHotable({MyChanges()}, readOnly = F)
 #output$tbl = DT::renderDataTable(MyChanges())
 output$hotable2 <- renderHotable({MyChanges2()}, readOnly = F)
-
+output$hotable3 <- renderHotable({MyChanges3()}, readOnly = F)
 })
   
 
