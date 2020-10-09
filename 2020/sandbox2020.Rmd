@@ -23,14 +23,11 @@ The idea is that I will have chucks of code and widgets that can be used in a R 
 
 ```{r import lib, include=FALSE}
 #install.packages("dplyr")
-
-
 library(dplyr)
 library(tidyverse)
 library(shiny)
 library(DT)
 library(flexdashboard)
-
 ```
 
 ## Bring in the template data
@@ -41,7 +38,6 @@ The template data will guide the user with values, but they will be able to over
 
 ```{r import_data, echo=FALSE}
 df <- read_csv(file = "input_sheet_template.csv")
-
 #path <- file.path("C:","Users","ouz001","working_from_home","ripper","2020")
 #df <- read_csv(paste0(path, "/" ,"input_sheet_template.csv"))
 head(df, 3)
@@ -63,15 +59,11 @@ but the code that is running is what I am after.
 
 
 ```{r select_grouping, eval=FALSE, include=FALSE}
-
 #All we are doing here is selecting a grouping. 
 #Then it returns a df that is filtered for the selection.
-
-
 # df <- df %>% 
 #   filter(grouping == "mixing")
 # head(df, 10)
-
  radioButtons("grouping", label = h3("Grouping"), 
      choices = list("Mixing" = "mixing", "Fracturing" = "fracturing", "Fix pH" = "fix_pH"),
      selected = "mixing")
@@ -81,38 +73,29 @@ but the code that is running is what I am after.
  df_grouping <- df %>% 
     filter(grouping == input$grouping)
  })
-
-
 ```
 
 
 
 ```{r select_nested_grouping, eval=FALSE, include=FALSE}
-
 # The method used here is from:
 # https://excelquick.com/r-shiny/selectinput-dependent-on-another-input/
 # 2 metods listed here
 # This is method 1 - not used at this stage
-
 selectInput(inputId="choose_grouping",
             label="Select grouping",
             choices=unique(df$grouping),
             selected="mixing")
-
 # display the second selectInput control - note that we can
 # define the output further down in the R script, R will find the output
-
 uiOutput("cat_choice")
-
 #display the table with the user's choices from the selectInputs
 tableOutput("tb_chosen")
-
 output$tb_chosen <- renderTable(
   subset(df,
  df$grouping==input$choose_grouping & 
  df$intervenion==input$choose_intervenion), 
  rownames = TRUE)
-
 # The SECOND selectInput control
 # create an output variable based on the first control
 # wrap the variable in a reactive function renderUI() 
@@ -120,29 +103,24 @@ output$tb_chosen <- renderTable(
 #  the first selectInput.
 # We've used 'unique' when subsetting the choices
 #  because we have duplicate intervenion
-
 output$cat_choice <- renderUI({
   selectInput(inputId="choose_intervenion",
             label="Select intervenion",
             choices=unique(df 
             [df$grouping==input$choose_grouping,"intervenion"]))
 })
-
 ```
 
 
 
 ```{r method2, eval=FALSE, include=FALSE}
-
 # The method used here is from:
 # https://excelquick.com/r-shiny/selectinput-dependent-on-another-input/
 # 2 metods listed here
 # This is method 2 - not used at this stage
-
 # create both selectInput selection control
 # in this example we also show how to add the controls
 #  into a formatted input panel
-
 # start of inputPanel
 inputPanel(
  
@@ -150,20 +128,16 @@ inputPanel(
             label="Select grouping2",
             choices=unique(df$grouping),
             selected=unique(df$grouping)[1]),
-
  selectInput(inputId="choose_intervenion2",
             label="Select intervenion2",
             choices=unique(df$intervenion),
             selected=unique(df$intervenion)[1])
 # end of inputPanel
           )
-
 tableOutput("tb_chosen2")
-
 output$tb_chosen2 <- renderTable(subset(df,
                                        df$grouping==input$choose_grouping2 &                                                           df$intervenion==input$choose_intervenion2), 
                                        rownames=TRUE)
-
 # observe function which updates the second selectInput when the 
 #  first selectInput is changed
 observe({
@@ -178,14 +152,10 @@ This is the one I will use!
 
 
 ```{r method3_site, echo=FALSE}
-
-
 inputPanel(uiOutput("data1"),   ## uiOutput - gets the UI from the server
       uiOutput("data2"),
       uiOutput("data3"))
-
 tableOutput("tb_chosen3")
-
   
  output$data1 <- renderUI({
     selectInput("data1", "Select grouping",      
@@ -193,23 +163,21 @@ tableOutput("tb_chosen3")
   })
   ## input dependant on the choices in `data1`
    output$data2 <- renderUI({
-    selectInput("data2", "select intervenion",   
-                choices = c(df$intervenion[df$grouping == input$data1]))
+    selectInput("data2", "select modification",   
+                choices = c(df$modification
+[df$grouping == input$data1]))
    })
   ## input dependant on the choices in `data2`
   output$data3 <- renderUI({
     selectInput("data3", "select site",          
-                choices = c(df$site[df$intervenion == input$data2]))
+                choices = c(df$site[df$modification == input$data2]))
   })
-
 output$tb_chosen3 <- renderTable(subset(df,
-                                       df$grouping==input$data1 &                                                                      df$intervenion==input$data2 &
+                                       df$grouping==input$data1 &                                                                      df$modification==input$data2 &
                                        df$site==input$data3
                                        ), 
                                        rownames=TRUE)
-
  
-
 ```
 
 ##  Create a record of what was selected by making a df
@@ -218,19 +186,16 @@ or even as inputs.
 
 ```{r df_record_selection, echo=FALSE}
 tableOutput("df_selection")
-
 df_selection <- reactive({
    df %>% 
    filter(grouping == input$data1&
-          intervenion==input$data2 &
+          modification==input$data2 &
            site==input$data3  ) %>% 
-   select(grouping, intervenion, site ) %>% 
+   select(grouping, modification, site ) %>% 
     slice(1L)
    
  })
-
  output$df_selection <- renderTable(df_selection())
-
 ```
 
 ### step 2 - use selection as prefilled value
@@ -259,18 +224,13 @@ max yield value for the mixing / spading +1.5
 
 
 ```{r min_yld_max_yld filter, echo=FALSE}
-
-
 #this would be in the input data that the user selected
 data_x <-  "mixing"  #"grouping"      input$data1
-data_y <- "spading"  #"intervenion"   input$data2
+data_y <- "spading"  #"modification"   input$data2
 data_z <- "Karoonda" #"site"          input$data3
-
 all_sites_mix_spad <-   subset(df,
                            df$grouping == data_x  &
-                           df$intervenion == data_y )
-
-
+                           df$modification == data_y )
 all_sites_mix_spad_yr1 <- all_sites_mix_spad %>% filter(year == 1)
 sliderInput(
   inputId = "yield_year1",
@@ -283,7 +243,6 @@ sliderInput(
 ) 
     
 output$value <- renderPrint({ input$yield_year1 })
-
 ```
 
 #### Cost slider
@@ -291,7 +250,7 @@ output$value <- renderPrint({ input$yield_year1 })
 This first one is the yield for all sites.
 In this example its 
 grouping        = mixing
-intervension    = spading
+modification    = spading
 
 Very similar to above
 The scale is:
@@ -303,18 +262,13 @@ max yield value for the mixing / spading  +20% (*1.1)
 
 
 ```{r min_cost_max_cost filter, echo=FALSE}
-
-
 #this would be in the input data that the user selected
 data_x <-  "mixing"  #"grouping"      input$data1
-data_y <- "spading"  #"intervenion"   input$data2
+data_y <- "spading"  #"modification"   input$data2
 data_z <- "Karoonda" #"site"          input$data3
-
 all_sites_mix_spad <-   subset(df,
                            df$grouping == data_x  &
-                           df$intervenion == data_y )
-
-
+                           df$modification == data_y )
 all_sites_mix_spad_yr1 <- all_sites_mix_spad %>% filter(year == 1)
 sliderInput(
   inputId = "cost_year1",
@@ -327,7 +281,6 @@ sliderInput(
 ) 
     
 output$value <- renderPrint({ input$cost_year1 })
-
 ```
 
 
