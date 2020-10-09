@@ -1,11 +1,3 @@
-#devtools::install_github("AnalytixWare/ShinySky")
-
-
-library(shiny)
-library("gapminder")
-library(dplyr)
-library(ggplot2)
-library(shinysky)
 
 
 
@@ -13,20 +5,16 @@ library(shinysky)
 ui <- fluidPage(
 
   # Application title
-  titlePanel("Select outcome"),
+  titlePanel(h1("Select outcome")),
 
 inputPanel(uiOutput("data1"),   ## uiOutput - gets the UI from the server
            uiOutput("data2"),
            uiOutput("data3")),
-
-mainPanel(hotable("hotable1")
+h2("Cost of modification"),
+mainPanel(hotable("hotable1"),
+          h2("Yield t/ha"),         
+          (hotable("hotable2"))  
 ))
-##########################
-# ui <- fluidPage(
-#   titlePanel("test fluid"),
-#   mainPanel(hotable("hotable1")
-# 
-#   )
-# )
+
 
 

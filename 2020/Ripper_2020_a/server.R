@@ -1,4 +1,4 @@
-
+#devtools::install_github("AnalytixWare/ShinySky")
 #bring in the library that I will be working with
 library(shiny)
 library("gapminder")
@@ -10,6 +10,10 @@ library(shinysky)
 #read in the data that my app will use
 df <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
                  sheet = "DT_selection")
+cost_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
+                         sheet = "DT_cost")
+yld_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
+                         sheet = "DT_yld")
 gapminder_df <- gapminder
 
 
@@ -39,8 +43,11 @@ server <- shinyServer(function(input, output, session) {
   rownames=TRUE)
 
   #################################################################################### 
-  # Initiate your table
-  previous <- reactive({mtcars[1:10,]})
+  # Initiate your table for costs
+  # the filtering will adjusted to reflect selection
+  cost_table_selection <- cost_table %>% filter(modification == "Ripping 40cm" &
+                                                  site == "Murlong")
+  previous <- reactive({cost_table_selection[1:4,]})
   
   MyChanges <- reactive({
     if(is.null(input$hotable1)){return(previous())}
@@ -49,10 +56,39 @@ server <- shinyServer(function(input, output, session) {
       as.data.frame(hot.to.df(input$hotable1))
     }
   })
-  output$hotable1 <- renderHotable({MyChanges()}, readOnly = F)
-  output$tbl = DT::renderDataTable(MyChanges())
+  
+
+#################################################################################### 
+# Initiate your table for yld
+# the filtering will adjusted to reflect selection
+yld_table_selection <- yld_table %>% filter(modification == "Ripping 40cm" &
+                                                site == "Murlong")
+previous_yld <- reactive({yld_table_selection[,4:6]})
+
+MyChanges2 <- reactive({
+  if(is.null(input$hotable2)){return(previous_yld())}
+  else if(!identical(previous_yld(),input$hotable2)){
+    # hot.to.df function will convert your updated table into the dataframe
+    as.data.frame(hot.to.df(input$hotable2))
+  }
+})
+
+output$hotable1 <- renderHotable({MyChanges()}, readOnly = F)
+#output$tbl = DT::renderDataTable(MyChanges())
+output$hotable2 <- renderHotable({MyChanges2()}, readOnly = F)
+
 })
   
+
+
+
+
+
+
+
+
+
+
  ######################################################################## 
 # ### This is old part of app that is not plugged in  
 #   output$year_plot <- renderText({
