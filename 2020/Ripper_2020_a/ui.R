@@ -15,10 +15,12 @@ mainPanel(hotable("hotable1"),
           h2("Yield t/ha"),
           (hotable("hotable2")),
           h2("Extra cost or benefits make this wide"), 
-          (hotable("hotable3")
-           
-           )  
-))
+          (hotable("hotable3")),
+           (verbatimTextOutput("mod1")),
+            (verbatimTextOutput("site1")
+           )
+)  
+)
 
 
 

@@ -19,6 +19,21 @@ extra_cost_benefits_table <- read_excel("C:/Users/ouz001/working_from_home/rippe
 gapminder_df <- gapminder
 
 
+######################################################################################################
+## function that will be used as reactive #####
+
+
+function_cost_mod <- function(data2 ){
+  mod <- paste0("modification ", data2)
+return(mod)
+}
+function_cost_site <- function(data3 ){
+  site <- paste0("modification ", data3)
+  return(site)
+}
+
+
+
 # Define server logic required to draw a drop down
 server <- shinyServer(function(input, output, session) {
   
@@ -47,9 +62,11 @@ server <- shinyServer(function(input, output, session) {
   #################################################################################### 
   # Initiate your table for costs
   # the filtering will adjusted to reflect selection
-  cost_table_selection <- cost_table %>% filter(modification == "Ripping 40cm" &
-                                                  site == "Murlong")
-  previous <- reactive({cost_table_selection[1:4,]})
+   cost_table_selection <- cost_table %>% filter(modification == "Ripping 40cm" &
+                                                   site == "Murlong")
+ 
+  previous <- reactive({
+   cost_table_selection[1:4,]})
   
   MyChanges <- reactive({
     if(is.null(input$hotable1)){return(previous())}
@@ -91,12 +108,22 @@ MyChanges3 <- reactive({
   }
 })
 
-
+## call my function 
+mod <- reactive({
+  function_cost_mod(input$data2)
+})
+site <- reactive({
+  function_cost_site(input$data3)
+})
 
 output$hotable1 <- renderHotable({MyChanges()}, readOnly = F)
 #output$tbl = DT::renderDataTable(MyChanges())
 output$hotable2 <- renderHotable({MyChanges2()}, readOnly = F)
 output$hotable3 <- renderHotable({MyChanges3()}, readOnly = F)
+
+output$mod1 <- renderPrint(mod())
+output$site1 <- renderPrint(site())
+
 })
   
 
