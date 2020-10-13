@@ -5,7 +5,7 @@
 ui <- fluidPage(
 
   # Application title
-  titlePanel(h1("Select outcome")),
+  titlePanel(h1("Name of app")),
 
 inputPanel(uiOutput("data1"),   ## uiOutput - gets the UI from the server
            uiOutput("data2"),

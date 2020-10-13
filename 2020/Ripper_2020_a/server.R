@@ -1,3 +1,7 @@
+
+# if (require(devtools)) install.packages("devtools")#if not already installed
+# devtools::install_github("AnalytixWare/ShinySky")
+
 #devtools::install_github("AnalytixWare/ShinySky")
 #bring in the library that I will be working with
 library(shiny)
@@ -6,6 +10,7 @@ library(dplyr)
 library(ggplot2)
 library(readxl)
 library(shinysky)
+library(tidyverse)
 
 #read in the data that my app will use
 df <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
@@ -38,7 +43,7 @@ function_cost_site <- function(data3 ){
 server <- shinyServer(function(input, output, session) {
   
   output$data1 <- renderUI({
-    selectInput("data1", "Select grouping",
+    selectInput("data1", "What do you want to do to your soil?",
                 choices = c(df$grouping))
   })
   ## input dependant on the choices in `data1`
@@ -66,7 +71,7 @@ server <- shinyServer(function(input, output, session) {
                                                    site == "Murlong")
  
   previous <- reactive({
-   cost_table_selection[1:4,]})
+   cost_table_selection[1:4,4:7]})
   
   MyChanges <- reactive({
     if(is.null(input$hotable1)){return(previous())}
@@ -82,7 +87,7 @@ server <- shinyServer(function(input, output, session) {
 # the filtering will adjusted to reflect selection
 yld_table_selection <- yld_table %>% filter(modification == "Ripping 40cm" &
                                                 site == "Murlong")
-previous_yld <- reactive({yld_table_selection[,4:6]})
+previous_yld <- reactive({yld_table_selection[,4:8]})
 
 MyChanges2 <- reactive({
   if(is.null(input$hotable2)){return(previous_yld())}
@@ -96,9 +101,16 @@ MyChanges2 <- reactive({
 #################################################################################### 
 # Initiate your table for extra costs
 # the filtering will adjusted to reflect selection
-extra_selection <- extra_cost_benefits_table %>% filter(modification == "Ripping 40cm" &
+extra <- extra_cost_benefits_table %>% filter(modification == "Ripping 40cm" &
                                               site == "Murlong")
-previous_extra <- reactive({extra_selection[,4:8]})
+
+extra_selection <- extra %>% 
+  select(-grouping, -modification, -site) %>% 
+  mutate(year = paste0("year ", year)) %>% 
+  pivot_wider(names_from = year, values_from = value)%>% 
+  relocate(c(comments,`data source`), .after = last_col()) 
+
+previous_extra <- reactive({extra_selection[,1:8]})
 
 MyChanges3 <- reactive({
   if(is.null(input$hotable3)){return(previous_extra())}
