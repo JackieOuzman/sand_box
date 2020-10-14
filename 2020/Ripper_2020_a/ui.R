@@ -19,7 +19,7 @@ fluidRow(
 ),#fluid row bracket 2
   fluidRow(
     column(width=6,hotable("hotable1")),
-    column(width=6,hotable("hotable1_a")) #can't output the exact same tabel
+    column(width=6,hotable("hotable1a")) #can't output the exact same tabel
   ),#fluid row bracket 3
 ## Yield table
 fluidRow(
@@ -28,7 +28,7 @@ fluidRow(
 ),#fluid row bracket 4
 fluidRow(
   column(width=6,hotable("hotable2")),
-  column(width=6,hotable("hotable2_a")) #can't output the exact same tabel
+  column(width=6,hotable("hotable2a")) #can't output the exact same tabel
 ),#fluid row bracket 5
 
 ## Extra table
@@ -38,7 +38,7 @@ fluidRow(
 ),#fluid row bracket 6
 fluidRow(
   column(width=6,hotable("hotable3")),
-  column(width=6,hotable("hotable3_a")) #can't output the exact same tabel
+  column(width=6,hotable("hotable3a")) #can't output the exact same tabel
 ),#fluid row bracket 7
 
 ## Results

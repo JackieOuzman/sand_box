@@ -40,24 +40,41 @@ function_cost_site <- function(data3 ){
 
 
 
-# Define server logic required to draw a drop down
+# Define server logic required to draw a drop down sc2
 server <- shinyServer(function(input, output, session) {
-  
-  output$data1 <- renderUI({
-    selectInput("data1", "What do you want to do to your soil?",
+#### sc2  
+  output$data1_sc2 <- renderUI({
+    selectInput("data1_sc2", "What do you want to do to your soil?",
                 choices = c(df$grouping))
   })
   ## input dependant on the choices in `data1`
-  output$data2 <- renderUI({
-    selectInput("data2", "select modification",
+  output$data2_sc2 <- renderUI({
+    selectInput("data2_sc2", "select modification",
                 choices = c(df$modification
-                            [df$grouping == input$data1]))
+                            [df$grouping == input$data1_sc2]))
   })
   ## input dependant on the choices in `data2`
-  output$data3 <- renderUI({
-    selectInput("data3", "select site",
-                choices = c(df$site[df$modification == input$data2]))
+  output$data3_sc2 <- renderUI({
+    selectInput("data3_sc2", "select site",
+                choices = c(df$site[df$modification == input$data2_sc2]))
   })
+  
+#### sc1 
+     output$data1 <- renderUI({
+      selectInput("data1", "What do you want to do to your soil?",
+                  choices = c(df$grouping))
+    })
+    ## input dependant on the choices in `data1`
+    output$data2 <- renderUI({
+      selectInput("data2", "select modification",
+                  choices = c(df$modification
+                              [df$grouping == input$data1]))
+    })
+    ## input dependant on the choices in `data2`
+    output$data3 <- renderUI({
+      selectInput("data3", "select site",
+                  choices = c(df$site[df$modification == input$data2]))
+    })
 
   output$tb_chosen3 <- renderTable(subset(df,
                                           df$grouping==input$data1 &                                                                      df$modification==input$data2 &
@@ -70,7 +87,7 @@ server <- shinyServer(function(input, output, session) {
   # the filtering will adjusted to reflect selection
    cost_table_selection <- cost_table %>% filter(modification == "Ripping 40cm" &
                                                    site == "Murlong")
- 
+ ## Sc1
   previous <- reactive({
    cost_table_selection[1:4,4:7]})
   
@@ -81,10 +98,20 @@ server <- shinyServer(function(input, output, session) {
       as.data.frame(hot.to.df(input$hotable1))
     }
   })
+  ## sc2
+  previous_sc2<- reactive({
+    cost_table_selection[1:4,4:7]})
   
+  MyChanges_sc2 <- reactive({
+    if(is.null(input$hotable1a)){return(previous_sc2())}
+    else if(!identical(previous_sc2(),input$hotable1a)){
+      # hot.to.df function will convert your updated table into the dataframe
+      as.data.frame(hot.to.df(input$hotable1a))
+    }
+  })
 
 #################################################################################### 
-# Initiate your table for yld
+# Initiate your table for yld sc1
 # the filtering will adjusted to reflect selection
 yld_table_selection <- yld_table %>% filter(modification == "Ripping 40cm" &
                                                 site == "Murlong")
@@ -98,9 +125,22 @@ MyChanges2 <- reactive({
   }
 })
 
+# Initiate your table for yld sc1
+# the filtering will adjusted to reflect selection
+yld_table_selection <- yld_table %>% filter(modification == "Ripping 40cm" &
+                                              site == "Murlong")
+previous_yld_sc2 <- reactive({yld_table_selection[,4:9]})
+
+MyChanges2_sc2 <- reactive({
+  if(is.null(input$hotable2a)){return(previous_yld_sc2())}
+  else if(!identical(previous_yld_sc2(),input$hotable2a)){
+    # hot.to.df function will convert your updated table into the dataframe
+    as.data.frame(hot.to.df(input$hotable2a))
+  }
+})
 
 #################################################################################### 
-# Initiate your table for extra costs
+# Initiate your table for extra costs 
 # the filtering will adjusted to reflect selection
 extra <- extra_cost_benefits_table %>% filter(modification == "Ripping 40cm" &
                                               site == "Murlong")
@@ -112,7 +152,7 @@ extra_selection <- extra %>%
   relocate(c(comments,`data source`), .after = last_col()) 
 
 previous_extra <- reactive({extra_selection[,1:8]})
-
+## sc1
 MyChanges3 <- reactive({
   if(is.null(input$hotable3)){return(previous_extra())}
   else if(!identical(previous_yld(),input$hotable3)){
@@ -120,6 +160,16 @@ MyChanges3 <- reactive({
     as.data.frame(hot.to.df(input$hotable3))
   }
 })
+## sc2
+previous_extra <- reactive({extra_selection[,1:8]})
+MyChanges3_sc2 <- reactive({
+  if(is.null(input$hotable3a)){return(previous_extra())}
+  else if(!identical(previous_yld(),input$hotable3a)){
+    # hot.to.df function will convert your updated table into the dataframe
+    as.data.frame(hot.to.df(input$hotable3a))
+  }
+})
+
 
 ## call my function 
 mod <- reactive({
@@ -140,9 +190,11 @@ output$plot1 <- renderPlot({
      })
 
 output$hotable1 <- renderHotable({MyChanges()}, readOnly = F)
-#output$tbl = DT::renderDataTable(MyChanges())
+output$hotable1a <- renderHotable({MyChanges_sc2()}, readOnly = F)
 output$hotable2 <- renderHotable({MyChanges2()}, readOnly = F)
+output$hotable2a <- renderHotable({MyChanges2_sc2()}, readOnly = F)
 output$hotable3 <- renderHotable({MyChanges3()}, readOnly = F)
+output$hotable3a <- renderHotable({MyChanges3_sc2()}, readOnly = F)
 
 output$mod1 <- renderPrint(mod())
 output$site1 <- renderPrint(site())
