@@ -1,6 +1,7 @@
+if (require(devtools)) install.packages("devtools")#if not already installed
+devtools::install_github("AnalytixWare/ShinySky")
 
-
-
+library(shinysky)
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
