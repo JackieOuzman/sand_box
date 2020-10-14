@@ -23,6 +23,7 @@ extra_cost_benefits_table <- read_excel("C:/Users/ouz001/working_from_home/rippe
                                           sheet = "DT_extra_cost_benefits")
 gapminder_df <- gapminder
 
+sc1_2 <- read.csv("C:/Users/ouz001/working_from_home/ripper/2020/sc1_2.csv")
 
 ######################################################################################################
 ## function that will be used as reactive #####
@@ -87,7 +88,7 @@ server <- shinyServer(function(input, output, session) {
 # the filtering will adjusted to reflect selection
 yld_table_selection <- yld_table %>% filter(modification == "Ripping 40cm" &
                                                 site == "Murlong")
-previous_yld <- reactive({yld_table_selection[,4:8]})
+previous_yld <- reactive({yld_table_selection[,4:9]})
 
 MyChanges2 <- reactive({
   if(is.null(input$hotable2)){return(previous_yld())}
@@ -128,6 +129,16 @@ site <- reactive({
   function_cost_site(input$data3)
 })
 
+
+output$plot1 <- renderPlot({
+       #filter(gapminder_df, year== input$year_plot) %>% This the bit that will be defined by user inputs
+  ggplot(data= sc1_2, aes(x= year_numb, y = value, colour = scenario))+
+    geom_line()+
+    theme_bw()+
+    xlab("Years after modification") + ylab("Undiscounted cash flow $/ha") +
+    ggtitle("Scenarios")
+     })
+
 output$hotable1 <- renderHotable({MyChanges()}, readOnly = F)
 #output$tbl = DT::renderDataTable(MyChanges())
 output$hotable2 <- renderHotable({MyChanges2()}, readOnly = F)
@@ -135,6 +146,7 @@ output$hotable3 <- renderHotable({MyChanges3()}, readOnly = F)
 
 output$mod1 <- renderPrint(mod())
 output$site1 <- renderPrint(site())
+
 
 })
   
