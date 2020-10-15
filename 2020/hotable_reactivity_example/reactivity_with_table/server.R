@@ -19,8 +19,6 @@ extra_cost_benefits_table <- read_excel("C:/Users/ouz001/working_from_home/rippe
                                           sheet = "DT_extra_cost_benefits")
 
 
-sc1_2 <- read.csv("C:/Users/ouz001/working_from_home/ripper/2020/sc1_2.csv") #won't need this later
-
 ######################################################################################################
 
 
@@ -56,11 +54,16 @@ server <- shinyServer(function(input, output, session) {
   # Initiate the table for costs
   
   # the filtering will adjusted to reflect selection
-   cost_table_selection <- cost_table %>% filter(modification == "Ripping 40cm" &
-                                                   site == "Murlong")
- ## Sc1
+   # cost_table_selection <- cost_table %>% filter(modification == "Ripping 40cm" &
+   #                                                 site == "Murlong")
+  
+    #cost_table_selection <- reactive_filter()
+ 
+  ## Sc1
   previous <- reactive({
-   cost_table_selection[1:4,4:7]})
+   #cost_table_selection[1:4,4:7]
+    reactive_filter_cost()
+    })
   
   MyChanges <- reactive({
     if(is.null(input$hotable1)){return(previous())}
@@ -84,9 +87,11 @@ site <- reactive({
 })
 
 #reactive step for filter
-reactive_filter <- reactive({
+reactive_filter_cost <- reactive({
      filter(cost_table, modification == input$data1&
-              site == input$data2)
+              site == input$data2)%>% 
+    select(activity , price, comments, `data source`)
+  
    })
 
 #############################################################################################
@@ -111,7 +116,7 @@ output$mod1 <-     renderPrint(mod())
 output$site1 <-    renderPrint(site())
 
 output$cost_tb1 <- renderPrint({
-    reactive_filter()
+  reactive_filter_cost()
   })
 
 
