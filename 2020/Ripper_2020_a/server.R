@@ -1,16 +1,12 @@
 
-# if (require(devtools)) install.packages("devtools")#if not already installed
-# devtools::install_github("AnalytixWare/ShinySky")
+
 
 #devtools::install_github("AnalytixWare/ShinySky")
-#bring in the library that I will be working with
-library(shiny)
-library("gapminder")
-library(dplyr)
-library(ggplot2)
-library(readxl)
-library(shinysky)
-library(tidyverse)
+
+require(shiny)
+require(shinysky)
+
+
 
 #read in the data that my app will use
 df <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
@@ -21,9 +17,9 @@ yld_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_fr
                          sheet = "DT_yld")
 extra_cost_benefits_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
                                           sheet = "DT_extra_cost_benefits")
-gapminder_df <- gapminder
 
-sc1_2 <- read.csv("C:/Users/ouz001/working_from_home/ripper/2020/sc1_2.csv")
+
+sc1_2 <- read.csv("C:/Users/ouz001/working_from_home/ripper/2020/sc1_2.csv") #won't need this later
 
 ######################################################################################################
 ## function that will be used as reactive #####
@@ -38,11 +34,31 @@ function_cost_site <- function(data3 ){
   return(site)
 }
 
-
+##############################################################################################
+#### server ##################################################################################
 
 # Define server logic required to draw a drop down sc2
 server <- shinyServer(function(input, output, session) {
-#### sc2  
+
+######## sc1 this function renders the drop down  ########################################
+  output$data1 <- renderUI({
+    selectInput("data1", "What do you want to do to your soil?",
+                choices = c(df$grouping))
+  })
+  ## input dependant on the choices in `data1`
+  output$data2 <- renderUI({
+    selectInput("data2", "select modification",
+                choices = c(df$modification
+                            [df$grouping == input$data1]))
+  })
+  ## input dependant on the choices in `data2`
+  output$data3 <- renderUI({
+    selectInput("data3", "select site",
+                choices = c(df$site[df$modification == input$data2]))
+  }) 
+  
+  
+  ######## sc2 this function renders the drop down ? do we want 2 ###################################
   output$data1_sc2 <- renderUI({
     selectInput("data1_sc2", "What do you want to do to your soil?",
                 choices = c(df$grouping))
@@ -59,22 +75,7 @@ server <- shinyServer(function(input, output, session) {
                 choices = c(df$site[df$modification == input$data2_sc2]))
   })
   
-#### sc1 
-     output$data1 <- renderUI({
-      selectInput("data1", "What do you want to do to your soil?",
-                  choices = c(df$grouping))
-    })
-    ## input dependant on the choices in `data1`
-    output$data2 <- renderUI({
-      selectInput("data2", "select modification",
-                  choices = c(df$modification
-                              [df$grouping == input$data1]))
-    })
-    ## input dependant on the choices in `data2`
-    output$data3 <- renderUI({
-      selectInput("data3", "select site",
-                  choices = c(df$site[df$modification == input$data2]))
-    })
+
 
   output$tb_chosen3 <- renderTable(subset(df,
                                           df$grouping==input$data1 &                                                                      df$modification==input$data2 &
@@ -83,7 +84,8 @@ server <- shinyServer(function(input, output, session) {
   rownames=TRUE)
 
   #################################################################################### 
-  # Initiate your table for costs
+  # Initiate the table for costs
+  
   # the filtering will adjusted to reflect selection
    cost_table_selection <- cost_table %>% filter(modification == "Ripping 40cm" &
                                                    site == "Murlong")
@@ -144,7 +146,7 @@ MyChanges2_sc2 <- reactive({
 # the filtering will adjusted to reflect selection
 extra <- extra_cost_benefits_table %>% filter(modification == "Ripping 40cm" &
                                               site == "Murlong")
-
+#this step changes the format to display the data
 extra_selection <- extra %>% 
   select(-grouping, -modification, -site) %>% 
   mutate(year = paste0("year ", year)) %>% 
@@ -155,7 +157,7 @@ previous_extra <- reactive({extra_selection[,1:8]})
 ## sc1
 MyChanges3 <- reactive({
   if(is.null(input$hotable3)){return(previous_extra())}
-  else if(!identical(previous_yld(),input$hotable3)){
+  else if(!identical(previous_extra(),input$hotable3)){
     # hot.to.df function will convert your updated table into the dataframe
     as.data.frame(hot.to.df(input$hotable3))
   }
@@ -164,7 +166,7 @@ MyChanges3 <- reactive({
 previous_extra <- reactive({extra_selection[,1:8]})
 MyChanges3_sc2 <- reactive({
   if(is.null(input$hotable3a)){return(previous_extra())}
-  else if(!identical(previous_yld(),input$hotable3a)){
+  else if(!identical(previous_extra(),input$hotable3a)){
     # hot.to.df function will convert your updated table into the dataframe
     as.data.frame(hot.to.df(input$hotable3a))
   }
