@@ -20,5 +20,25 @@ server <- shinyServer(function(input, output, session) {
   output$tbl = DT::renderDataTable(MyChanges())
 })
 
-ui <- basicPage(mainPanel(column(6,hotable("hotable1")),column(6,DT::dataTableOutput('tbl'))))
+#ui <- basicPage(mainPanel(column(6,hotable("hotable1")),column(6,DT::dataTableOutput('tbl')))) #this is working
+ # ui <- fluidPage(
+ #   titlePanel("test fluid"),
+ #   sidebarLayout(
+ #     sidebarPanel(hotable("hotable1")),
+ #     #sidebarPanel(hotable("hotable1")),
+ #     mainPanel(DT::dataTableOutput('tbl')
+ #     )
+ #   )
+ # )
+ # 
+       
+ui <- fluidPage(
+  titlePanel("test fluid"),
+    mainPanel(hotable("hotable1"),
+              mainPanel(hotable("hotable1"))
+    
+  )
+)
+
+
 shinyApp(ui, server)
