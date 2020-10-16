@@ -25,7 +25,7 @@ if (interactive()) {
       inputId = "dataset", 
       label = "Data:",
       choices = c(
-        "iris", "mtcars", "economics", 
+        "mtcars","iris",  "economics", 
         "midwest", "mpg", "mpg_na", "msleep", "diamonds",
         "faithfuld", "txhousing"
       ),
@@ -95,3 +95,4 @@ if (interactive()) {
   shinyApp(ui, server)
   
 }
+

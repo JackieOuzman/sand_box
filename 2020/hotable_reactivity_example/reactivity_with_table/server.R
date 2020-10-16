@@ -31,13 +31,15 @@ server <- shinyServer(function(input, output, session) {
 ######## sc1 this function renders the drop down  ########################################
   output$data1 <- renderUI({
     selectInput("data1", "select modification",
-                choices = c(df$modification))
+                choices = c(unique(df$modification)),
+                selected = "Ploughing")
   })
   ## input dependant on the choices in `data1`
   output$data2 <- renderUI({
     selectInput("data2", "select modification",
-                choices = c(df$site
-                            [df$modification == input$data1]))
+                choices = c(unique(df$site
+                            [df$modification == input$data1])),
+                selected = "Cadgee")
   })
  
   
@@ -61,8 +63,7 @@ server <- shinyServer(function(input, output, session) {
  
   ## Sc1
   previous <- reactive({
-   #cost_table_selection[1:4,4:7]
-    reactive_filter_cost()
+      reactive_filter_cost()
     })
   
   MyChanges <- reactive({
@@ -89,8 +90,8 @@ site <- reactive({
 #reactive step for filter
 reactive_filter_cost <- reactive({
      filter(cost_table, modification == input$data1&
-              site == input$data2)%>% 
-    select(activity , price, comments, `data source`)
+               site == input$data2)%>% 
+     select(activity , price, comments, `data source`)
   
    })
 
@@ -118,7 +119,9 @@ output$site1 <-    renderPrint(site())
 output$cost_tb1 <- renderPrint({
   reactive_filter_cost()
   })
-
+output$cost_tb2 <- renderDataTable({
+  reactive_filter_cost()
+})
 
 })
   

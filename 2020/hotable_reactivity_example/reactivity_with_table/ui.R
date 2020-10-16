@@ -3,7 +3,7 @@
 library("devtools")
 library(shiny)
 library("gapminder")
-library(dplyr)
+library(dplyr,warn.conflicts = FALSE)
 library(ggplot2)
 library(readxl)
 library(shinysky)
@@ -34,9 +34,12 @@ fluidRow(
 fluidRow(
   column(width=6,verbatimTextOutput("mod1")),
   column(width=6,verbatimTextOutput("cost_tb1"))
-)#fluid row bracket 4
+),#fluid row bracket 4
 
-
+fluidRow(
+  column(width=6,dataTableOutput("cost_tb2"))
+  
+)#fluid row bracket 5
 ) #fluidPage bracket
 
    
