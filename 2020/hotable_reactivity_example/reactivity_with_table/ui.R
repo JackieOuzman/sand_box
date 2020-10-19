@@ -9,7 +9,8 @@ library(readxl)
 library(shinysky)
 #library(AnalytixWare)
 library(tidyverse)
-library(shinysky)
+#library(shinysky)
+library(rhandsontable)
 
 
 
@@ -25,22 +26,27 @@ fluidRow(
   column(width=4, uiOutput("data3"))
 ),#fluid row bracket 1
 ## Cost table
+ fluidRow(
+   column(width=6,h2("Cost of modification Scenario 1"))
+ ),#fluid row bracket 2
+ fluidRow(
+     column(width=6,rHandsontableOutput("cost"))
+ ),#fluid row bracket 3
+ fluidRow(
+   column(width=6,verbatimTextOutput("cost_tb1")) #this is just a check
+ ),#fluid row bracket 4
 fluidRow(
-  column(width=6,h2("Cost of modification Scenario 1"))
-),#fluid row bracket 2
-  fluidRow(
-    column(width=6,hotable("hotable1")),
-       ),#fluid row bracket 3
+  column(width=6,actionButton("saveBtn", "Save")) 
+),#fluid row bracket 5
 fluidRow(
-  column(width=6,verbatimTextOutput("mod1")),
-  column(width=6,verbatimTextOutput("cost_tb1"))
-),#fluid row bracket 4
+  column(width=6,rHandsontableOutput("cost2")) 
+),#fluid row bracket 6
+fluidRow(
+  column(width=6,plotOutput("plot1")) 
+)#fluid row bracket 7
 
-fluidRow(
-  column(width=6,dataTableOutput("cost_tb2"))
-  
-)#fluid row bracket 5
 ) #fluidPage bracket
+
 
    
 

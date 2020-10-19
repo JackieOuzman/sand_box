@@ -4,7 +4,8 @@
 #devtools::install_github("AnalytixWare/ShinySky")
 
 require(shiny)
-require(shinysky)
+#require(shinysky)
+require(rhandsontable)
 
 
 
@@ -13,10 +14,10 @@ df <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework
                  sheet = "DT_selection")
 cost_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
                          sheet = "DT_cost")
-yld_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
-                         sheet = "DT_yld")
-extra_cost_benefits_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
-                                          sheet = "DT_extra_cost_benefits")
+# yld_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
+#                          sheet = "DT_yld")
+# extra_cost_benefits_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
+#                                           sheet = "DT_extra_cost_benefits")
 
 
 ######################################################################################################
@@ -52,75 +53,52 @@ server <- shinyServer(function(input, output, session) {
   ),
   rownames=TRUE)
 
-  #################################################################################### 
-  # Initiate the table for costs
   
-  # the filtering will adjusted to reflect selection
-   # cost_table_selection <- cost_table %>% filter(modification == "Ripping 40cm" &
-   #                                                 site == "Murlong")
-  
-    #cost_table_selection <- reactive_filter()
- 
-  ## Sc1
-  previous <- reactive({
-      reactive_filter_cost()
-    })
-  
-  MyChanges <- reactive({
-    if(is.null(input$hotable1)){return(previous())}
-    else if(!identical(previous(),input$hotable1)){
-      # hot.to.df function will convert your updated table into the dataframe
-      as.data.frame(hot.to.df(input$hotable1))
-    }
-  })
-  
-
-
 ####################################################################################################  
 ##### reactivity ####
 
-## make input into reactivity so it can be used? 
-mod <- reactive({
-  function_cost_mod(input$data1)
-})
-site <- reactive({
-  function_cost_site(input$data2)
-})
 
 #reactive step for filter
 reactive_filter_cost <- reactive({
-     filter(cost_table, modification == input$data1&
-               site == input$data2)%>% 
+     filter(cost_table, 
+            modification == input$data1  &
+            site == input$data2)   %>% 
      select(activity , price, comments, `data source`)
   
    })
 
+
+
 #############################################################################################
 ###  functions 
-function_cost_mod <- function(data1 ){
-  mod <- paste0("modification ", data1)
-  return(mod)
-}
-#lets make a more complicated function like the one I might use
-function_cost_site <- function(data2 ){
-  mod <- paste0("modification ", data2)
-  return(mod)
-}
-  
+
 
 
 ######################################################################################################
 #### outputs
 
-output$hotable1 <- renderHotable({MyChanges()}, readOnly = F)
-output$mod1 <-     renderPrint(mod())
-output$site1 <-    renderPrint(site())
-
-output$cost_tb1 <- renderPrint({
-  reactive_filter_cost()
+output$cost <- renderRHandsontable({
+    rhandsontable(reactive_filter_cost()) #converts the R dataframe to rhandsontable object
+  })  
+ 
+output$cost_tb1 <- renderPrint({   #this is just a check
+  reactive_filter_cost() #this has my filtering reactive object
   })
-output$cost_tb2 <- renderDataTable({
-  reactive_filter_cost()
+
+observeEvent(input$saveBtn, write.csv(hot_to_r(input$cost),
+                                      file = "test.csv",
+                                      row.names = FALSE))
+
+      
+             
+output$cost2 <- renderRHandsontable({
+  rhandsontable(datavalues$data) #converts the R dataframe to rhandsontable object
+})  
+
+output$plot1 <- renderPlot({
+  ggplot(data = hot_to_r(input$cost), aes(x = activity , y = price))+
+    geom_col()
+  
 })
 
 })
