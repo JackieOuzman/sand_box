@@ -1,15 +1,9 @@
 
 #bring in the library that I will be working with
-library("devtools")
 library(shiny)
-library("gapminder")
-library(dplyr,warn.conflicts = FALSE)
 library(ggplot2)
 library(readxl)
-library(shinysky)
-#library(AnalytixWare)
 library(tidyverse)
-#library(shinysky)
 library(rhandsontable)
 
 

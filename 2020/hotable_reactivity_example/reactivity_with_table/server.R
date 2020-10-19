@@ -1,10 +1,9 @@
 
 
 
-#devtools::install_github("AnalytixWare/ShinySky")
+
 
 require(shiny)
-#require(shinysky)
 require(rhandsontable)
 
 
