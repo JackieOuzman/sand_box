@@ -28,22 +28,22 @@ extra_sc1 <- extra_cost_benefits_table_test %>% filter(modification == "Ripping 
 rm(cost_table_test, yld_table_test, extra_cost_benefits_table_test)
 
 
-function_economics_tb_sc1 <- function(cost_sc1,yld_sc1, extra_sc1, sc1, run_of_years ){
+function_economics_tb_sc1 <- function(cost_sc_x,yld_sc_x, extra_sc_x, sc_x, run_of_years ){
 
 
 ## replace all na with 0 value
-cost_sc1[is.na(cost_sc1)] <- 0
-yld_sc1[is.na(yld_sc1)] <- 0
-extra_sc1[is.na(extra_sc1)] <- 0
+cost_sc_x[is.na(cost_sc_x)] <- 0
+yld_sc_x[is.na(yld_sc_x)] <- 0
+extra_sc_x[is.na(extra_sc_x)] <- 0
 
 #value of yield
-yld_sc1 <- yld_sc1 %>% 
+yld_sc_x <- yld_sc_x %>% 
   mutate(yld_gain_value = (`yield (modified)` - `yield  (un modified)`) * price) %>% 
-  mutate(scenario = paste0("scenario ", sc1)) %>% 
+  mutate(scenario = paste0("scenario ", sc_x)) %>% 
   select(scenario, year, yld_gain_value )
 
 #add a clm that has type is it a cost or saving
-extra_sc1 <- extra_sc1 %>% 
+extra_sc_x <- extra_sc_x %>% 
   mutate(type =  case_when(
     activity == "additional costs ($/ha)" ~ "cost",
     activity == "cost harvesting and handling extra grain $/t" ~ "cost",
@@ -51,57 +51,61 @@ extra_sc1 <- extra_sc1 %>%
     TRUE ~ activity
   ))
 
-extra_benefits_cost_sc1 <- extra_sc1 %>% 
+extra_benefits_cost_sc_x <- extra_sc_x %>% 
   group_by(year, type ) %>% 
   summarise(value = sum(value, na.rm = TRUE)) %>% 
  ungroup()
 
-extra_benefits_sc1 <-  extra_benefits_cost_sc1 %>% 
+extra_benefits_sc_x <-  extra_benefits_cost_sc_x %>% 
   filter(type == "benefit") %>% 
-  mutate(scenario = paste0("scenario ", sc1)) %>% 
+  mutate(scenario = paste0("scenario ", sc_x)) %>% 
   select(scenario, year, value )
 
 #Add the beneifits to the yld table
-benefits_sc1 <- left_join(yld_sc1, extra_benefits_sc1) %>% 
+benefits_sc_x <- left_join(yld_sc_x, extra_benefits_sc_x) %>% 
   mutate(total_benefit = yld_gain_value + value) %>% 
   select(scenario  ,  year, total_benefit )
 
 
 
 ##### now for the costs
-extra_cost_sc1 <-  extra_benefits_cost_sc1 %>% 
+extra_cost_sc_x <-  extra_benefits_cost_sc_x %>% 
   filter(type == "cost") %>% 
-  mutate(scenario = paste0("scenario ", sc1)) %>% 
+  mutate(scenario = paste0("scenario ", sc_x)) %>% 
   select(scenario, year, value ) %>% 
   rename(total_cost =value)
 
 
 
 ### inital costs
-intial_cost_sc1 <- cost_sc1 %>% 
+intial_cost_sc_x <- cost_sc_x %>% 
   summarise(total_cost = sum(price, na.rm = TRUE)) %>% 
-  mutate(scenario = paste0("scenario ", sc1)) %>% 
+  mutate(scenario = paste0("scenario ", sc_x)) %>% 
   mutate(year = 0) %>% 
   select(scenario, year, total_cost )
 
 
 
-total_cost_sc1 <- rbind(intial_cost_sc1, extra_cost_sc1)
-economics_tbl_sc1 <- left_join(total_cost_sc1, benefits_sc1)
-economics_tbl_sc1[is.na(economics_tbl_sc1)] <- 0
-economics_tbl_sc1 <- economics_tbl_sc1 %>% 
+total_cost_sc_x <- rbind(intial_cost_sc_x, extra_cost_sc_x)
+economics_tbl_sc_x <- left_join(total_cost_sc_x, benefits_sc_x)
+economics_tbl_sc_x[is.na(economics_tbl_sc_x)] <- 0
+economics_tbl_sc_x <- economics_tbl_sc_x %>% 
   mutate(undiscounted_cash_flow = total_benefit - total_cost)
 
-economics_tbl_sc1 <- economics_tbl_sc1[ 1: (run_of_years+1),]
+economics_tbl_sc_x <- economics_tbl_sc_x[ 1: (run_of_years+1),]
 
 
 
-return(economics_tbl_sc1)
+return(economics_tbl_sc_x)
 }
 
 ### use the function
 economics_tbl_sc1 <- function_economics_tb_sc1(cost_sc1,yld_sc1, extra_sc1, 1, 3)
 economics_tbl_sc2 <- function_economics_tb_sc1(cost_sc1,yld_sc1, extra_sc1, 2, 3)
+ 
+economics_tbl_sc1_sc2 <- bind_rows(economics_tbl_sc1, economics_tbl_sc2)
+
+
 
 #### STOP and check it has worked
 
@@ -109,8 +113,7 @@ economics_tbl_sc2 <- function_economics_tb_sc1(cost_sc1,yld_sc1, extra_sc1, 2, 3
 print(economics_tbl_sc1)
 print(economics_tbl_sc2)
 
-ggplot(data= economics_tbl_sc1, aes(x= year, y = undiscounted_cash_flow))+
-#ggplot(data= economics_tbl_sc1_2, aes(x= year_numb, y = value, colour = scenario))+
+ggplot(data= economics_tbl_sc1_sc2, aes(x= year, y = undiscounted_cash_flow, colour = scenario))+
   geom_line()+
   theme_bw()+
   xlab("Years after modification") + ylab("Undiscounted cash flow $/ha") +
