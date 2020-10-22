@@ -45,19 +45,35 @@ server <- shinyServer(function(input, output, session) {
                             [df$modification == input$data1])),
                 selected = "Cadgee")
   })
-
-  
-  
-  
-  ###########################################################################################
-
+  ##############################################################################################
   output$tb_chosen3 <- renderTable(subset(df,
                                           df$modification==input$data1 &                                                                      df$modification==input$data2 &
                                             df$site==input$data2
   ),
   rownames=TRUE)
-
   
+  
+  
+  ###########################################################################################
+  
+  shinyalert(
+    title = "What the name of your farm / analysis?", 
+    type = "input",
+    #text = "This ia draft app",
+    size = "s", 
+    closeOnEsc = TRUE,
+    closeOnClickOutside = FALSE,
+    html = FALSE,
+    showConfirmButton = TRUE,
+    showCancelButton = FALSE,
+    confirmButtonText = "OK",
+    confirmButtonCol = "#AEDEF4",
+    timer = 0,
+    imageUrl = "",
+    animation = TRUE
+  )
+  
+
 ####################################################################################################  
 ##### reactivity ####
 
@@ -181,6 +197,9 @@ reactive_filter_cost <- reactive({
  #   return(Undiscounted_cash_flow)
  # }
 
+  
+ 
+                                      
 ######################################################################################################
 #### outputs
 
@@ -224,10 +243,15 @@ output$plot2 <- renderPlot({
     ggtitle("Undiscounted cash flow")
 })
 
-
-# output$plot2 <- renderPlot({
-#   reactive_plot2()
-# })
+observeEvent(input$preview, {
+  # Show a modal when the button is pressed
+  shinyalert("Inital costs include", 
+  HTML("This is the first line. 
+      This should be the second.
+       Third line
+       etc..."))
+})
+ 
 
 })
   

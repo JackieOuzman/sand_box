@@ -5,6 +5,7 @@ library(ggplot2)
 library(readxl)
 library(tidyverse)
 library(rhandsontable)
+library(shinyalert)
 
 
 
@@ -49,7 +50,12 @@ fluidRow(
 ),#fluid bracket 9
  fluidRow(
    column(width=6,plotOutput("plot2")) 
- )#fluid row bracket 10
+ ),#fluid row bracket 10
+
+fluidRow(
+  column(width=6,useShinyalert(),  # Set up shinyalert
+         actionButton("preview", "More information on costs")) 
+)#fluid row bracket 11
 
 ) #fluidPage bracket
 
