@@ -40,9 +40,14 @@ fluidRow(
 ),#fluid row bracket 7
 fluidRow(
   column(width=6,verbatimTextOutput("economic_tb1")) #this is just a check
-)#fluid row bracket 8
+),#fluid row bracket 8
+fluidRow(
+  column(width=6,selectInput("years", label = h3("years for analysis"), 
+                             choices = list("1 Year" = 1, "2 Year" = 2, "3 Year" = 3,
+                                            "4 Year" = 4, "5 Year" = 5), 
+                             selected = 3)) 
+)#fluid bracket 9
 
-#economic_tb1
 
 ) #fluidPage bracket
 

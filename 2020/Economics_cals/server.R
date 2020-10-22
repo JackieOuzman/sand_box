@@ -40,12 +40,13 @@ server <- shinyServer(function(input, output, session) {
   })
   ## input dependant on the choices in `data1`
   output$data2 <- renderUI({
-    selectInput("data2", "select modification",
+    selectInput("data2", "select site",
                 choices = c(unique(df$site
                             [df$modification == input$data1])),
                 selected = "Cadgee")
   })
- 
+
+  
   
   
   ###########################################################################################
@@ -70,17 +71,14 @@ reactive_filter_cost <- reactive({
   
    })
  reactive_economics <- reactive({
- economics_tbl_sc1 <- function_economics_tb_sc1(hot_to_r(input$cost), yld_table, extra_table, 1, 3)
- economics_tbl_sc2 <- function_economics_tb_sc1(hot_to_r(input$cost), yld_table, extra_table, 2, 3)
+ economics_tbl_sc1 <- function_economics_tb_sc1(hot_to_r(input$cost), yld_table, extra_table, 1, as.double(input$years))
+ economics_tbl_sc2 <- function_economics_tb_sc1(hot_to_r(input$cost), yld_table, extra_table, 2, as.double(input$years))
  
  economics_tbl_sc1_sc2 <- bind_rows(economics_tbl_sc1, economics_tbl_sc2)
-  economics_tbl_sc1_sc2
+ economics_tbl_sc1_sc2
  })
 
-# reactive_economics <- reactive({
-#     economics_tbl_sc1 <- function_economics_tb_sc1(hot_to_r(input$cost)) 
-#     economics_tbl_sc1
-#   })
+
   
 #############################################################################################
 ###  functions 
