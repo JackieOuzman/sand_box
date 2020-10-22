@@ -46,8 +46,10 @@ fluidRow(
                              choices = list("1 Year" = 1, "2 Year" = 2, "3 Year" = 3,
                                             "4 Year" = 4, "5 Year" = 5), 
                              selected = 3)) 
-)#fluid bracket 9
-
+),#fluid bracket 9
+ fluidRow(
+   column(width=6,plotOutput("plot2")) 
+ )#fluid row bracket 10
 
 ) #fluidPage bracket
 

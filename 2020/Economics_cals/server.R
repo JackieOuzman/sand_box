@@ -79,17 +79,18 @@ reactive_filter_cost <- reactive({
  })
 
 
+  reactive_plot2 <- reactive({
+ function_economics_tb_sc1(reactive_economics()) 
+  })
+ 
   
 #############################################################################################
 ###  functions 
 
   
-#Function that bring togther the input data table and creates a df with economics
-  
-  
+#Function 1 - that bring togther the input data table and creates a df with economics
   function_economics_tb_sc1 <- function(cost_sc_x, yld_sc_x, extra_sc_x, sc_x, run_of_years ){
   
-    
     ## replace all na with 0 value
     cost_sc_x[is.na(cost_sc_x)] <- 0
     yld_sc_x[is.na(yld_sc_x)] <- 0
@@ -143,8 +144,6 @@ reactive_filter_cost <- reactive({
       mutate(year = 0) %>%
       select(scenario, year, total_cost )
 
-
-
     total_cost_sc_x <- rbind(intial_cost_sc_x, extra_cost_sc_x)
     economics_tbl_sc_x <- left_join(total_cost_sc_x, benefits_sc_x)
     economics_tbl_sc_x[is.na(economics_tbl_sc_x)] <- 0
@@ -153,14 +152,34 @@ reactive_filter_cost <- reactive({
 
     economics_tbl_sc_x <- economics_tbl_sc_x[ 1: (run_of_years+1),]
 
-
-
     return(economics_tbl_sc_x)
   }
   
+#function 2 - plots the results This is not working as a reactive element - not sure why?
   
-  
-  
+ # function_graph_cashflow <- function(economics_tbl_sc1_sc2){
+ # 
+ #   x_max <- max(economics_tbl_sc1_sc2$year)
+ #   x_min <- 1
+ #   y_max <- filter(economics_tbl_sc1_sc2, year != 0) %>%
+ #     summarise(max = max(undiscounted_cash_flow))
+ #   y_min <- filter(economics_tbl_sc1_sc2, year != 0) %>%
+ #     summarise(min = min(undiscounted_cash_flow))
+ # 
+ # 
+ #   Undiscounted_cash_flow <- ggplot(data= economics_tbl_sc1_sc2, aes(x= year, y = undiscounted_cash_flow, colour = scenario))+
+ #     geom_line()+
+ #     geom_hline(yintercept=0, linetype="dashed",
+ #                color = "black", size=0.5)+
+ #     theme_bw()+
+ #     scale_x_continuous(limits = c(x_min, x_max), breaks = seq(0, 5, by = 1))+
+ #     scale_y_continuous(limits = c(y_min[[1]], y_max[[1]]))+
+ #     xlab("Years after modification") + ylab("$/ha") +
+ #     ggtitle("Undiscounted cash flow")
+ # 
+ # 
+ #   return(Undiscounted_cash_flow)
+ # }
 
 ######################################################################################################
 #### outputs
@@ -192,7 +211,23 @@ output$economic_tb1 <- renderPrint({   #this is just a check
   reactive_economics() #this has my filtering reactive object
 })
 
+output$plot2 <- renderPlot({
 
+    ggplot(data= reactive_economics(), aes(x= year, y = undiscounted_cash_flow, colour = scenario))+
+    geom_line()+
+    geom_hline(yintercept=0, linetype="dashed",
+               color = "black", size=0.5)+
+    theme_bw()+
+    #scale_x_continuous(limits = c(x_min, x_max), breaks = seq(0, 5, by = 1))+
+    #scale_y_continuous(limits = c(y_min[[1]], y_max[[1]]))+
+    xlab("Years after modification") + ylab("$/ha") +
+    ggtitle("Undiscounted cash flow")
+})
+
+
+# output$plot2 <- renderPlot({
+#   reactive_plot2()
+# })
 
 })
   
