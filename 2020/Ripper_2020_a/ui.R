@@ -1,46 +1,47 @@
 
 #bring in the library that I will be working with
-library("devtools")
 library(shiny)
-library("gapminder")
-library(dplyr)
 library(ggplot2)
 library(readxl)
-library(shinysky)
-#library(AnalytixWare)
 library(tidyverse)
-library(shinysky)
+library(rhandsontable)
+library(shinyalert)
 
 
 
-# Define UI for application that draws a histogram
+# Define UI 
 ui <- fluidPage(
 
   # Application title
   titlePanel(h1("Name of app")),
-
+############################################################################################################
+#################                  options to filter the data       ########################################
+############################################################################################################
 fluidRow(
-  column(width=4, uiOutput("data1")),   ## uiOutput - gets the UI from the server
-  column(width=4, uiOutput("data2")),
-  column(width=4, uiOutput("data3"))
+  column(width=6, uiOutput("data1")),   ## uiOutput - gets the UI from the server
+  column(width=6, uiOutput("data2"))   #remove on of this one?
 ),#fluid row bracket 1
+############################################################################################################
+##############################            the tables         ###############################################
+############################################################################################################
 ## Cost table
 fluidRow(
   column(width=6,h2("Cost of modification Scenario 1")),
   column(width=6,h2("Cost of modification Scenario 2"))
 ),#fluid row bracket 2
   fluidRow(
-    column(width=6,hotable("hotable1")),
-    column(width=6,hotable("hotable1a")) #can't output the exact same tabel
+    column(width=6,rHandsontableOutput("cost_sc1")),
+    column(width=6,rHandsontableOutput("cost_sc2")) #can't output the exact same tabel
   ),#fluid row bracket 3
+
 ## Yield table
 fluidRow(
   column(width=6,h2("Yield t/ha Scenario 1")),
   column(width=6,h2("Yield t/ha Scenario 2"))
 ),#fluid row bracket 4
 fluidRow(
-  column(width=6,hotable("hotable2")),
-  column(width=6,hotable("hotable2a")) #can't output the exact same tabel
+  column(width=6,rHandsontableOutput("yld_sc1")),
+  column(width=6,rHandsontableOutput("yld_sc2")) 
 ),#fluid row bracket 5
 
 ## Extra table
@@ -49,23 +50,57 @@ fluidRow(
   column(width=6,h2("Extra cost or benefits Scenario 2"))
 ),#fluid row bracket 6
 fluidRow(
-  column(width=6,hotable("hotable3")),
-  column(width=6,hotable("hotable3a")) #can't output the exact same tabel
+  column(width=6,rHandsontableOutput("extra_sc1")),
+  column(width=6,rHandsontableOutput("extra_sc2")) 
 ),#fluid row bracket 7
 
-## Results
+############################################################################################################
+##############################            results         ###############################################
+############################################################################################################
+
+#select number of years
+fluidRow(
+  column(width=6,selectInput("years", label = h3("years for analysis"), 
+                             choices = list("1 Year" = 1, "2 Year" = 2, "3 Year" = 3,
+                                            "4 Year" = 4, "5 Year" = 5), 
+                             selected = 3)) 
+),#fluid bracket 8
+
+#heading for results
 fluidRow(
   column(width=12,h2("Results Scenario 1 and 2"))
-),#fluid row bracket 8
-fluidRow(
-  column(width=12,plotOutput("plot1")),
-  
 ),#fluid row bracket 9
+
+fluidRow(
+  column(width=6,plotOutput("plot1")) 
+),#fluid row bracket 10
+
+fluidRow(
+  column(width=6,verbatimTextOutput("economic_tb1")) #this is just a check
+),#fluid row bracket 11
+
+############################################################################################################
+##############################            action buttons         ###########################################
+############################################################################################################
+
+fluidRow(
+  column(width=6,useShinyalert(),  # Set up shinyalert
+         actionButton("preview", "More information on costs")) 
+),#fluid row bracket 12
+
+fluidRow(
+  column(width=6,actionButton("saveBtn", "Save")) 
+)#fluid row bracket 13
+
+############################################################################################################
+##############################            end of UI              ###########################################
+############################################################################################################
+
+
 ) #fluidPage bracket
 
    
-##(verbatimTextOutput("mod1")), #change this to graph see below
-##  (verbatimTextOutput("site1"))
+
 
 
 
