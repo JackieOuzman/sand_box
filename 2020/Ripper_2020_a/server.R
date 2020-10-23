@@ -15,7 +15,7 @@ extra_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_
                                           sheet = "DT_extra_cost_benefits")
 
 
-#sc1_2 <- read.csv("C:/Users/ouz001/working_from_home/ripper/2020/sc1_2.csv") #won't need this later
+
 
 ######################################################################################################
 #########################                       server               #################################
