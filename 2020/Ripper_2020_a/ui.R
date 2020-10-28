@@ -13,21 +13,23 @@ library(shinyalert)
 ui <- fluidPage(
 
   # Application title
-  titlePanel(h1("Name of app")),
+  titlePanel(uiOutput("data2")),
 ############################################################################################################
 #################                  options to filter the data       ########################################
 ############################################################################################################
 fluidRow(
-  column(width=6, uiOutput("data1")),   ## uiOutput - gets the UI from the server
-  column(width=6, uiOutput("data2"))   #remove on of this one?
+  column(width=6, uiOutput("data1_scen1")),   ## uiOutput - gets the UI from the server
+  column(width=6, uiOutput("data1_scen2"))   #remove on of this one?
 ),#fluid row bracket 1
 ############################################################################################################
 ##############################            the tables         ###############################################
 ############################################################################################################
 ## Cost table
 fluidRow(
-  column(width=6,h2("Cost of modification Scenario 1")),
-  column(width=6,h2("Cost of modification Scenario 2"))
+  column(width=4,h2("Cost of modification Scenario 1")),
+  column(width=2,useShinyalert(),  # Set up shinyalert
+           actionButton("cost", "More information on costs")), 
+  column(width=4,h2("Cost of modification Scenario 2"))
 ),#fluid row bracket 2
   fluidRow(
     column(width=6,rHandsontableOutput("cost_sc1")),
@@ -36,8 +38,10 @@ fluidRow(
 
 ## Yield table
 fluidRow(
-  column(width=6,h2("Yield t/ha Scenario 1")),
-  column(width=6,h2("Yield t/ha Scenario 2"))
+  column(width=4,h2("Yield t/ha Scenario 1")),
+  column(width=2,useShinyalert(),  # Set up shinyalert
+         actionButton("yield", "More information on yield")), 
+  column(width=4,h2("Yield t/ha Scenario 2"))
 ),#fluid row bracket 4
 fluidRow(
   column(width=6,rHandsontableOutput("yld_sc1")),
@@ -47,6 +51,8 @@ fluidRow(
 ## Extra table
 fluidRow(
   column(width=6,h2("Extra cost or benefits Scenario 1")),
+  column(width=2,useShinyalert(),  # Set up shinyalert
+         actionButton("extra", "More information on yield")), 
   column(width=6,h2("Extra cost or benefits Scenario 2"))
 ),#fluid row bracket 6
 fluidRow(
@@ -83,14 +89,10 @@ fluidRow(
 ##############################            action buttons         ###########################################
 ############################################################################################################
 
-fluidRow(
-  column(width=6,useShinyalert(),  # Set up shinyalert
-         actionButton("preview", "More information on costs")) 
-),#fluid row bracket 12
 
 fluidRow(
   column(width=6,actionButton("saveBtn", "Save")) 
-)#fluid row bracket 13
+)#fluid row bracket 12
 
 ############################################################################################################
 ##############################            end of UI              ###########################################

@@ -32,8 +32,14 @@ server <- shinyServer(function(input, output, session) {
   
 ######## sc1   #######################################################################################
  
-  output$data1 <- renderUI({
-    selectInput("data1", "select modification",
+  output$data1_scen1 <- renderUI({
+    selectInput("data1_scen1", "modification for scenario 1",
+                choices = c(unique(df$modification)),
+                selected = "Ploughing")
+  })
+  
+  output$data1_scen2 <- renderUI({
+    selectInput("data1_scen2", "modification for scenario 2",
                 choices = c(unique(df$modification)),
                 selected = "Ploughing")
   })
@@ -41,7 +47,7 @@ server <- shinyServer(function(input, output, session) {
   output$data2 <- renderUI({
     selectInput("data2", "select site",
                 choices = c(unique(df$site
-                                   [df$modification == input$data1])),
+                                   [df$modification == input$data1_scen1])),
                 selected = "Cadgee")
   })
 
@@ -50,7 +56,7 @@ server <- shinyServer(function(input, output, session) {
 ######################################################################################################
 
   output$tb_chosen3 <- renderTable(subset(df,
-                                          df$modification==input$data1 &                                                                      df$modification==input$data2 &
+                                          df$modification==input$data1_scen1 &                                                                      df$modification==input$data2 &
                                             df$site==input$data2
   ),
   rownames=TRUE)
@@ -86,14 +92,14 @@ server <- shinyServer(function(input, output, session) {
 ######## cost table sc1 and sc2 ########
 reactive_filter_cost_sc1 <- reactive({
     filter(cost_table, 
-           modification == input$data1  &
+           modification == input$data1_scen1  &
              site == input$data2)   %>% 
       select(activity , price, comments, `data source`)
   })
   
 reactive_filter_cost_sc2 <- reactive({
     filter(cost_table, 
-           modification == input$data1  &
+           modification == input$data1_scen2  &
              site == input$data2)   %>% 
       select(activity , price, comments, `data source`)
   })
@@ -101,14 +107,14 @@ reactive_filter_cost_sc2 <- reactive({
 ########   yld table sc1 and sc2   ########
 reactive_filter_yld_sc1 <- reactive({
   filter(yld_table, 
-         modification == input$data1  &
+         modification == input$data1_scen1  &
            site == input$data2)   %>% 
     select(year, crop, `yield  (un modified)`, `yield (modified)`,price, `data source` )
 })
 
 reactive_filter_yld_sc2 <- reactive({
   filter(yld_table, 
-         modification == input$data1  &
+         modification == input$data1_scen2  &
            site == input$data2)   %>% 
     select(year, crop, `yield  (un modified)`, `yield (modified)`, price, `data source`)
 })
@@ -116,7 +122,7 @@ reactive_filter_yld_sc2 <- reactive({
 ########   extra table sc1 and sc2   ########
 reactive_filter_extra_sc1 <- reactive({
   filter(extra_table, 
-         modification == input$data1  &
+         modification == input$data1_scen1  &
            site == input$data2)   %>% 
     #select(activity ,year, value, `data source`)
     select(activity ,`year 1`, `year 2`,`year 3`,`year 4`,`year 5`, `data source`)
@@ -124,7 +130,7 @@ reactive_filter_extra_sc1 <- reactive({
 
 reactive_filter_extra_sc2 <- reactive({
   filter(extra_table, 
-         modification == input$data1  &
+         modification == input$data1_scen2  &
            site == input$data2)   %>% 
     select(activity ,`year 1`, `year 2`,`year 3`,`year 4`,`year 5`, `data source`)
     #select(activity ,year, value, `data source`)
@@ -148,8 +154,10 @@ reactive_filter_extra_sc2 <- reactive({
   })
  
   reactive_plot2 <- reactive({
-    function_economics_tb_sc1(reactive_economics()) 
-  })
+    function_graph_cashflow(reactive_economics()) 
+    })
+  
+  
   
 #############################################################################################
 ####################                  functions        #####################################
@@ -240,6 +248,33 @@ reactive_filter_extra_sc2 <- reactive({
   }
   
   
+#### function for the graph  
+  function_graph_cashflow <- function(economics_tbl_sc1_sc2 ){
+    
+    x_max <- max(economics_tbl_sc1_sc2$year) 
+    x_min <- 1 
+    y_max <- filter(economics_tbl_sc1_sc2, year != 0) %>% 
+      summarise(max = max(undiscounted_cash_flow))
+    y_min <- filter(economics_tbl_sc1_sc2, year != 0) %>% 
+      summarise(min = min(undiscounted_cash_flow))
+    
+    
+    Undiscounted_cash_flow <- 
+      ggplot(data= economics_tbl_sc1_sc2, aes(x= year, y = undiscounted_cash_flow, colour = scenario))+
+      geom_line()+
+      geom_hline(yintercept=0, linetype="dashed", 
+                 color = "black", size=0.5)+
+      theme_bw()+
+      scale_x_continuous(limits = c(x_min, x_max), breaks = seq(0, 5, by = 1))+
+      scale_y_continuous(limits = c(y_min[[1]], y_max[[1]]))+
+      xlab("Years after modification") + ylab("$/ha") +
+      ggtitle("Undiscounted cash flow")
+    
+    
+    return(Undiscounted_cash_flow)
+  }
+  
+  
 #############################################################################################
 ####################                  outputs        #####################################
 ############################################################################################# 
@@ -297,20 +332,28 @@ observeEvent(input$saveBtn, write.csv(hot_to_r(input$cost),
                                         row.names = FALSE))
 
 
-output$plot2 <- renderPlot({
-  
-  ggplot(data= reactive_economics(), aes(x= year, y = undiscounted_cash_flow, colour = scenario))+
-    geom_line()+
-    geom_hline(yintercept=0, linetype="dashed",
-               color = "black", size=0.5)+
-    theme_bw()+
-    #scale_x_continuous(limits = c(x_min, x_max), breaks = seq(0, 5, by = 1))+
-    #scale_y_continuous(limits = c(y_min[[1]], y_max[[1]]))+
-    xlab("Years after modification") + ylab("$/ha") +
-    ggtitle("Undiscounted cash flow")
+#this is the plot 
+output$plot2 <- renderPrint({reactive_plot2()})
+
+observeEvent(input$cost, {
+  # Show a modal when the button is pressed
+  shinyalert("Inital costs include", 
+             HTML("This is the first line. 
+      This should be the second.
+       Third line
+       etc..."))
 })
 
-observeEvent(input$preview, {
+observeEvent(input$yield, {
+  # Show a modal when the button is pressed
+  shinyalert("Inital costs include", 
+             HTML("This is the first line. 
+      This should be the second.
+       Third line
+       etc..."))
+})
+
+observeEvent(input$extra, {
   # Show a modal when the button is pressed
   shinyalert("Inital costs include", 
              HTML("This is the first line. 
