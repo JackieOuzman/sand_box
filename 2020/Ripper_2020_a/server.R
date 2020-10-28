@@ -14,7 +14,10 @@ yld_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_fr
 extra_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
                                           sheet = "DT_extra_cost_benefits")
 
-
+   extra_table <- extra_table %>% 
+   mutate(year = paste0("year ", year)) %>% 
+   pivot_wider(names_from = year, values_from = value) %>% 
+   relocate(c(comments,`data source`), .after = last_col()) 
 
 
 ######################################################################################################
@@ -115,19 +118,22 @@ reactive_filter_extra_sc1 <- reactive({
   filter(extra_table, 
          modification == input$data1  &
            site == input$data2)   %>% 
-    select(activity ,year, value, `data source`)
+    #select(activity ,year, value, `data source`)
+    select(activity ,`year 1`, `year 2`,`year 3`,`year 4`,`year 5`, `data source`)
 })
 
 reactive_filter_extra_sc2 <- reactive({
   filter(extra_table, 
          modification == input$data1  &
            site == input$data2)   %>% 
-    select(activity ,year, value, `data source`)
+    select(activity ,`year 1`, `year 2`,`year 3`,`year 4`,`year 5`, `data source`)
+    #select(activity ,year, value, `data source`)
 })
 
 
 ######   cost_sc1 yld_sc1 extra_sc1
   reactive_economics <- reactive({
+    
     economics_tbl_sc1 <- function_economics_tb_sc1(hot_to_r(input$cost_sc1), 
                                                    hot_to_r(input$yld_sc1), 
                                                    hot_to_r(input$extra_sc1), 
@@ -152,7 +158,23 @@ reactive_filter_extra_sc2 <- reactive({
   
   #Function 1 - that bring togther the input data table and creates a df with economics
   function_economics_tb_sc1 <- function(cost_sc_x, yld_sc_x, extra_sc_x, sc_x, run_of_years ){
-    
+   
+    #change extra table from wide to narrow
+     extra_sc_x <- extra_sc_x %>% 
+       rename("1" = "year 1",
+              "2" = "year 2",
+              "3" = "year 3",
+              "4" = "year 4",
+              "5" = "year 5")
+     
+     
+     extra_sc_x <- extra_sc_x %>% 
+       pivot_longer(cols = c(`1`, `2`, `3`, `4`, `5` ),
+                     names_to = "year",
+                   values_to = "value"
+       )
+    extra_sc_x$year <- as.double(extra_sc_x$year)
+     
     ## replace all na with 0 value
     cost_sc_x[is.na(cost_sc_x)] <- 0
     yld_sc_x[is.na(yld_sc_x)] <- 0
@@ -239,13 +261,7 @@ output$yld_sc2 <- renderRHandsontable({
   rhandsontable(reactive_filter_yld_sc2()) 
 })
 
-### yld tables
-output$extra_sc1 <- renderRHandsontable({
-  rhandsontable(reactive_filter_extra_sc1()) 
-})
-output$extra_sc2 <- renderRHandsontable({
-  rhandsontable(reactive_filter_extra_sc2()) 
-})
+
 
 ### extra tables
 output$extra_sc1 <- renderRHandsontable({
@@ -280,9 +296,6 @@ observeEvent(input$saveBtn, write.csv(hot_to_r(input$cost),
                                         file = "test.csv",
                                         row.names = FALSE))
 
-output$cost2 <- renderRHandsontable({
-  rhandsontable(datavalues$data) #converts the R dataframe to rhandsontable object
-})  
 
 output$plot2 <- renderPlot({
   
