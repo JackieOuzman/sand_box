@@ -6,21 +6,53 @@ library(readxl)
 library(tidyverse)
 library(rhandsontable)
 library(shinyalert)
+library(shinydashboard)
+
 
 
 
 # Define UI 
-ui <- fluidPage(
-
-  # Application title
-  titlePanel(uiOutput("data2")),
+#ui <- fluidPage(
+ui <-dashboardPage(
+  dashboardHeader(title = ""),
+ 
+  
 ############################################################################################################
 #################                  options to filter the data       ########################################
 ############################################################################################################
+dashboardSidebar(disable = TRUE),
+dashboardBody(
+
+fluidRow(
+   box(
+     title = "Site", width = 4, solidHeader = TRUE, status = "primary",
+     
+    uiOutput("data2")
+   ), #box sites
+  
+
+   box(
+      title = "Constraint", width = 8, solidHeader = TRUE, status = "primary",
+  
+   infoBoxOutput("non_wetting"),
+   infoBoxOutput("acidic"),
+   infoBoxOutput("physical"),
+   valueBoxOutput("rainfall")
+  
+ ) #box Constraint
+),#fluid row 1
+
+#temp
+fluidRow(
+  verbatimTextOutput(outputId = "test")
+),#fluid row 2
+
+  
 fluidRow(
   column(width=6, uiOutput("data1_scen1")),   ## uiOutput - gets the UI from the server
   column(width=6, uiOutput("data1_scen2"))   #remove on of this one?
-),#fluid row bracket 1
+),#fluid row bracket 2
+
 ############################################################################################################
 ##############################            the tables         ###############################################
 ############################################################################################################
@@ -101,7 +133,7 @@ fluidRow(
 
 ) #fluidPage bracket
 
-   
+)  #dashboard body bracket
 
 
 

@@ -1,11 +1,13 @@
 require(shiny)
 require(rhandsontable)
-
+require(shinydashboard)
 ######################################################################################################
 #####                       bring in the data the app will use       #################################
 ######################################################################################################
 
 df <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
+                 sheet = "DT_selection")
+df_info <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
                  sheet = "DT_selection")
 cost_table <- read_excel("C:/Users/ouz001/working_from_home/ripper/2020/malcom_framework.xlsx", 
                          sheet = "DT_cost")
@@ -45,7 +47,7 @@ server <- shinyServer(function(input, output, session) {
   })
   ## input dependant on the choices in `data1`
   output$data2 <- renderUI({
-    selectInput("data2", "select site",
+    selectInput("data2", "select",
                 choices = c(unique(df$site
                                    [df$modification == input$data1_scen1])),
                 selected = "Cadgee")
@@ -56,7 +58,7 @@ server <- shinyServer(function(input, output, session) {
 ######################################################################################################
 
   output$tb_chosen3 <- renderTable(subset(df,
-                                          df$modification==input$data1_scen1 &                                                                      df$modification==input$data2 &
+                                          df$modification==input$data1_scen1 & df$modification==input$data2 &
                                             df$site==input$data2
   ),
   rownames=TRUE)
@@ -89,6 +91,17 @@ server <- shinyServer(function(input, output, session) {
 ##################                     reactivity                              #######################
 ###################################################################################################### 
 
+  
+## df for the info boxs about the site
+reactive_df_info <- reactive({
+    filter(df_info, 
+           site == input$data2)    %>% 
+      select("non-wetting", "acidic", "physical", "rainfall_mean_annual") %>% 
+      unique()
+    
+  })
+  
+  
 ######## cost table sc1 and sc2 ########
 reactive_filter_cost_sc1 <- reactive({
     filter(cost_table, 
@@ -279,6 +292,37 @@ reactive_filter_extra_sc2 <- reactive({
 ####################                  outputs        #####################################
 ############################################################################################# 
  
+
+  output$non_wetting <- renderInfoBox({
+    valueBox(value = tags$p("non-wetting", style = "font-size: 50%;"),
+             subtitle = "",
+             icon = NULL,
+             color = paste0(reactive_df_info()[1,1]))
+  })
+  output$acidic <- renderInfoBox({
+    valueBox(value = tags$p("acidic", style = "font-size: 50%;"),
+             subtitle = "",
+             icon = NULL,
+             color = paste0(reactive_df_info()[1,2]))
+  })
+  output$physical <- renderInfoBox({
+    valueBox(value = tags$p("physical", style = "font-size: 50%;"),
+             subtitle = "",
+             icon = NULL,
+             color = paste0(reactive_df_info()[1,3]))
+  })
+
+  output$rainfall <- renderValueBox({
+    valueBox(
+      value = paste0(round(reactive_df_info()[1,4]),2), 
+      subtitle = "Mean Annual rainfall",
+      icon = icon("cloud"), # not working??
+      color = "blue"
+    )
+  })
+
+  
+  
 ### cost tables
 output$cost_sc1 <- renderRHandsontable({
     rhandsontable(reactive_filter_cost_sc1()) #converts the R dataframe to rhandsontable object
@@ -361,6 +405,8 @@ observeEvent(input$extra, {
        Third line
        etc..."))
 })
+
+output$test <- renderPrint(reactive_df_info()) 
 
 
 })
